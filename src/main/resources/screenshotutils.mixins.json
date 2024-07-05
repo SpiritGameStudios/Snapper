@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "ca.worldwidepixel.screenshotutils.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "HugeScreenshotInvoker",
+    "TitleScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}
