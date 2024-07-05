@@ -44,13 +44,6 @@ public class ScreenshotListWidget extends ElementListWidget<ScreenshotListWidget
         File[] screenshots = screenshotDir.listFiles();
         //Arrays.sort(screenshots);
         Arrays.sort(screenshots, (f1, f2) -> Long.valueOf(f1.lastModified()).compareTo(f2.lastModified()));
-        // FLIP ARRAY, https://stackoverflow.com/questions/2137755/how-do-i-reverse-an-int-array-in-java
-        for(int i = 0; i < screenshots.length / 2; i++)
-        {
-            File temp = screenshots[i];
-            screenshots[i] = screenshots[screenshots.length - i - 1];
-            screenshots[screenshots.length - i - 1] = temp;
-        }
         for (File screenshot : screenshots) {
             if (Files.isDirectory(screenshot.toPath())) {
                 screenshots = ArrayUtils.removeElement(screenshots, screenshot);
@@ -69,7 +62,7 @@ public class ScreenshotListWidget extends ElementListWidget<ScreenshotListWidget
     public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight) throws IOException {
         super(client, width, height, y, itemHeight);
         for (int i = 0; i < getScreenshots().length; i++) {
-            this.addEntry(new Entry(getScreenshots(), i, client));
+            this.addEntryToTop(new Entry(getScreenshots(), i, client));
         }
     }
 
