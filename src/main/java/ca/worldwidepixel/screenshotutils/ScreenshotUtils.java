@@ -1,6 +1,7 @@
 package ca.worldwidepixel.screenshotutils;
 
 import ca.worldwidepixel.screenshotutils.mixin.HugeScreenshotInvoker;
+import ca.worldwidepixel.screenshotutils.screen.screenshot.ScreenshotScreen;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -15,11 +16,18 @@ import org.slf4j.LoggerFactory;
 
 public class ScreenshotUtils implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("screenshotutils");
+	private static KeyBinding screenshotMenuKey;
 	private static KeyBinding panoramaKey;
 	private static KeyBinding hugeShotKey;
 
 	@Override
 	public void onInitialize() {
+		screenshotMenuKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+				"key.screenshotutils.screenshotMenu",
+				InputUtil.Type.KEYSYM,
+				GLFW.GLFW_KEY_M,
+				"key.categories.misc"
+		));
 		panoramaKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.screenshotutils.panorama",
 				InputUtil.Type.KEYSYM,
@@ -34,6 +42,9 @@ public class ScreenshotUtils implements ModInitializer {
 		));*/
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			while (screenshotMenuKey.wasPressed()) {
+				client.setScreen(new ScreenshotScreen());
+			}
 			while (panoramaKey.wasPressed()) {
 				client.takePanorama(client.runDirectory, 1024, 1024);
 			}

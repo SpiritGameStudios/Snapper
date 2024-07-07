@@ -1,6 +1,7 @@
 package ca.worldwidepixel.screenshotutils.screen.screenshot;
 
 import ca.worldwidepixel.screenshotutils.ScreenshotUtils;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
@@ -8,21 +9,40 @@ import net.minecraft.client.gui.widget.*;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class ScreenshotScreen extends Screen {
     public ScreenshotScreen() {
         super(Text.translatable("menu.screenshotutils.screenshotmenu"));
     }
 
-    public File[] getScreenshots() {
+    private File[] getScreenshots() throws IOException {
         File screenshotDir = new File(client.runDirectory, "screenshots");
         File[] screenshots = screenshotDir.listFiles();
-        Arrays.sort(screenshots);
+        //Arrays.sort(screenshots);
+        Arrays.sort(screenshots, (f1, f2) -> Long.valueOf(f1.lastModified()).compareTo(f2.lastModified()));
+        for (File screenshot : screenshots) {
+            if (Files.isDirectory(screenshot.toPath())) {
+                screenshots = ArrayUtils.removeElement(screenshots, screenshot);
+                continue;
+            }
+            //InputStream fileStream = new BufferedInputStream(new FileInputStream(screenshot));
+            //String fileType = URLConnection.guessContentTypeFromStream(fileStream);
+            String fileType = Files.probeContentType(screenshot.toPath());
+            ScreenshotUtils.LOGGER.info(fileType);
+            if (Objects.equals(fileType, "image/png")) {
+                continue;
+            } else {
+                screenshots = ArrayUtils.removeElement(screenshots, screenshot);
+            }
+        }
         return screenshots;
     }
 
@@ -32,7 +52,7 @@ public class ScreenshotScreen extends Screen {
     protected void init() {
         ScreenshotListWidget screenshotList = null;
         try {
-            screenshotList = new ScreenshotListWidget(client, width, height - 48 - 48, 48, 36);
+            screenshotList = new ScreenshotListWidget(client, width, height - 48 - 48, 48, 36, getScreenshots());
         } catch (FileNotFoundException e) {
             ScreenshotUtils.LOGGER.error("SCREENSHOT MENU FAILED; FILE RENAMED/DELETED", e);
             client.setScreen(new TitleScreen());
@@ -76,5 +96,10 @@ public class ScreenshotScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 16777215);
+    }
+
+    @Override
+    public void resize(MinecraftClient client, int width, int height) {
+        super.resize(client, width, height);
     }
 }

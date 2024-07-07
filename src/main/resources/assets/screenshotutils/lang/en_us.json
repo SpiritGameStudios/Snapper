@@ -1,6 +1,7 @@
 {
   "key.screenshotutils.panorama": "Take Panoramic Screenshots",
   "key.screenshotutils.huge": "Take Huge Screenshot",
+  "key.screenshotutils.screenshotMenu": "View Screenshots",
   "menu.screenshotutils.screenshotmenu": "Screenshots",
   "menu.screenshotutils.viewermenu": "Viewer",
   "button.screenshotutils.view": "Open Image",

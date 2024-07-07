@@ -10,10 +10,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.client.gui.widget.ElementListWidget;
-import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.texture.NativeImage;
@@ -25,7 +23,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -33,36 +30,17 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class ScreenshotListWidget extends ElementListWidget<ScreenshotListWidget.Entry> {
 
     static final Identifier VIEW_TEXTURE = Identifier.of("screenshotutils", "screenshots/view");
     static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Identifier.of("screenshotutils", "screenshots/view_highlighted");
 
-    private File[] getScreenshots() throws IOException {
-        File screenshotDir = new File(client.runDirectory, "screenshots");
-        File[] screenshots = screenshotDir.listFiles();
-        //Arrays.sort(screenshots);
-        Arrays.sort(screenshots, (f1, f2) -> Long.valueOf(f1.lastModified()).compareTo(f2.lastModified()));
-        for (File screenshot : screenshots) {
-            if (Files.isDirectory(screenshot.toPath())) {
-                screenshots = ArrayUtils.removeElement(screenshots, screenshot);
-                continue;
-            }
-            InputStream fileStream = new BufferedInputStream(new FileInputStream(screenshot));
-            String fileType = URLConnection.guessContentTypeFromStream(fileStream);
-            if (fileType != "image/png") {
-                //ScreenshotUtils.LOGGER.info(fileType);
-                screenshots = ArrayUtils.removeElement(screenshots, screenshot);
-            }
-        }
-        return screenshots;
-    }
-
-    public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight) throws IOException {
+    public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, File[] screenshots) throws IOException {
         super(client, width, height, y, itemHeight);
-        for (int i = 0; i < getScreenshots().length; i++) {
-            this.addEntryToTop(new Entry(getScreenshots(), i, client));
+        for (int i = 0; i < screenshots.length; i++) {
+            this.addEntryToTop(new Entry(screenshots, i, client));
         }
     }
 
