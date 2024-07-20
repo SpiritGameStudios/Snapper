@@ -24,6 +24,8 @@ public class TitleScreenMixin extends Screen {
             at = @At("HEAD")
     )
     protected void init(CallbackInfo ci) {
+        if (this.client == null) return;
+
         this.addDrawableChild(
                 ButtonWidget.builder(Text.translatable("menu.screenshotutils.screenshotmenu"), button -> this.client.setScreen(new ScreenshotScreen()))
                         .dimensions(this.width - 100, 0, 100, 20)

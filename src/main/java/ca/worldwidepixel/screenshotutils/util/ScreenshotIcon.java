@@ -1,6 +1,5 @@
 package ca.worldwidepixel.screenshotutils.util;
 
-import com.google.common.hash.Hashing;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.texture.NativeImage;
@@ -13,8 +12,7 @@ import org.jetbrains.annotations.Nullable;
 @Environment(EnvType.CLIENT)
 public class ScreenshotIcon implements AutoCloseable {
     private static final Identifier UNKNOWN_SERVER_ID = Identifier.ofVanilla("textures/misc/unknown_server.png");
-    private static final int ICON_WIDTH = 64;
-    private static final int ICON_HEIGHT = 64;
+
     private final TextureManager textureManager;
     private final Identifier id;
     @Nullable
@@ -30,33 +28,20 @@ public class ScreenshotIcon implements AutoCloseable {
         return new ScreenshotIcon(
                 textureManager,
                 Identifier.ofVanilla(
-                        "screenshots/" + Util.replaceInvalidChars(screenshotName, Identifier::isPathCharacterValid) + "/" + Hashing.sha1().hashUnencodedChars(screenshotName) + "/icon"
+                        "screenshots/" + Util.replaceInvalidChars(screenshotName, Identifier::isPathCharacterValid) + "/icon"
                 )
         );
     }
 
     public void load(NativeImage image) {
-        //if (image.getWidth() == 64 && image.getHeight() == 64) {
-        if (true) {
-            try {
-                this.assertOpen();
-                if (this.texture == null) {
-                    this.texture = new NativeImageBackedTexture(image);
-                } else {
-                    this.texture.setImage(image);
-                    this.texture.upload();
-                }
-
-                this.textureManager.registerTexture(this.id, this.texture);
-            } catch (Throwable var3) {
-                image.close();
-                this.destroy();
-                throw var3;
-            }
-        } else {
-            image.close();
-            throw new IllegalArgumentException("Icon must be 64x64, but was " + image.getWidth() + "x" + image.getHeight());
+        this.assertOpen();
+        if (this.texture == null) this.texture = new NativeImageBackedTexture(image);
+        else {
+            this.texture.setImage(image);
+            this.texture.upload();
         }
+
+        this.textureManager.registerTexture(this.id, this.texture);
     }
 
     public void destroy() {
@@ -66,6 +51,16 @@ public class ScreenshotIcon implements AutoCloseable {
             this.texture.close();
             this.texture = null;
         }
+    }
+
+    public int getWidth() {
+        this.assertOpen();
+        return this.texture != null && this.texture.getImage() != null ? this.texture.getImage().getWidth() : 64;
+    }
+
+    public int getHeight() {
+        this.assertOpen();
+        return this.texture != null && this.texture.getImage() != null ? this.texture.getImage().getHeight() : 64;
     }
 
     public Identifier getTextureId() {

@@ -24,8 +24,6 @@ public class ScreenshotViewerScreen extends Screen {
     private final String title;
     private int width = client.getWindow().getScaledWidth();
     private int height = client.getWindow().getScaledHeight();
-    private int fullWidth = client.getWindow().getWidth();
-    private int fullHeight = client.getWindow().getScaledHeight();
     private final int imageWidth;
     private final int imageHeight;
 
@@ -35,10 +33,8 @@ public class ScreenshotViewerScreen extends Screen {
         this.icon = icon;
         this.title = title;
         this.iconPath = path;
-        //this.imageWidth = client.getGuiAtlasManager().getSprite(icon.getTextureId()).getContents().getWidth();
         this.imageWidth = img.getWidth();
         this.imageHeight = img.getHeight();
-        //this.imageHeight = client.getGuiAtlasManager().getSprite(icon.getTextureId()).getContents().getHeight();
     }
 
     @Override
@@ -48,9 +44,7 @@ public class ScreenshotViewerScreen extends Screen {
 
     @Override
     protected void init() {
-        addDrawableChild(ButtonWidget.builder(Text.translatable("button.screenshotutils.view"), button -> {
-                            Util.getOperatingSystem().open(this.iconPath);
-                        })
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.screenshotutils.view"), button -> Util.getOperatingSystem().open(this.iconPath))
                         .dimensions(width / 2 - 150 - 2, height - 32, 150, 20)
                         .build()
         );
@@ -83,7 +77,5 @@ public class ScreenshotViewerScreen extends Screen {
         super.resize(client, width, height);
         this.width = client.getWindow().getScaledWidth();
         this.height = client.getWindow().getScaledHeight();
-        this.fullWidth = client.getWindow().getWidth();
-        this.fullHeight = client.getWindow().getScaledHeight();
     }
 }
