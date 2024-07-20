@@ -49,7 +49,7 @@ public class ScreenshotUtils implements ModInitializer {
 				client.takePanorama(client.runDirectory, 1024, 1024);
 			}
 			/*while (hugeShotKey.wasPressed()) {
-				((HugeScreenshotInvoker) client).callTakeHugeScreenshot(client.runDirectory, 32, 32, 1024, 768);
+				((HugeScreenshotInvoker) client).callTakeHugeScreenshot(client.runDirectory, client.getWindow().getWidth(), client.getWindow().getHeight(), 7680, 4320);
 			}*/
 		});
 

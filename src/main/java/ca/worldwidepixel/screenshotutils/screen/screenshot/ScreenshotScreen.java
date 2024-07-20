@@ -23,11 +23,17 @@ public class ScreenshotScreen extends Screen {
         super(Text.translatable("menu.screenshotutils.screenshotmenu"));
     }
 
-    private File[] getScreenshots() throws IOException {
+    /*private File[] getScreenshots() throws IOException {
         File screenshotDir = new File(client.runDirectory, "screenshots");
         File[] screenshots = screenshotDir.listFiles();
         //Arrays.sort(screenshots);
         Arrays.sort(screenshots, (f1, f2) -> Long.valueOf(f1.lastModified()).compareTo(f2.lastModified()));
+        for(int i = 0; i < screenshots.length / 2; i++)
+        {
+            File temp = screenshots[i];
+            screenshots[i] = screenshots[screenshots.length - i - 1];
+            screenshots[screenshots.length - i - 1] = temp;
+        }
         for (File screenshot : screenshots) {
             if (Files.isDirectory(screenshot.toPath())) {
                 screenshots = ArrayUtils.removeElement(screenshots, screenshot);
@@ -35,7 +41,16 @@ public class ScreenshotScreen extends Screen {
             }
             //InputStream fileStream = new BufferedInputStream(new FileInputStream(screenshot));
             //String fileType = URLConnection.guessContentTypeFromStream(fileStream);
+            /*String fileType = "unknown";
+            int i = screenshot.getPath().lastIndexOf('.');
+            if (i > 0) {
+                String extension = screenshot.getName().substring(i + 1);
+                if (extension == ".png") {
+                    fileType = "image/png";
+                }
+            }*//*
             String fileType = Files.probeContentType(screenshot.toPath());
+            //String fileType = "text/plain";
             ScreenshotUtils.LOGGER.info(fileType);
             if (Objects.equals(fileType, "image/png")) {
                 continue;
@@ -44,15 +59,15 @@ public class ScreenshotScreen extends Screen {
             }
         }
         return screenshots;
-    }
+    }*/
 
-    public ButtonWidget testButton;
+    //public ButtonWidget testButton;
 
     @Override
     protected void init() {
         ScreenshotListWidget screenshotList = null;
         try {
-            screenshotList = new ScreenshotListWidget(client, width, height - 48 - 48, 48, 36, getScreenshots());
+            screenshotList = new ScreenshotListWidget(client, width, height - 48 - 48, 48, 36);
         } catch (FileNotFoundException e) {
             ScreenshotUtils.LOGGER.error("SCREENSHOT MENU FAILED; FILE RENAMED/DELETED", e);
             client.setScreen(new TitleScreen());

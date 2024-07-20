@@ -6,5 +6,7 @@
   "menu.screenshotutils.viewermenu": "Viewer",
   "button.screenshotutils.view": "Open Image",
   "button.screenshotutils.folder": "Open Folder",
-  "text.screenshotutils.created": "Created"
+  "text.screenshotutils.created": "Created",
+  "text.screenshotutils.generic": "Screenshot",
+  "text.screenshotutils.loading": "Loading Screenshots"
 }
