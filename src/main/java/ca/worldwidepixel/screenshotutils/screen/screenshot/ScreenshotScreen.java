@@ -11,8 +11,10 @@ import net.minecraft.util.Util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class ScreenshotScreen extends Screen {
+
     public ScreenshotScreen() {
         super(Text.translatable("menu.screenshotutils.screenshotmenu"));
     }
@@ -39,6 +41,18 @@ public class ScreenshotScreen extends Screen {
 
         addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close())
                 .dimensions(width / 2 + 2, height - 32, 150, 20)
+                .build()
+        );
+
+        addDrawableChild(ButtonWidget.builder(Text.literal("TEST PANROAMA"), button -> {
+            try {
+                this.client.setScreen(new PanoramaViewerScreen("Panorama"));
+            } catch (IOException e) {
+                ScreenshotUtils.LOGGER.info("Kind of curious how this would happen");
+                //this.client.setScreen(new TitleScreen());
+            }
+        })
+                .dimensions(width / 2 + 2, height - 64, 150, 20)
                 .build()
         );
     }

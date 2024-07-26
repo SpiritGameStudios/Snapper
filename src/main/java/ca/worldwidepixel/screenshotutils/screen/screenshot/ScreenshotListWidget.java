@@ -228,7 +228,6 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 );
                 RenderSystem.disableBlend();
             }
-
             if (this.client.options.getTouchscreen().getValue() || hovered) {
                 context.fill(x, y, x + 32, y + 32, 0xA0909090);
                 context.drawGuiTexture(
@@ -268,7 +267,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
             try {
-                this.client.setScreen(new ScreenshotViewerScreen(this.iconFileName, this.icon, this.iconPath));
+                    this.client.setScreen(new ScreenshotViewerScreen(this.iconFileName, this.icon, this.iconPath));
             } catch (IOException e) {
                 this.client.setScreen(new TitleScreen());
             }

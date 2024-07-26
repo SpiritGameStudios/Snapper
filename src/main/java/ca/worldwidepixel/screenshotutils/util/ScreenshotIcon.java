@@ -33,6 +33,15 @@ public class ScreenshotIcon implements AutoCloseable {
         );
     }
 
+    public static ScreenshotIcon forPanoramaFace(TextureManager textureManager, String screenshotName) {
+        return new ScreenshotIcon(
+                textureManager,
+                Identifier.ofVanilla(
+                        "screenshots/panorama/" + Util.replaceInvalidChars(screenshotName, Identifier::isPathCharacterValid) + "/icon"
+                )
+        );
+    }
+
     public void load(NativeImage image) {
         this.assertOpen();
         if (this.texture == null) this.texture = new NativeImageBackedTexture(image);
