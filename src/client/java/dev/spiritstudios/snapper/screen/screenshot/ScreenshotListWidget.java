@@ -188,7 +188,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 creationString = Text.translatable("text.snapper.created").getString() + " " + DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
 
             if (StringHelper.isEmpty(fileName))
-                fileName = I18n.translate("text.screenshotutils.generic") + " " + (index + 1);
+                fileName = I18n.translate("text.snapper.generic") + " " + (index + 1);
 
             context.drawText(
                     this.client.textRenderer,
