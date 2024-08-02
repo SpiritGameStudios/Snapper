@@ -1,7 +1,6 @@
-package ca.worldwidepixel.screenshotutils.screen.screenshot;
+package dev.spiritstudios.snapper.screen.screenshot;
 
-import ca.worldwidepixel.screenshotutils.ScreenshotUtils;
-import ca.worldwidepixel.screenshotutils.util.ScreenshotIcon;
+import dev.spiritstudios.snapper.util.ScreenshotIcon;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -28,7 +27,7 @@ public class ScreenshotViewerScreen extends Screen {
     private final int imageHeight;
 
     protected ScreenshotViewerScreen(String title, ScreenshotIcon icon, Path path) throws IOException {
-        super(Text.translatable("menu.screenshotutils.viewermenu"));
+        super(Text.translatable("menu.snapper.viewermenu"));
         BufferedImage img = ImageIO.read(new File(String.valueOf(path)));
         this.icon = icon;
         this.title = title;
@@ -44,7 +43,7 @@ public class ScreenshotViewerScreen extends Screen {
 
     @Override
     protected void init() {
-        addDrawableChild(ButtonWidget.builder(Text.translatable("button.screenshotutils.view"), button -> Util.getOperatingSystem().open(this.iconPath))
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.view"), button -> Util.getOperatingSystem().open(this.iconPath))
                         .dimensions(width / 2 - 150 - 2, height - 32, 150, 20)
                         .build()
         );

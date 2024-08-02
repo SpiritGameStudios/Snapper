@@ -1,12 +1,9 @@
-package ca.worldwidepixel.screenshotutils.mixin;
+package dev.spiritstudios.snapper.mixin;
 
-import ca.worldwidepixel.screenshotutils.screen.screenshot.ScreenshotScreen;
+import dev.spiritstudios.snapper.screen.screenshot.ScreenshotScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.PlayerSkinWidget;
-import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.client.util.SkinTextures;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +24,7 @@ public class TitleScreenMixin extends Screen {
         if (this.client == null) return;
 
         this.addDrawableChild(
-                ButtonWidget.builder(Text.translatable("menu.screenshotutils.screenshotmenu"), button -> this.client.setScreen(new ScreenshotScreen()))
+                ButtonWidget.builder(Text.translatable("menu.snapper.screenshotmenu"), button -> this.client.setScreen(new ScreenshotScreen()))
                         .dimensions(this.width - 100, 0, 100, 20)
                         .build()
         );

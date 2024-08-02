@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "ca.worldwidepixel.screenshotutils.mixin",
+  "package": "dev.spiritstudios.snapper.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "HugeScreenshotInvoker",

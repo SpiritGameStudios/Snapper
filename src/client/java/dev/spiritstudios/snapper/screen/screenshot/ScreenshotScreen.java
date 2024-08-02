@@ -1,6 +1,6 @@
-package ca.worldwidepixel.screenshotutils.screen.screenshot;
+package dev.spiritstudios.snapper.screen.screenshot;
 
-import ca.worldwidepixel.screenshotutils.ScreenshotUtils;
+import dev.spiritstudios.snapper.Snapper;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
@@ -11,12 +11,11 @@ import net.minecraft.util.Util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public class ScreenshotScreen extends Screen {
 
     public ScreenshotScreen() {
-        super(Text.translatable("menu.screenshotutils.screenshotmenu"));
+        super(Text.translatable("menu.snapper.screenshotmenu"));
     }
     ScreenshotListWidget screenshotList;
 
@@ -27,13 +26,13 @@ public class ScreenshotScreen extends Screen {
         try {
             screenshotList = this.addDrawableChild(new ScreenshotListWidget(client, width, height - 48 - 48, 48, 36, screenshotList));
         } catch (IOException e) {
-            ScreenshotUtils.LOGGER.error("Failed to load screenshots", e);
+            Snapper.LOGGER.error("Failed to load screenshots", e);
             client.setScreen(new TitleScreen());
             return;
         }
 
         addDrawableChild(
-                ButtonWidget.builder(Text.translatable("button.screenshotutils.folder"), button ->
+                ButtonWidget.builder(Text.translatable("button.snapper.folder"), button ->
                                 Util.getOperatingSystem().open(new File(client.runDirectory, "screenshots")))
                 .dimensions(width / 2 - 152, height - 32, 150, 20)
                 .build()
@@ -48,7 +47,7 @@ public class ScreenshotScreen extends Screen {
             try {
                 this.client.setScreen(new PanoramaViewerScreen("Panorama"));
             } catch (IOException e) {
-                ScreenshotUtils.LOGGER.info("Kind of curious how this would happen");
+                Snapper.LOGGER.info("Kind of curious how this would happen");
                 //this.client.setScreen(new TitleScreen());
             }
         })

@@ -1,0 +1,12 @@
+{
+  "key.snapper.panorama": "Take Panoramic Screenshots",
+  "key.snapper.huge": "Take Huge Screenshot",
+  "key.snapper.screenshotMenu": "View Screenshots",
+  "menu.snapper.screenshotmenu": "Screenshots",
+  "menu.snapper.viewermenu": "Viewer",
+  "button.snapper.view": "Open Image",
+  "button.snapper.folder": "Open Folder",
+  "text.snapper.created": "Created",
+  "text.snapper.generic": "Screenshot",
+  "text.snapper.loading": "Loading Screenshots"
+}

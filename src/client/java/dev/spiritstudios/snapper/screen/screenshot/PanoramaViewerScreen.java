@@ -1,7 +1,7 @@
-package ca.worldwidepixel.screenshotutils.screen.screenshot;
+package dev.spiritstudios.snapper.screen.screenshot;
 
-import ca.worldwidepixel.screenshotutils.ScreenshotUtils;
-import ca.worldwidepixel.screenshotutils.util.ScreenshotIcon;
+import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.util.ScreenshotIcon;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.CubeMapRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -14,8 +14,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +40,7 @@ public class PanoramaViewerScreen extends Screen {
     protected static final RotatingCubeMapRenderer PANORAMA_RENDERER_CUBE;
 
     protected PanoramaViewerScreen(String title) throws IOException {
-        super(Text.translatable("menu.screenshotutils.viewermenu"));
+        super(Text.translatable("menu.snapper.viewermenu"));
         //BufferedImage img = ImageIO.read(new File(String.valueOf(path)));
         //this.icon = icon;
         this.title = title;
@@ -74,7 +72,7 @@ public class PanoramaViewerScreen extends Screen {
             try (InputStream inputStream = Files.newInputStream(filePath)) {
                 icon.load(NativeImage.read(inputStream));
             } catch (IOException error) {
-                ScreenshotUtils.LOGGER.error("Invalid face for panorama {}", fileName, error);
+                Snapper.LOGGER.error("Invalid face for panorama {}", fileName, error);
             }
         });
     }
@@ -95,7 +93,7 @@ public class PanoramaViewerScreen extends Screen {
                 try {
                     fileType = Files.probeContentType(file.toPath());
                 } catch (IOException e) {
-                    ScreenshotUtils.LOGGER.error("Couldn't load panorama list", e);
+                    Snapper.LOGGER.error("Couldn't load panorama list", e);
                     return true;
                 }
 
@@ -108,12 +106,12 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     public void close() {
-        this.client.setScreen(new ScreenshotScreen());
+        client.setScreen(new ScreenshotScreen());
     }
 
     @Override
     protected void init() {
-        addDrawableChild(ButtonWidget.builder(Text.translatable("button.screenshotutils.view"), button -> Util.getOperatingSystem().open(this.iconPath))
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.view"), button -> Util.getOperatingSystem().open(this.iconPath))
                         .dimensions(width / 2 - 150 - 2, height - 32, 150, 20)
                         .build()
         );

@@ -1,4 +1,4 @@
-package ca.worldwidepixel.screenshotutils.util;
+package dev.spiritstudios.snapper.util;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

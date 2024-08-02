@@ -1,4 +1,4 @@
-package ca.worldwidepixel.screenshotutils.mixin;
+package dev.spiritstudios.snapper.mixin;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
@@ -10,5 +10,5 @@ import java.io.File;
 @Mixin(MinecraftClient.class)
 public interface HugeScreenshotInvoker {
     @Invoker("takeHugeScreenshot")
-    public Text callTakeHugeScreenshot(File gameDirectory, int unitWidth, int unitHeight, int width, int height);
+    Text callTakeHugeScreenshot(File gameDirectory, int unitWidth, int unitHeight, int width, int height);
 }

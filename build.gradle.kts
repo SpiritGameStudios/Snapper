@@ -20,6 +20,15 @@ class Dependencies {
 val mod = ModInfo()
 val deps = Dependencies()
 
+loom {
+	splitEnvironmentSourceSets()
+
+	mods.create(mod.id) {
+		sourceSet(sourceSets.getByName("main"))
+		sourceSet(sourceSets.getByName("client"))
+	}
+}
+
 dependencies {
 	minecraft("com.mojang:minecraft:${deps.minecraft}")
 	mappings("net.fabricmc:yarn:${deps.yarn}:v2")

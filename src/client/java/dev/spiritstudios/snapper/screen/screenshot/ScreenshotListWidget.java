@@ -1,11 +1,10 @@
-package ca.worldwidepixel.screenshotutils.screen.screenshot;
+package dev.spiritstudios.snapper.screen.screenshot;
 
-import ca.worldwidepixel.screenshotutils.ScreenshotUtils;
-import ca.worldwidepixel.screenshotutils.util.ScreenshotIcon;
+import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.util.ScreenshotIcon;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.impl.util.StringUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.LoadingDisplay;
@@ -20,7 +19,6 @@ import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-import static ca.worldwidepixel.screenshotutils.ScreenshotUtils.MODID;
+import static dev.spiritstudios.snapper.Snapper.MODID;
 
 public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
     static final Identifier VIEW_TEXTURE = Identifier.of(MODID, "screenshots/view");
@@ -95,7 +93,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             try {
                 fileType = Files.probeContentType(file.toPath());
             } catch (IOException e) {
-                ScreenshotUtils.LOGGER.error("Couldn't load screenshot list", e);
+                Snapper.LOGGER.error("Couldn't load screenshot list", e);
                 //this.showUnableToLoadScreen(var3.getMessageText());
                 return true;
             }
@@ -115,7 +113,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     @Environment(EnvType.CLIENT)
     public static class LoadingEntry extends Entry implements AutoCloseable {
-        private static final Text LOADING_LIST_TEXT = Text.translatable("text.screenshotutils.loading");
+        private static final Text LOADING_LIST_TEXT = Text.translatable("text.snapper.loading");
         private final MinecraftClient client;
 
         public LoadingEntry(MinecraftClient client) {
@@ -182,12 +180,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             try {
                 creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException e) {
-                ScreenshotUtils.LOGGER.error("FILE RENAMED/DELETED, RELOADING SCREEN");
+                Snapper.LOGGER.error("FILE RENAMED/DELETED, RELOADING SCREEN");
                 client.setScreen(new ScreenshotScreen());
             }
 
             if (creationTime != -1L)
-                creationString = Text.translatable("text.screenshotutils.created").getString() + " " + DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
+                creationString = Text.translatable("text.snapper.created").getString() + " " + DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
 
             if (StringHelper.isEmpty(fileName))
                 fileName = I18n.translate("text.screenshotutils.generic") + " " + (index + 1);
@@ -250,7 +248,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 try (InputStream inputStream = Files.newInputStream(this.iconPath)) {
                     this.icon.load(NativeImage.read(inputStream));
                 } catch (IOException error) {
-                    ScreenshotUtils.LOGGER.error("Invalid icon for screenshot {}", iconFileName, error);
+                    Snapper.LOGGER.error("Invalid icon for screenshot {}", iconFileName, error);
                     this.iconPath = null;
                 }
             });

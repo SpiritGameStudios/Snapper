@@ -1,26 +1,27 @@
 {
 	"schemaVersion": 1,
-	"id": "screenshotutils",
+	"id": "snapper",
 	"version": "${version}",
-	"name": "ScreenshotUtils",
+	"name": "Snapper",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
-		"WorldWidePixel"
+		"WorldWidePixel",
+		"CallMeEcho"
 	],
 	"contact": {
-		"homepage": "https://worldwidepixel.ca/",
-		"sources": "https://github.com/worldwidepixel/ScreenshotUtils"
+		"sources": "https://github.com/SpiritGameStudios/Snapper",
+		"issues": "https://github.com/SpiritGameStudios/Snapper/issues"
 	},
 	"license": "ARR-FOR-NOW",
-	"icon": "assets/screenshotutils/icon.png",
-	"environment": "*",
+	"icon": "assets/snapper/icon.png",
+	"environment": "client",
 	"entrypoints": {
-		"main": [
-			"ca.worldwidepixel.screenshotutils.ScreenshotUtils"
+		"client": [
+			"dev.spiritstudios.snapper.Snapper"
 		]
 	},
 	"mixins": [
-		"screenshotutils.mixins.json"
+		"snapper.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=${loader_version}",
