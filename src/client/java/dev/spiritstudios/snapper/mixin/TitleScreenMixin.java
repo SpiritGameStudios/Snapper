@@ -1,6 +1,6 @@
 package dev.spiritstudios.snapper.mixin;
 
-import dev.spiritstudios.snapper.screen.screenshot.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.ScreenshotScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;

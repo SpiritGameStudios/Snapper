@@ -1,6 +1,7 @@
-package dev.spiritstudios.snapper.screen.screenshot;
+package dev.spiritstudios.snapper.gui;
 
 import dev.spiritstudios.snapper.util.ScreenshotIcon;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -16,17 +17,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class ScreenshotViewerScreen extends Screen {
-
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final ScreenshotIcon icon;
     private final Path iconPath;
     private final String title;
-    private int width = client.getWindow().getScaledWidth();
-    private int height = client.getWindow().getScaledHeight();
     private final int imageWidth;
     private final int imageHeight;
 
-    protected ScreenshotViewerScreen(String title, ScreenshotIcon icon, Path path) throws IOException {
+    public ScreenshotViewerScreen(String title, ScreenshotIcon icon, Path path) throws IOException {
         super(Text.translatable("menu.snapper.viewermenu"));
         BufferedImage img = ImageIO.read(new File(String.valueOf(path)));
         this.icon = icon;
@@ -44,8 +42,8 @@ public class ScreenshotViewerScreen extends Screen {
     @Override
     protected void init() {
         addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.view"), button -> Util.getOperatingSystem().open(this.iconPath))
-                        .dimensions(width / 2 - 150 - 2, height - 32, 150, 20)
-                        .build()
+                .dimensions(width / 2 - 150 - 2, height - 32, 150, 20)
+                .build()
         );
 
         addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close())
@@ -58,23 +56,23 @@ public class ScreenshotViewerScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 16777215);
-        //context.getMatrices().push();
         int finalHeight = this.height - 48 - 48;
         float scaleFactor = (float) finalHeight / imageHeight;
         int finalWidth = (int) (imageWidth * scaleFactor);
-        //context.getMatrices().scale(scaleFactor, scaleFactor, 1.0F);
+
         context.drawTexture(this.icon.getTextureId(), (this.width / 2) - (finalWidth / 2), this.height - 48 - finalHeight, 0, 0, finalWidth, finalHeight, finalWidth, finalHeight);
-        //context.getMatrices().pop();
-        //context.drawCenteredTextWithShadow(this.textRenderer, "Image height: " + this.imageHeight + " Image width: " + this.imageWidth, this.width / 2, 30, 16777215);
-        //context.drawCenteredTextWithShadow(this.textRenderer, "Screen height: " + this.height + " Screen width: " + this.width, this.width / 2, 40, 16777215);
-        //context.drawCenteredTextWithShadow(this.textRenderer, "Scale Factor: " + String.valueOf(scaleFactor), this.width / 2, 50, 16777215);
-        //context.drawCenteredTextWithShadow(this.textRenderer, "Scaled image height: " + finalHeight + " Scaled image width: " + finalWidth, this.width / 2, 60, 16777215);
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) renderDebugInfo(context);
     }
 
-    @Override
-    public void resize(MinecraftClient client, int width, int height) {
-        super.resize(client, width, height);
-        this.width = client.getWindow().getScaledWidth();
-        this.height = client.getWindow().getScaledHeight();
+    private void renderDebugInfo(DrawContext context) {
+        context.getMatrices().push();
+        int finalHeight = this.height - 48 - 48;
+        float scaleFactor = (float) finalHeight / imageHeight;
+        int finalWidth = (int) (imageWidth * scaleFactor);
+
+        context.drawCenteredTextWithShadow(this.textRenderer, "Image Size: %dx%d".formatted(imageWidth, imageHeight), this.width / 2, 30, 0xffffff);
+        context.drawCenteredTextWithShadow(this.textRenderer, "Screen Size: %dx%d".formatted(this.width, this.height), this.width / 2, 40, 0xffffff);
+        context.drawCenteredTextWithShadow(this.textRenderer, "Scale Factor: %s".formatted(scaleFactor), this.width / 2, 50, 0xffffff);
+        context.drawCenteredTextWithShadow(this.textRenderer, "Scaled Size: %dx%d".formatted(finalWidth, finalHeight), this.width / 2, 60, 0xffffff);
     }
 }

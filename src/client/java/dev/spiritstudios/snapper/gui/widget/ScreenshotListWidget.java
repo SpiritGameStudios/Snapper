@@ -1,8 +1,10 @@
-package dev.spiritstudios.snapper.screen.screenshot;
+package dev.spiritstudios.snapper.gui.widget;
 
-import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.util.ScreenshotIcon;
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.gui.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
+import dev.spiritstudios.snapper.util.ScreenshotIcon;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -39,24 +41,18 @@ import java.util.concurrent.CompletableFuture;
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
 public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
-    static final Identifier VIEW_TEXTURE = Identifier.of(MODID, "screenshots/view");
-    static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Identifier.of(MODID, "screenshots/view_highlighted");
+    private static final Identifier VIEW_TEXTURE = Identifier.of(MODID, "screenshots/view");
+    private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Identifier.of(MODID, "screenshots/view_highlighted");
 
     public CompletableFuture<List<ScreenshotEntry>> loadFuture;
 
-    public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, ScreenshotListWidget old) throws IOException {
+    public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, ScreenshotListWidget previous) throws IOException {
         super(client, width, height, y, itemHeight);
-        addEntry(new LoadingEntry(client));
+        this.addEntry(new LoadingEntry(client));
 
-        if (old != null) {
-            this.loadFuture = old.loadFuture;
-        } else {
-            this.loadFuture = load(client);
-        }
-        show();
-    }
+        if (previous != null) this.loadFuture = previous.loadFuture;
+        else this.loadFuture = load(client);
 
-    public void show() {
         this.loadFuture.thenAccept((entries) -> {
             this.clearEntries();
             entries.sort(Comparator.comparingLong(ScreenshotEntry::lastModified).reversed());
@@ -94,7 +90,6 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 fileType = Files.probeContentType(file.toPath());
             } catch (IOException e) {
                 Snapper.LOGGER.error("Couldn't load screenshot list", e);
-                //this.showUnableToLoadScreen(var3.getMessageText());
                 return true;
             }
 
@@ -107,9 +102,9 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     @Environment(EnvType.CLIENT)
     public abstract static class Entry extends AlwaysSelectedEntryListWidget.Entry<Entry> implements AutoCloseable {
-        public void close() { }
+        public void close() {
+        }
     }
-
 
     @Environment(EnvType.CLIENT)
     public static class LoadingEntry extends Entry implements AutoCloseable {
@@ -153,13 +148,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     @Environment(EnvType.CLIENT)
     public static class ScreenshotEntry extends Entry implements AutoCloseable {
+        public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault());
+        public final long lastModified;
         private final MinecraftClient client;
         private final ScreenshotIcon icon;
-        private Path iconPath;
         private final String iconFileName;
-        public final long lastModified;
-
-        public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault());
+        private Path iconPath;
 
 
         public ScreenshotEntry(File screenshot, MinecraftClient client) {
@@ -265,7 +259,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
             try {
-                    this.client.setScreen(new ScreenshotViewerScreen(this.iconFileName, this.icon, this.iconPath));
+                this.client.setScreen(new ScreenshotViewerScreen(this.iconFileName, this.icon, this.iconPath));
             } catch (IOException e) {
                 this.client.setScreen(new TitleScreen());
             }

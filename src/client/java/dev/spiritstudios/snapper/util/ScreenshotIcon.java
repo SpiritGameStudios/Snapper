@@ -37,7 +37,7 @@ public class ScreenshotIcon implements AutoCloseable {
         return new ScreenshotIcon(
                 textureManager,
                 Identifier.ofVanilla(
-                        "screenshots/panorama/" + Util.replaceInvalidChars(screenshotName, Identifier::isPathCharacterValid) + "/icon"
+                        "screenshots/panorama/" + Util.replaceInvalidChars(screenshotName, Identifier::isPathCharacterValid)
                 )
         );
     }

@@ -1,6 +1,7 @@
-package dev.spiritstudios.snapper.screen.screenshot;
+package dev.spiritstudios.snapper.gui;
 
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
@@ -14,10 +15,11 @@ import java.io.IOException;
 
 public class ScreenshotScreen extends Screen {
 
+    ScreenshotListWidget screenshotList;
+
     public ScreenshotScreen() {
         super(Text.translatable("menu.snapper.screenshotmenu"));
     }
-    ScreenshotListWidget screenshotList;
 
     @Override
     protected void init() {
@@ -34,8 +36,8 @@ public class ScreenshotScreen extends Screen {
         addDrawableChild(
                 ButtonWidget.builder(Text.translatable("button.snapper.folder"), button ->
                                 Util.getOperatingSystem().open(new File(client.runDirectory, "screenshots")))
-                .dimensions(width / 2 - 152, height - 32, 150, 20)
-                .build()
+                        .dimensions(width / 2 - 152, height - 32, 150, 20)
+                        .build()
         );
 
         addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close())
@@ -44,15 +46,15 @@ public class ScreenshotScreen extends Screen {
         );
 
         addDrawableChild(ButtonWidget.builder(Text.literal("TEST PANROAMA"), button -> {
-            try {
-                this.client.setScreen(new PanoramaViewerScreen("Panorama"));
-            } catch (IOException e) {
-                Snapper.LOGGER.info("Kind of curious how this would happen");
-                //this.client.setScreen(new TitleScreen());
-            }
-        })
-                .dimensions(width / 2 + 2, height - 64, 150, 20)
-                .build()
+                            try {
+                                this.client.setScreen(new PanoramaViewerScreen("Panorama"));
+                            } catch (IOException e) {
+                                Snapper.LOGGER.info("Kind of curious how this would happen");
+                                //this.client.setScreen(new TitleScreen());
+                            }
+                        })
+                        .dimensions(width / 2 + 2, height - 64, 150, 20)
+                        .build()
         );
     }
 
