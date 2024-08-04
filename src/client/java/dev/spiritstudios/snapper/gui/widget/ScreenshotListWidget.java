@@ -44,6 +44,7 @@ import static dev.spiritstudios.snapper.Snapper.MODID;
 public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
     private static final Identifier VIEW_TEXTURE = Identifier.of(MODID, "screenshots/view");
     private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Identifier.of(MODID, "screenshots/view_highlighted");
+
     private Screen screenParent;
 
     public CompletableFuture<List<ScreenshotEntry>> loadFuture;

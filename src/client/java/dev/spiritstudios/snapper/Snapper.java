@@ -16,7 +16,7 @@ public class Snapper implements ClientModInitializer {
     private static final KeyBinding SCREENSHOT_MENU_KEY = KeyBindingHelper.registerKeyBinding(
             new KeyBinding(
                     "key.snapper.screenshot_menu",
-                    GLFW.GLFW_KEY_M,
+                    GLFW.GLFW_KEY_V,
                     "key.categories.misc"
             ));
 
@@ -24,7 +24,7 @@ public class Snapper implements ClientModInitializer {
     private static final KeyBinding PANORAMA_KEY = KeyBindingHelper.registerKeyBinding(
             new KeyBinding(
                     "key.snapper.panorama",
-                    GLFW.GLFW_KEY_F7,
+                    GLFW.GLFW_KEY_F8,
                     "key.categories.misc"
             ));
 

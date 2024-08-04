@@ -4,17 +4,23 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextIconButtonWidget;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
 import java.io.File;
 import java.io.IOException;
 
+import static dev.spiritstudios.snapper.Snapper.MODID;
+
 public class ScreenshotScreen extends Screen {
     private Screen parent;
+    private static final Identifier PANORAMA_BUTTON_ICON = Identifier.of(MODID, "screenshots/panorama");
     ScreenshotListWidget screenshotList;
 
     public ScreenshotScreen(Screen parent) {
@@ -45,17 +51,17 @@ public class ScreenshotScreen extends Screen {
                 .dimensions(width / 2 + 2, height - 32, 150, 20)
                 .build()
         );
-
-        addDrawableChild(ButtonWidget.builder(Text.literal("TEST PANROAMA (translate too)"), button -> {
-                            try {
-                                this.client.setScreen(new PanoramaViewerScreen("View Panorama (translate this)", this));
-                            } catch (IOException e) {
-                                Snapper.LOGGER.info("Kind of curious how this would happen");
-                            }
-                        })
-                        .dimensions(width / 2 + 2, height - 64, 150, 20)
-                        .build()
-        );
+        TextIconButtonWidget panorama_button = addDrawableChild(
+                TextIconButtonWidget.builder(
+                            Text.translatable("button.snapper.screenshots"),
+                            button -> {
+                                this.client.setScreen(new PanoramaViewerScreen(I18n.translate("menu.snapper.panorama"), this));
+                            },
+                            true
+                    ).width(20).texture(PANORAMA_BUTTON_ICON, 15, 15).build()
+            );
+        panorama_button.setPosition(width / 2 + 156, height - 32);
+        panorama_button.setTooltip(Tooltip.of(Text.translatable("button.snapper.panorama.tooltip")));
     }
 
     @Override

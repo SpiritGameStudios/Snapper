@@ -1,12 +1,18 @@
 {
   "key.snapper.panorama": "Take Panoramic Screenshots",
   "key.snapper.huge": "Take Huge Screenshot",
-  "key.snapper.screenshotMenu": "View Screenshots",
+  "key.snapper.screenshot_menu": "View Screenshots",
   "menu.snapper.screenshotmenu": "Screenshots",
   "menu.snapper.viewermenu": "Viewer",
+  "menu.snapper.panorama": "View Panorama",
   "button.snapper.view": "Open Image",
   "button.snapper.folder": "Open Folder",
+  "button.snapper.panorama.tooltip": "View the current stored panorama.",
+  "button.snapper.screenshots": "View Screenshots",
   "text.snapper.created": "Created",
   "text.snapper.generic": "Screenshot",
-  "text.snapper.loading": "Loading Screenshots"
+  "text.snapper.loading": "Loading Screenshots",
+  "text.snapper.panorama_encourage": "Take a panorama in-game to see it here!",
+  "panorama.snapper.failure": "Couldn't save panorama: %s",
+  "panorama.snapper.success": "Saved screenshot as %s"
 }

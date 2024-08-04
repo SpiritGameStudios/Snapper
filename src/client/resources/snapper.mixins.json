@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "HugeScreenshotInvoker",
-    "TitleScreenMixin"
+    "TitleScreenMixin",
+    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

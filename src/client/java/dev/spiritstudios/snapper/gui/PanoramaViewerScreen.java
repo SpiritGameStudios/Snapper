@@ -25,9 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static dev.spiritstudios.snapper.Snapper.MODID;
+
 public class PanoramaViewerScreen extends Screen {
     protected static final CubeMapRenderer PANORAMA_RENDERER = new CubeMapRenderer(Identifier.ofVanilla("screenshots/panorama/panorama"));
+    protected static final CubeMapRenderer FALLBACK_PANORAMA_RENDERER = new CubeMapRenderer(Identifier.ofVanilla("textures/gui/title/background/panorama"));
     protected static final RotatingCubeMapRenderer PANORAMA_RENDERER_CUBE = new RotatingCubeMapRenderer(PANORAMA_RENDERER);
+    protected static final RotatingCubeMapRenderer FALLBACK_PANORAMA_RENDERER_CUBE = new RotatingCubeMapRenderer(FALLBACK_PANORAMA_RENDERER);
     private static final MinecraftClient client = MinecraftClient.getInstance();
 
     private final Path iconPath;
@@ -38,7 +42,7 @@ public class PanoramaViewerScreen extends Screen {
     private float backgroundAlpha;
     private Screen parent;
 
-    protected PanoramaViewerScreen(String title, Screen parent) throws IOException {
+    protected PanoramaViewerScreen(String title, Screen parent) {
         super(Text.translatable("menu.snapper.viewermenu"));
         this.title = title;
         this.parent = parent;
@@ -103,7 +107,15 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     protected void init() {
-        addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.folder"), button -> Util.getOperatingSystem().open(this.iconPath))
+        File panoramaDirectory = new File(client.runDirectory, "screenshots/panorama");
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.folder"), button -> {
+            if (!panoramaDirectory.exists()) {
+                new File(String.valueOf(panoramaDirectory)).mkdirs();
+                Util.getOperatingSystem().open(panoramaDirectory);
+            } else {
+                Util.getOperatingSystem().open(panoramaDirectory);
+            }
+        })
                 .dimensions(width / 2 - 150 - 2, height - 32, 150, 20)
                 .build()
         );
@@ -134,6 +146,10 @@ public class PanoramaViewerScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
 
         if (this.loaded) this.renderPanoramaBackground(context, delta);
+        else {
+            FALLBACK_PANORAMA_RENDERER_CUBE.render(context, this.width, this.height, this.backgroundAlpha, delta);
+            context.drawCenteredTextWithShadow(textRenderer, Text.translatable("text.snapper.panorama_encourage"), this.width / 2, this.height / 2, 0xFFFFFF);
+        }
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xffffff);
     }
 
