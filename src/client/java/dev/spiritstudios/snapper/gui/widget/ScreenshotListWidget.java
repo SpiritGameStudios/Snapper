@@ -10,6 +10,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.LoadingDisplay;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.resource.language.I18n;
@@ -43,11 +44,13 @@ import static dev.spiritstudios.snapper.Snapper.MODID;
 public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
     private static final Identifier VIEW_TEXTURE = Identifier.of(MODID, "screenshots/view");
     private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Identifier.of(MODID, "screenshots/view_highlighted");
+    private Screen screenParent;
 
     public CompletableFuture<List<ScreenshotEntry>> loadFuture;
 
-    public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, ScreenshotListWidget previous) throws IOException {
+    public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, ScreenshotListWidget previous, Screen parent) throws IOException {
         super(client, width, height, y, itemHeight);
+        this.screenParent = parent;
         this.addEntry(new LoadingEntry(client));
 
         if (previous != null) this.loadFuture = previous.loadFuture;
@@ -70,7 +73,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         return CompletableFuture.supplyAsync(() -> {
             List<File> screenshots = this.loadScreenshots();
             List<ScreenshotEntry> entries = new ArrayList<>();
-            screenshots.parallelStream().forEach(file -> entries.add(new ScreenshotEntry(file, client)));
+            screenshots.parallelStream().forEach(file -> entries.add(new ScreenshotEntry(file, client, screenParent)));
             return entries;
         });
     }
@@ -151,10 +154,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         private final ScreenshotIcon icon;
         private final String iconFileName;
         private Path iconPath;
+        private Screen screenParent;
 
 
-        public ScreenshotEntry(File screenshot, MinecraftClient client) {
+        public ScreenshotEntry(File screenshot, MinecraftClient client, Screen parent) {
             this.client = client;
+            this.screenParent = parent;
             this.icon = ScreenshotIcon.forScreenshot(this.client.getTextureManager(), screenshot.getName());
             this.iconPath = screenshot.toPath();
             this.iconFileName = screenshot.getName();
@@ -172,7 +177,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException e) {
                 Snapper.LOGGER.error("FILE RENAMED/DELETED, RELOADING SCREEN");
-                client.setScreen(new ScreenshotScreen());
+                client.setScreen(this.screenParent);
             }
 
             if (creationTime != -1L)
@@ -256,7 +261,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
             try {
-                this.client.setScreen(new ScreenshotViewerScreen(this.iconFileName, this.icon, this.iconPath));
+                this.client.setScreen(new ScreenshotViewerScreen(this.iconFileName, this.icon, this.iconPath, this.screenParent));
             } catch (IOException e) {
                 this.client.setScreen(new TitleScreen());
             }

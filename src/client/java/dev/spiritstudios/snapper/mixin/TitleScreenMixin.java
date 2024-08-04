@@ -24,7 +24,7 @@ public class TitleScreenMixin extends Screen {
         if (this.client == null) return;
 
         this.addDrawableChild(
-                ButtonWidget.builder(Text.translatable("menu.snapper.screenshotmenu"), button -> this.client.setScreen(new ScreenshotScreen()))
+                ButtonWidget.builder(Text.translatable("menu.snapper.screenshotmenu"), button -> this.client.setScreen(new ScreenshotScreen(this)))
                         .dimensions(this.width - 100, 0, 100, 20)
                         .build()
         );

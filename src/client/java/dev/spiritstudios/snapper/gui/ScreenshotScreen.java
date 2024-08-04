@@ -14,10 +14,12 @@ import java.io.File;
 import java.io.IOException;
 
 public class ScreenshotScreen extends Screen {
+    private Screen parent;
     ScreenshotListWidget screenshotList;
 
-    public ScreenshotScreen() {
+    public ScreenshotScreen(Screen parent) {
         super(Text.translatable("menu.snapper.screenshotmenu"));
+        this.parent = parent;
     }
 
     @Override
@@ -25,10 +27,10 @@ public class ScreenshotScreen extends Screen {
         if (client == null) return;
 
         try {
-            screenshotList = this.addDrawableChild(new ScreenshotListWidget(client, width, height - 48 - 48, 48, 36, screenshotList));
+            screenshotList = this.addDrawableChild(new ScreenshotListWidget(client, width, height - 48 - 48, 48, 36, screenshotList, this));
         } catch (IOException e) {
             Snapper.LOGGER.error("Failed to load screenshots", e);
-            client.setScreen(new TitleScreen());
+            client.setScreen(parent);
             return;
         }
 
@@ -44,12 +46,11 @@ public class ScreenshotScreen extends Screen {
                 .build()
         );
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("TEST PANROAMA"), button -> {
+        addDrawableChild(ButtonWidget.builder(Text.literal("TEST PANROAMA (translate too)"), button -> {
                             try {
-                                this.client.setScreen(new PanoramaViewerScreen("Panorama"));
+                                this.client.setScreen(new PanoramaViewerScreen("View Panorama (translate this)", this));
                             } catch (IOException e) {
                                 Snapper.LOGGER.info("Kind of curious how this would happen");
-                                //this.client.setScreen(new TitleScreen());
                             }
                         })
                         .dimensions(width / 2 + 2, height - 64, 150, 20)

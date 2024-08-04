@@ -3,7 +3,7 @@
 	"id": "snapper",
 	"version": "${version}",
 	"name": "Snapper",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Screenshots, made simple.",
 	"authors": [
 		"WorldWidePixel",
 		"CallMeEcho"

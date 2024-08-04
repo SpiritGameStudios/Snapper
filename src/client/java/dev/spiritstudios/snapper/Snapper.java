@@ -31,7 +31,7 @@ public class Snapper implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (SCREENSHOT_MENU_KEY.wasPressed()) client.setScreen(new ScreenshotScreen());
+            while (SCREENSHOT_MENU_KEY.wasPressed()) client.setScreen(new ScreenshotScreen(null));
             while (PANORAMA_KEY.wasPressed()) client.takePanorama(client.runDirectory, 1024, 1024);
         });
     }

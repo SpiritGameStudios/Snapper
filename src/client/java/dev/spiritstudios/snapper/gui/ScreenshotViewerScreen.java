@@ -23,9 +23,11 @@ public class ScreenshotViewerScreen extends Screen {
     private final String title;
     private final int imageWidth;
     private final int imageHeight;
+    private Screen parent;
 
-    public ScreenshotViewerScreen(String title, ScreenshotIcon icon, Path path) throws IOException {
+    public ScreenshotViewerScreen(String title, ScreenshotIcon icon, Path path, Screen parent) throws IOException {
         super(Text.translatable("menu.snapper.viewermenu"));
+        this.parent = parent;
         BufferedImage img = ImageIO.read(new File(String.valueOf(path)));
         this.icon = icon;
         this.title = title;
@@ -36,7 +38,7 @@ public class ScreenshotViewerScreen extends Screen {
 
     @Override
     public void close() {
-        this.client.setScreen(new ScreenshotScreen());
+        this.client.setScreen(this.parent);
     }
 
     @Override

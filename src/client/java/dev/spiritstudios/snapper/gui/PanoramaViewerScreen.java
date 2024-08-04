@@ -36,11 +36,12 @@ public class PanoramaViewerScreen extends Screen {
     private long backgroundFadeStart;
     private boolean loaded = false;
     private float backgroundAlpha;
+    private Screen parent;
 
-    protected PanoramaViewerScreen(String title) throws IOException {
+    protected PanoramaViewerScreen(String title, Screen parent) throws IOException {
         super(Text.translatable("menu.snapper.viewermenu"));
         this.title = title;
-
+        this.parent = parent;
         this.iconPath = new File(client.runDirectory + "screenshots/panorama").toPath();
         this.load();
     }
@@ -97,7 +98,7 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     public void close() {
-        client.setScreen(new ScreenshotScreen());
+        client.setScreen(this.parent);
     }
 
     @Override
