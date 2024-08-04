@@ -24,20 +24,25 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+import static dev.spiritstudios.snapper.Snapper.MODID;
+
 public class PanoramaViewerScreen extends Screen {
+    private static final Identifier LOADING_BACKGROUND = Identifier.of(MODID, "textures/gui/background.png");
     protected static final CubeMapRenderer PANORAMA_RENDERER = new CubeMapRenderer(Identifier.ofVanilla("screenshots/panorama/panorama"));
     protected static final RotatingCubeMapRenderer PANORAMA_RENDERER_CUBE = new RotatingCubeMapRenderer(PANORAMA_RENDERER);
     private static final MinecraftClient client = MinecraftClient.getInstance();
 
     private final Path iconPath;
     private final String title;
+    private boolean loaded = false;
 
     protected PanoramaViewerScreen(String title) throws IOException {
         super(Text.translatable("menu.snapper.viewermenu"));
+        Snapper.LOGGER.info(String.valueOf(this.loaded));
         this.title = title;
         this.iconPath = new File(client.runDirectory + "screenshots/panorama").toPath();
-
         this.load();
+        this.loaded = true;
     }
 
     private void load() {
@@ -96,7 +101,7 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     protected void init() {
-        addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.view"), button -> Util.getOperatingSystem().open(this.iconPath))
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.folder"), button -> Util.getOperatingSystem().open(this.iconPath))
                 .dimensions(width / 2 - 150 - 2, height - 32, 150, 20)
                 .build()
         );
@@ -109,8 +114,14 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        Snapper.LOGGER.info(String.valueOf(this.loaded));
         super.render(context, mouseX, mouseY, delta);
-        this.renderPanoramaBackground(context, delta);
+        super.renderPanoramaBackground(context, delta);
+        if (!this.loaded) {
+            super.renderPanoramaBackground(context, delta);
+        } else {
+            this.renderPanoramaBackground(context, delta);
+        }
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
     }
 
@@ -121,12 +132,5 @@ public class PanoramaViewerScreen extends Screen {
     @Override
     protected void renderPanoramaBackground(DrawContext context, float delta) {
         PANORAMA_RENDERER_CUBE.render(context, this.width, this.height, 1, delta);
-    }
-
-    @Override
-    public void resize(MinecraftClient client, int width, int height) {
-        super.resize(client, width, height);
-        this.width = client.getWindow().getScaledWidth();
-        this.height = client.getWindow().getScaledHeight();
     }
 }
