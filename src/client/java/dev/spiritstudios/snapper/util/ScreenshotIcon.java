@@ -1,7 +1,5 @@
 package dev.spiritstudios.snapper.util;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
@@ -9,12 +7,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
-@Environment(EnvType.CLIENT)
 public class ScreenshotIcon implements AutoCloseable {
     private static final Identifier UNKNOWN_SERVER_ID = Identifier.ofVanilla("textures/misc/unknown_server.png");
 
     private final TextureManager textureManager;
     private final Identifier id;
+
     @Nullable
     private NativeImageBackedTexture texture;
     private boolean closed;

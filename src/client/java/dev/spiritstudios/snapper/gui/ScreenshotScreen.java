@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class ScreenshotScreen extends Screen {
-
     ScreenshotListWidget screenshotList;
 
     public ScreenshotScreen() {

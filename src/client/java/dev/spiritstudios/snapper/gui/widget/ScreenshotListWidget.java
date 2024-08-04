@@ -100,13 +100,11 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         return screenshots;
     }
 
-    @Environment(EnvType.CLIENT)
     public abstract static class Entry extends AlwaysSelectedEntryListWidget.Entry<Entry> implements AutoCloseable {
         public void close() {
         }
     }
 
-    @Environment(EnvType.CLIENT)
     public static class LoadingEntry extends Entry implements AutoCloseable {
         private static final Text LOADING_LIST_TEXT = Text.translatable("text.snapper.loading");
         private final MinecraftClient client;
@@ -146,7 +144,6 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         }
     }
 
-    @Environment(EnvType.CLIENT)
     public static class ScreenshotEntry extends Entry implements AutoCloseable {
         public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault());
         public final long lastModified;
