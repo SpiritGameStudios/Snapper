@@ -2,12 +2,11 @@
   "required": true,
   "package": "dev.spiritstudios.snapper.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
-    "HugeScreenshotInvoker",
-    "TitleScreenMixin",
-    "MinecraftClientMixin"
+  "client": [
+    "MinecraftClientMixin",
+    "TitleScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-	}
+  }
 }
