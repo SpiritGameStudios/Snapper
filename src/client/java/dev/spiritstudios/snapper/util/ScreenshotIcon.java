@@ -47,8 +47,8 @@ public class ScreenshotIcon implements AutoCloseable {
             this.texture.setImage(image);
             this.texture.upload();
         }
-
         this.textureManager.registerTexture(this.id, this.texture);
+        this.texture.setFilter(true, false);
     }
 
     public void destroy() {

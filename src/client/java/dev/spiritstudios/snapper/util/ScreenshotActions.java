@@ -22,49 +22,53 @@ import java.io.IOException;
 
 public class ScreenshotActions {
     private static final Clipboard clipboard = getClipboard();
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void deleteScreenshot(File screenshot, Screen screen) {
+        if (!screenshot.exists()) return;
+
         MinecraftClient client = MinecraftClient.getInstance();
-        if (screenshot.exists()) {
-            client.setScreen(
-                    new ConfirmScreen(
-                            confirmed -> {
-                                if (confirmed) {
-                                    client.setScreen(new ProgressScreen(true));
-                                    screenshot.delete();
-                                    //Snapper.LOGGER.info("Pretending to delete :3");
-                                }
-                                client.setScreen(screen);
-                            },
-                            Text.translatable("text.snapper.delete_question"),
-                            Text.translatable("text.snapper.delete_warning", screenshot.getName()),
-                            Text.translatable("button.snapper.delete"),
-                            ScreenTexts.CANCEL
-                    )
-            );
-        }
+        client.setScreen(
+                new ConfirmScreen(
+                        confirmed -> {
+                            if (confirmed) {
+                                client.setScreen(new ProgressScreen(true));
+                                screenshot.delete();
+                            }
+                            client.setScreen(screen);
+                        },
+                        Text.translatable("text.snapper.delete_question"),
+                        Text.translatable("text.snapper.delete_warning", screenshot.getName()),
+                        Text.translatable("button.snapper.delete"),
+                        ScreenTexts.CANCEL
+                )
+        );
     }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void renameScreenshot(File screenshot, String newName) {
-        if (screenshot.exists()) {
-            screenshot.renameTo(new File(screenshot.getParentFile().toPath() + "/" + newName));
-        }
+        if (screenshot.exists()) screenshot.renameTo(new File(screenshot.getParentFile().toPath() + "/" + newName));
     }
+
     @Nullable
     private static Clipboard getClipboard() {
-        if (MinecraftClient.IS_SYSTEM_MAC) {
-            return null;
-        }
+        if (MinecraftClient.IS_SYSTEM_MAC) return null;
+
         try {
             return Toolkit.getDefaultToolkit().getSystemClipboard();
-        } catch (Throwable e) {
+        } catch (HeadlessException e) {
             Snapper.LOGGER.error("Failed to get clipboard");
         }
+
         return null;
     }
+
     public static void copyScreenshot(File screenshot) {
         if (MinecraftClient.IS_SYSTEM_MAC) {
             ScreenshotActionsMac.copyScreenshotMac(screenshot.getAbsolutePath());
             return;
         }
+
         if (clipboard != null && screenshot.exists()) {
             try {
                 BufferedImage imageBuffer = ImageIO.read(screenshot);
@@ -76,8 +80,8 @@ public class ScreenshotActions {
             }
         }
     }
-    record TransferableImage(Image image) implements Transferable {
 
+    record TransferableImage(Image image) implements Transferable {
         @Override
         public DataFlavor[] getTransferDataFlavors() {
             return new DataFlavor[] {

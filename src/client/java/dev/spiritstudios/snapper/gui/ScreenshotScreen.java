@@ -20,18 +20,15 @@ import java.io.IOException;
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
 public class ScreenshotScreen extends Screen {
-    private Screen parent;
     private static final Identifier PANORAMA_BUTTON_ICON = Identifier.of(MODID, "screenshots/panorama");
-
+    private final Screen parent;
+    ScreenshotListWidget screenshotList;
     private ButtonWidget deleteButton;
     private ButtonWidget renameButton;
     private ButtonWidget viewButton;
     private ButtonWidget copyButton;
     private ButtonWidget openButton;
-
     private ScreenshotListWidget.@Nullable ScreenshotEntry selectedScreenshot = null;
-
-    ScreenshotListWidget screenshotList;
 
     public ScreenshotScreen(Screen parent) {
         super(Text.translatable("menu.snapper.screenshotmenu"));
@@ -105,13 +102,13 @@ public class ScreenshotScreen extends Screen {
 
         TextIconButtonWidget panorama_button = addDrawableChild(
                 TextIconButtonWidget.builder(
-                            Text.translatable("button.snapper.screenshots"),
-                            button -> {
-                                this.client.setScreen(new PanoramaViewerScreen(I18n.translate("menu.snapper.panorama"), this));
-                            },
-                            true
-                    ).width(20).texture(PANORAMA_BUTTON_ICON, 15, 15).build()
-            );
+                        Text.translatable("button.snapper.screenshots"),
+                        button -> {
+                            this.client.setScreen(new PanoramaViewerScreen(I18n.translate("menu.snapper.panorama"), this));
+                        },
+                        true
+                ).width(20).texture(PANORAMA_BUTTON_ICON, 15, 15).build()
+        );
         panorama_button.setPosition(width / 2 + 158, height - 32);
         panorama_button.setTooltip(Tooltip.of(Text.translatable("button.snapper.panorama.tooltip")));
 

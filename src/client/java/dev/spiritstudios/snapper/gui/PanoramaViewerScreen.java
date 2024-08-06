@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static dev.spiritstudios.snapper.Snapper.MODID;
-
 public class PanoramaViewerScreen extends Screen {
     protected static final CubeMapRenderer PANORAMA_RENDERER = new CubeMapRenderer(Identifier.ofVanilla("screenshots/panorama/panorama"));
     protected static final CubeMapRenderer FALLBACK_PANORAMA_RENDERER = new CubeMapRenderer(Identifier.ofVanilla("textures/gui/title/background/panorama"));
@@ -107,25 +105,16 @@ public class PanoramaViewerScreen extends Screen {
         client.setScreen(this.parent);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     protected void init() {
         File panoramaDirectory = new File(client.runDirectory, "screenshots/panorama");
         addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.folder"), button -> {
-            if (!panoramaDirectory.exists()) {
-                new File(String.valueOf(panoramaDirectory)).mkdirs();
-                Util.getOperatingSystem().open(panoramaDirectory);
-            } else {
-                Util.getOperatingSystem().open(panoramaDirectory);
-            }
-        })
-                .dimensions(width / 2 - 150 - 4, height - 32, 150, 20)
-                .build()
-        );
+            if (!panoramaDirectory.exists()) new File(String.valueOf(panoramaDirectory)).mkdirs();
+            Util.getOperatingSystem().open(panoramaDirectory);
+        }).dimensions(width / 2 - 150 - 4, height - 32, 150, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close())
-                .dimensions(width / 2 + 4, height - 32, 150, 20)
-                .build()
-        );
+        addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close()).dimensions(width / 2 + 4, height - 32, 150, 20).build());
     }
 
     @Override
@@ -142,7 +131,8 @@ public class PanoramaViewerScreen extends Screen {
                 backgroundAlpha = 1.0F;
             } else {
                 progress = MathHelper.clamp(progress, 0.0F, 1.0F);
-                widgetProgress = MathHelper.clampedMap(progress, 0.0F, 0.5F, 0.0F, 1.0F);;
+                widgetProgress = MathHelper.clampedMap(progress, 0.0F, 0.5F, 0.0F, 1.0F);
+                ;
                 backgroundAlpha = MathHelper.clampedMap(progress, 0.0F, 0.5F, 0.0F, 1.0F);
             }
             //this.setWidgetOpacity(widgetProgress); // SORT OF IMPORTANT
@@ -167,7 +157,8 @@ public class PanoramaViewerScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) { }
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+    }
 
     @Override
     protected void renderPanoramaBackground(DrawContext context, float delta) {

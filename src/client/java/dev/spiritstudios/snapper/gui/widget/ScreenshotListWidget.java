@@ -5,13 +5,10 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.ScreenshotIcon;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.LoadingDisplay;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -46,13 +43,13 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     private static final Identifier VIEW_TEXTURE = Identifier.of(MODID, "screenshots/view");
     private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Identifier.of(MODID, "screenshots/view_highlighted");
 
-    private Screen screenParent;
+    private final Screen parent;
 
     public CompletableFuture<List<ScreenshotEntry>> loadFuture;
 
     public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, ScreenshotListWidget previous, Screen parent) throws IOException {
         super(client, width, height, y, itemHeight);
-        this.screenParent = parent;
+        this.parent = parent;
         this.addEntry(new LoadingEntry(client));
 
         if (previous != null) this.loadFuture = previous.loadFuture;
@@ -75,7 +72,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         return CompletableFuture.supplyAsync(() -> {
             List<File> screenshots = this.loadScreenshots();
             List<ScreenshotEntry> entries = new ArrayList<>();
-            screenshots.parallelStream().forEach(file -> entries.add(new ScreenshotEntry(file, client, screenParent)));
+            screenshots.parallelStream().forEach(file -> entries.add(new ScreenshotEntry(file, client, parent)));
             return entries;
         });
     }
@@ -107,7 +104,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     private void setEntrySelected(@Nullable ScreenshotEntry entry) {
         super.setSelected(entry);
-        ScreenshotScreen parentScreen = (ScreenshotScreen) this.screenParent;
+        ScreenshotScreen parentScreen = (ScreenshotScreen) this.parent;
         parentScreen.imageSelected(entry);
     }
 
@@ -202,7 +199,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     fileName,
                     x + 32 + 3,
                     y + 1,
-                    16777215,
+                    0xFFFFFF,
                     false
             );
 

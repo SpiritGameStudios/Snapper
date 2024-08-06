@@ -24,7 +24,7 @@ public class ScreenshotViewerScreen extends Screen {
     private final String title;
     private final int imageWidth;
     private final int imageHeight;
-    private Screen parent;
+    private final Screen parent;
 
     public ScreenshotViewerScreen(String title, ScreenshotIcon icon, Path path, Screen parent) {
         super(Text.translatable("menu.snapper.viewermenu"));
@@ -36,11 +36,12 @@ public class ScreenshotViewerScreen extends Screen {
             Snapper.LOGGER.error("Image failed to read.");
             this.client.setScreen(parent);
         }
+
         this.icon = icon;
         this.title = title;
         this.iconPath = path;
-        this.imageWidth = img.getWidth();
-        this.imageHeight = img.getHeight();
+        this.imageWidth = img != null ? img.getWidth() : 0;
+        this.imageHeight = img != null ? img.getHeight() : 0;
     }
 
     @Override
