@@ -35,6 +35,8 @@ dependencies {
 	modImplementation("net.fabricmc:fabric-loader:${deps.loader}")
 
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApi}")
+
+	implementation ("ca.weblite:java-objc-bridge:1.0.0")
 }
 
 tasks.processResources {

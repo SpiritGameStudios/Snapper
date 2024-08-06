@@ -22,6 +22,7 @@ import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,6 +105,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         return screenshots;
     }
 
+    private void setEntrySelected(@Nullable ScreenshotEntry entry) {
+        super.setSelected(entry);
+        ScreenshotScreen parentScreen = (ScreenshotScreen) this.screenParent;
+        parentScreen.imageSelected(entry);
+    }
+
     public abstract static class Entry extends AlwaysSelectedEntryListWidget.Entry<Entry> implements AutoCloseable {
         public void close() {
         }
@@ -148,14 +155,16 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         }
     }
 
-    public static class ScreenshotEntry extends Entry implements AutoCloseable {
+    public class ScreenshotEntry extends Entry implements AutoCloseable {
         public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault());
         public final long lastModified;
         private final MinecraftClient client;
-        private final ScreenshotIcon icon;
-        private final String iconFileName;
-        private Path iconPath;
-        private Screen screenParent;
+        public final ScreenshotIcon icon;
+        public final String iconFileName;
+        public Path iconPath;
+        public Screen screenParent;
+        private long time;
+        public File screenshot;
 
 
         public ScreenshotEntry(File screenshot, MinecraftClient client, Screen parent) {
@@ -165,6 +174,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             this.iconPath = screenshot.toPath();
             this.iconFileName = screenshot.getName();
             this.lastModified = screenshot.lastModified();
+            this.screenshot = screenshot;
             this.loadIcon();
         }
 
@@ -177,8 +187,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             try {
                 creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException e) {
-                Snapper.LOGGER.error("FILE RENAMED/DELETED, RELOADING SCREEN");
-                client.setScreen(this.screenParent);
+                //Snapper.LOGGER.error("FILE RENAMED/DELETED, RELOADING SCREEN");
+                client.setScreen(new ScreenshotScreen(screenParent));
             }
 
             if (creationTime != -1L)
@@ -258,16 +268,19 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (this.icon == null) return false;
-            this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            ScreenshotListWidget.this.setEntrySelected(this);
 
-            try {
+            if (!(mouseX - (double) ScreenshotListWidget.this.getRowLeft() <= 32.0) && Util.getMeasuringTimeMs() - this.time >= 250L) {
+                this.time = Util.getMeasuringTimeMs();
+                return super.mouseClicked(mouseX, mouseY, button);
+            } else {
+                if (this.icon == null) return false;
+                this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+
                 this.client.setScreen(new ScreenshotViewerScreen(this.iconFileName, this.icon, this.iconPath, this.screenParent));
-            } catch (IOException e) {
-                this.client.setScreen(new TitleScreen());
+                return true;
             }
 
-            return true;
         }
 
         @Override

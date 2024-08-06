@@ -5,9 +5,11 @@ import dev.spiritstudios.snapper.util.ScreenshotIcon;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.CubeMapRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.RotatingCubeMapRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -116,12 +118,12 @@ public class PanoramaViewerScreen extends Screen {
                 Util.getOperatingSystem().open(panoramaDirectory);
             }
         })
-                .dimensions(width / 2 - 150 - 2, height - 32, 150, 20)
+                .dimensions(width / 2 - 150 - 4, height - 32, 150, 20)
                 .build()
         );
 
         addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close())
-                .dimensions(width / 2 + 2, height - 32, 150, 20)
+                .dimensions(width / 2 + 4, height - 32, 150, 20)
                 .build()
         );
     }
@@ -133,14 +135,17 @@ public class PanoramaViewerScreen extends Screen {
 
         if (doBackgroundFade) {
             float progress = (float) (Util.getMeasuringTimeMs() - this.backgroundFadeStart) / 2000.0F;
+            float widgetProgress = 1.0F;
 
             if (progress > 1.0F) {
                 this.doBackgroundFade = false;
                 backgroundAlpha = 1.0F;
             } else {
                 progress = MathHelper.clamp(progress, 0.0F, 1.0F);
+                widgetProgress = MathHelper.clampedMap(progress, 0.0F, 0.5F, 0.0F, 1.0F);;
                 backgroundAlpha = MathHelper.clampedMap(progress, 0.0F, 0.5F, 0.0F, 1.0F);
             }
+            //this.setWidgetOpacity(widgetProgress); // SORT OF IMPORTANT
         }
 
         super.render(context, mouseX, mouseY, delta);
@@ -151,6 +156,14 @@ public class PanoramaViewerScreen extends Screen {
             context.drawCenteredTextWithShadow(textRenderer, Text.translatable("text.snapper.panorama_encourage"), this.width / 2, this.height / 2, 0xFFFFFF);
         }
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xffffff);
+    }
+
+    private void setWidgetOpacity(float alpha) {
+        for (Element element : this.children()) {
+            if (element instanceof ClickableWidget clickableWidget) {
+                clickableWidget.setAlpha(alpha);
+            }
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package dev.spiritstudios.snapper.gui;
 
+import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.ScreenshotIcon;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -25,10 +26,16 @@ public class ScreenshotViewerScreen extends Screen {
     private final int imageHeight;
     private Screen parent;
 
-    public ScreenshotViewerScreen(String title, ScreenshotIcon icon, Path path, Screen parent) throws IOException {
+    public ScreenshotViewerScreen(String title, ScreenshotIcon icon, Path path, Screen parent) {
         super(Text.translatable("menu.snapper.viewermenu"));
         this.parent = parent;
-        BufferedImage img = ImageIO.read(new File(String.valueOf(path)));
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(new File(String.valueOf(path)));
+        } catch (IOException e) {
+            Snapper.LOGGER.error("Image failed to read.");
+            this.client.setScreen(parent);
+        }
         this.icon = icon;
         this.title = title;
         this.iconPath = path;
@@ -43,13 +50,13 @@ public class ScreenshotViewerScreen extends Screen {
 
     @Override
     protected void init() {
-        addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.view"), button -> Util.getOperatingSystem().open(this.iconPath))
-                .dimensions(width / 2 - 150 - 2, height - 32, 150, 20)
+        addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.open"), button -> Util.getOperatingSystem().open(this.iconPath))
+                .dimensions(width / 2 - 150 - 4, height - 32, 150, 20)
                 .build()
         );
 
         addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close())
-                .dimensions(width / 2 + 2, height - 32, 150, 20)
+                .dimensions(width / 2 + 4, height - 32, 150, 20)
                 .build()
         );
     }
