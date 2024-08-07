@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class PanoramaViewerScreen extends Screen {
     protected static final CubeMapRenderer PANORAMA_RENDERER = new CubeMapRenderer(Identifier.ofVanilla("screenshots/panorama/panorama"));
@@ -54,10 +55,12 @@ public class PanoramaViewerScreen extends Screen {
         List<File> panorama = this.loadPanorama();
         if (panorama == null) return;
 
-        panorama.parallelStream().forEach(face -> {
+        panorama.parallelStream().map(face -> {
             ScreenshotIcon icon = ScreenshotIcon.forPanoramaFace(client.getTextureManager(), face.getName());
             this.loadIcon(icon, face.getName(), Path.of(face.getPath()));
-        });
+            return icon;
+        }).collect(Collectors.toList())
+        .forEach(ScreenshotIcon::joinLoad);
 
         this.loaded = true;
     }

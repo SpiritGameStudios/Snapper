@@ -48,6 +48,10 @@ public class ScreenshotIcon implements AutoCloseable {
             this.texture.upload();
         }
         this.textureManager.registerTexture(this.id, this.texture);
+    }
+
+    public void joinLoad() {
+        // must be called on render thread
         this.texture.setFilter(true, false);
     }
 
