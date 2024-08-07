@@ -5,6 +5,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,10 @@ public class Snapper implements ClientModInitializer {
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (SCREENSHOT_MENU_KEY.wasPressed()) client.setScreen(new ScreenshotScreen(null));
-            while (PANORAMA_KEY.wasPressed()) client.takePanorama(client.runDirectory, 1024, 1024);
+            while (PANORAMA_KEY.wasPressed()) {
+                if (client.player == null) continue;
+                client.player.sendMessage(client.takePanorama(client.runDirectory, 1024, 1024), true);
+            }
         });
     }
 }
