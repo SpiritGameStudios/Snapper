@@ -168,7 +168,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             this.client = client;
             this.screenParent = parent;
             this.icon = ScreenshotIcon.forScreenshot(this.client.getTextureManager(), screenshot.getName());
-            this.iconPath = screenshot.toPath();
+            this.iconPath = Path.of(screenshot.getPath());
             this.iconFileName = screenshot.getName();
             this.lastModified = screenshot.lastModified();
             this.screenshot = screenshot;

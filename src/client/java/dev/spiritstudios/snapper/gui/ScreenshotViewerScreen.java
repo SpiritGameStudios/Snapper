@@ -179,7 +179,7 @@ public class ScreenshotViewerScreen extends Screen {
         RenderSystem.disableBlend();
     }
 
-    protected void drawHeaderAndFooterSeparators(DrawContext context) {
+    private void drawHeaderAndFooterSeparators(DrawContext context) {
         RenderSystem.enableBlend();
         Identifier identifier = this.client.world == null ? Screen.HEADER_SEPARATOR_TEXTURE : Screen.INWORLD_HEADER_SEPARATOR_TEXTURE;
         Identifier identifier2 = this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE;
