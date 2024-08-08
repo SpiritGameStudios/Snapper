@@ -13,8 +13,6 @@ public class Snapper implements ClientModInitializer {
     public static final String MODID = "snapper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
-    // TELL COPY-LOGIC THAT THE GAME IS NOT HEADLESS
-
     private static final KeyBinding SCREENSHOT_MENU_KEY = KeyBindingHelper.registerKeyBinding(
             new KeyBinding(
                     "key.snapper.screenshot_menu",

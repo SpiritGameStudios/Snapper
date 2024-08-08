@@ -12,7 +12,6 @@ import net.minecraft.text.Text;
 import java.io.File;
 
 public class RenameScreenshotScreen extends Screen {
-
     private final File screenshot;
     private final TextFieldWidget renameInput;
     private final Text RENAME_INPUT_TEXT = Text.translatable("text.snapper.rename_input");
@@ -32,9 +31,7 @@ public class RenameScreenshotScreen extends Screen {
         this.addDrawableChild(new TextWidget(RENAME_INPUT_TEXT, textRenderer)).setPosition(this.width / 2 - textRenderer.getWidth(RENAME_INPUT_TEXT) / 2, this.height / 2 - 20);
         this.addDrawableChild(this.renameInput).setPosition(this.width / 2 - 100, this.height / 2);
         this.renameInput.setText(this.screenshot.getName());
-        this.addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.rename"), button -> {
-                    this.renameScreenshot(this.renameInput.getText());
-                })
+        this.addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.rename"), button -> this.renameScreenshot(this.renameInput.getText()))
                 .dimensions(width / 2 - 150 - 4, height - 32, 150, 20)
                 .build()
         );
@@ -46,18 +43,13 @@ public class RenameScreenshotScreen extends Screen {
     }
 
     private void renameScreenshot(String newName) {
-        if (newName == null || !newName.endsWith(".png")) {
-            return;
-        }
+        if (newName == null || !newName.endsWith(".png")) return;
+
         ScreenshotActions.renameScreenshot(screenshot, newName);
         client.setScreen(this.parent);
-        // Should I make this an if-else statement just to bug Echo?
-    }
 
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 15, 0xFFFFFF);
+        // Should I make this an if-else statement just to bug Echo?
+        // no.
     }
 
     @Override

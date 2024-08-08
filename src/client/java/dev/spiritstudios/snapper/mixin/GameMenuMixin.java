@@ -3,7 +3,6 @@ package dev.spiritstudios.snapper.mixin;
 import dev.spiritstudios.snapper.gui.ScreenshotScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -32,7 +31,12 @@ public class GameMenuMixin extends Screen {
         this.addDrawableChild(
                 TextIconButtonWidget.builder(
                         Text.translatable("button.snapper.screenshots"),
-                        button -> this.client.setScreen(new ScreenshotScreen(new GameMenuScreen(true))),
+                        button -> {
+                            if (this.client == null)
+                                return;
+
+                            this.client.setScreen(new ScreenshotScreen(new GameMenuScreen(true)));
+                        },
                         true
                 ).width(20).texture(SNAPPER_BUTTON_ICON, 15, 15).build()
         ).setPosition(this.width / 2 - 130, height / 4 + 32);

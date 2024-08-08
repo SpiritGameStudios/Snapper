@@ -52,6 +52,7 @@ public class ScreenshotIcon implements AutoCloseable {
 
     public void joinLoad() {
         // must be called on render thread
+        if (this.texture == null) return;
         this.texture.setFilter(true, false);
     }
 
@@ -84,8 +85,6 @@ public class ScreenshotIcon implements AutoCloseable {
     }
 
     private void assertOpen() {
-        if (this.closed) {
-            throw new IllegalStateException("Icon already closed");
-        }
+        if (this.closed) throw new IllegalStateException("Icon already closed");
     }
 }

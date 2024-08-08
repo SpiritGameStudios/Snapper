@@ -26,7 +26,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class PanoramaViewerScreen extends Screen {
     protected static final CubeMapRenderer PANORAMA_RENDERER = new CubeMapRenderer(Identifier.ofVanilla("screenshots/panorama/panorama"));
@@ -35,19 +34,17 @@ public class PanoramaViewerScreen extends Screen {
     protected static final RotatingCubeMapRenderer FALLBACK_PANORAMA_RENDERER_CUBE = new RotatingCubeMapRenderer(FALLBACK_PANORAMA_RENDERER);
     private static final MinecraftClient client = MinecraftClient.getInstance();
 
-    private final Path iconPath;
     private final String title;
     private boolean doBackgroundFade = true;
     private long backgroundFadeStart;
-    private boolean loaded = false;
+    private boolean loaded;
     private float backgroundAlpha;
-    private Screen parent;
+    private final Screen parent;
 
     protected PanoramaViewerScreen(String title, Screen parent) {
         super(Text.translatable("menu.snapper.viewermenu"));
         this.title = title;
         this.parent = parent;
-        this.iconPath = new File(client.runDirectory + "screenshots/panorama").toPath();
         this.load();
     }
 
@@ -59,8 +56,7 @@ public class PanoramaViewerScreen extends Screen {
             ScreenshotIcon icon = ScreenshotIcon.forPanoramaFace(client.getTextureManager(), face.getName());
             this.loadIcon(icon, face.getName(), Path.of(face.getPath()));
             return icon;
-        }).collect(Collectors.toList())
-        .forEach(ScreenshotIcon::joinLoad);
+        }).toList().forEach(ScreenshotIcon::joinLoad);
 
         this.loaded = true;
     }
@@ -135,10 +131,10 @@ public class PanoramaViewerScreen extends Screen {
             } else {
                 progress = MathHelper.clamp(progress, 0.0F, 1.0F);
                 widgetProgress = MathHelper.clampedMap(progress, 0.0F, 0.5F, 0.0F, 1.0F);
-                ;
                 backgroundAlpha = MathHelper.clampedMap(progress, 0.0F, 0.5F, 0.0F, 1.0F);
             }
-            this.setWidgetOpacity(widgetProgress); // SORT OF IMPORTANT
+
+            this.setWidgetOpacity(widgetProgress);
         }
 
         super.render(context, mouseX, mouseY, delta);

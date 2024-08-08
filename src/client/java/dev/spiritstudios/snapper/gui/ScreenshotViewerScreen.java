@@ -98,9 +98,7 @@ public class ScreenshotViewerScreen extends Screen {
 
         // DELETE SCREENSHOT
 
-        ButtonWidget deleteButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.delete"), button -> {
-                            ScreenshotActions.deleteScreenshot(this.screenshot, this.parent);
-                        })
+        ButtonWidget deleteButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.delete"), button -> ScreenshotActions.deleteScreenshot(this.screenshot, this.parent))
                 .width(100)
                 .build()
         );

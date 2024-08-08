@@ -79,10 +79,9 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     private List<File> loadScreenshots() {
         File screenshotDir = new File(client.runDirectory, "screenshots");
-        List<File> screenshots;
 
         File[] files = screenshotDir.listFiles();
-        screenshots = new ArrayList<>(List.of(files == null ? new File[0] : files));
+        List<File> screenshots = new ArrayList<>(List.of(files == null ? new File[0] : files));
 
         screenshots.removeIf(file -> {
             if (Files.isDirectory(file.toPath())) return true;
@@ -153,7 +152,10 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     }
 
     public class ScreenshotEntry extends Entry implements AutoCloseable {
-        public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault());
+        public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter
+                .ofLocalizedDateTime(FormatStyle.SHORT)
+                .withZone(ZoneId.systemDefault());
+
         public final long lastModified;
         private final MinecraftClient client;
         public final ScreenshotIcon icon;
@@ -184,7 +186,6 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             try {
                 creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException e) {
-                //Snapper.LOGGER.error("FILE RENAMED/DELETED, RELOADING SCREEN");
                 client.setScreen(new ScreenshotScreen(screenParent));
             }
 
@@ -192,7 +193,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 creationString = Text.translatable("text.snapper.created").getString() + " " + DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
 
             if (StringHelper.isEmpty(fileName))
-                fileName = I18n.translate("text.snapper.generic") + " " + (index + 1);
+                fileName = Text.translatable("text.snapper.generic") + " " + (index + 1);
 
             context.drawText(
                     this.client.textRenderer,
@@ -220,7 +221,6 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                         y,
                         32,
                         32,
-                        //centered
                         (icon.getHeight()) / 3.0F + 32,
                         0,
                         icon.getHeight(),
@@ -230,6 +230,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 );
                 RenderSystem.disableBlend();
             }
+
             if (this.client.options.getTouchscreen().getValue() || hovered) {
                 context.fill(x, y, x + 32, y + 32, 0xA0909090);
                 context.drawGuiTexture(
