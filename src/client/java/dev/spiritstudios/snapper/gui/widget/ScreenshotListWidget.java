@@ -274,7 +274,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 if (this.icon == null) return false;
                 this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
-                this.client.setScreen(new ScreenshotViewerScreen(this.iconFileName, this.icon, this.iconPath, this.screenParent));
+                this.client.setScreen(new ScreenshotViewerScreen(this.icon, this.screenshot, this.screenParent));
                 return true;
             }
 

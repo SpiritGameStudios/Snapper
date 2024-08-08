@@ -138,7 +138,7 @@ public class PanoramaViewerScreen extends Screen {
                 ;
                 backgroundAlpha = MathHelper.clampedMap(progress, 0.0F, 0.5F, 0.0F, 1.0F);
             }
-            //this.setWidgetOpacity(widgetProgress); // SORT OF IMPORTANT
+            this.setWidgetOpacity(widgetProgress); // SORT OF IMPORTANT
         }
 
         super.render(context, mouseX, mouseY, delta);

@@ -3,16 +3,19 @@ package dev.spiritstudios.snapper.gui;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,8 +58,11 @@ public class ScreenshotScreen extends Screen {
         );
 
         this.viewButton = addDrawableChild(
-                ButtonWidget.builder(Text.translatable("button.snapper.view"), button ->
-                                this.client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.iconFileName, selectedScreenshot.icon, selectedScreenshot.iconPath, selectedScreenshot.screenParent)))
+                ButtonWidget.builder(Text.translatable("button.snapper.view"), button -> {
+                    if (selectedScreenshot != null) {
+                        this.client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.screenshot, selectedScreenshot.screenParent));
+                    }
+                })
                         .width(100)
                         .build()
         );
@@ -76,7 +82,11 @@ public class ScreenshotScreen extends Screen {
                 .build()
         );
 
-        this.renameButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.rename"), button -> ScreenshotActions.renameScreenshot(selectedScreenshot.screenshot, Util.getFormattedCurrentTime() + "_test" + ".png"))
+        this.renameButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.rename"), button -> {
+            if (this.selectedScreenshot != null) {
+                client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.screenshot, this));
+            }
+        })
                 .width(74)
                 .build()
         );
@@ -132,6 +142,24 @@ public class ScreenshotScreen extends Screen {
             this.selectedScreenshot = screenshot;
         }
     }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        long handle = MinecraftClient.getInstance().getWindow().getHandle();
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        } else if (keyCode == GLFW.GLFW_KEY_F5) {
+            client.setScreen(new ScreenshotScreen(this.parent));
+            return true;
+        } else if ((InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_LEFT_CONTROL) || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_CONTROL)) && InputUtil.isKeyPressed(handle, InputUtil.GLFW_KEY_C)) {
+            if (selectedScreenshot != null) {
+                ScreenshotActions.copyScreenshot(selectedScreenshot.screenshot);
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {

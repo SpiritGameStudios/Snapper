@@ -47,7 +47,9 @@ public class ScreenshotActions {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void renameScreenshot(File screenshot, String newName) {
-        if (screenshot.exists()) screenshot.renameTo(new File(screenshot.getParentFile().toPath() + "/" + newName));
+        if (screenshot.exists()) {
+            screenshot.renameTo(new File(screenshot.getParentFile().toPath() + "/" + newName));
+        }
     }
 
     @Nullable
@@ -57,7 +59,7 @@ public class ScreenshotActions {
         try {
             return Toolkit.getDefaultToolkit().getSystemClipboard();
         } catch (HeadlessException e) {
-            Snapper.LOGGER.error("Failed to get clipboard");
+            Snapper.LOGGER.error("Failed to get clipboard", e);
         }
 
         return null;

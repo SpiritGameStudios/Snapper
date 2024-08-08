@@ -5,7 +5,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +12,8 @@ import org.slf4j.LoggerFactory;
 public class Snapper implements ClientModInitializer {
     public static final String MODID = "snapper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
+
+    // TELL COPY-LOGIC THAT THE GAME IS NOT HEADLESS
 
     private static final KeyBinding SCREENSHOT_MENU_KEY = KeyBindingHelper.registerKeyBinding(
             new KeyBinding(
