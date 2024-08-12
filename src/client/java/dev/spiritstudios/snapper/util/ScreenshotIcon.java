@@ -1,11 +1,20 @@
 package dev.spiritstudios.snapper.util;
 
+import dev.spiritstudios.snapper.Snapper;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 
 public class ScreenshotIcon implements AutoCloseable {
     private static final Identifier UNKNOWN_SERVER_ID = Identifier.ofVanilla("textures/misc/unknown_server.png");
@@ -16,10 +25,42 @@ public class ScreenshotIcon implements AutoCloseable {
     @Nullable
     private NativeImageBackedTexture texture;
     private boolean closed;
+    private static MinecraftClient client = MinecraftClient.getInstance();
 
     private ScreenshotIcon(TextureManager textureManager, Identifier id) {
         this.textureManager = textureManager;
         this.id = id;
+    }
+
+    private ScreenshotIcon(TextureManager textureManager, Identifier id, File screenshot, boolean FuckIt) {
+        this.textureManager = textureManager;
+        this.id = id;
+        this.loadIcon(screenshot.toPath());
+    }
+
+    public static ScreenshotIcon of(File screenshot) {
+        return new ScreenshotIcon(
+                client.getTextureManager(),
+                Identifier.ofVanilla(
+                        "screenshots/" + Util.replaceInvalidChars(screenshot.getName(), Identifier::isPathCharacterValid) + "/icon"
+                ),
+                screenshot,
+                true
+        );
+    }
+
+    private void loadIcon(Path path) {
+        CompletableFuture.runAsync(() -> {
+            if (path == null || !Files.isRegularFile(path)) {
+                return;
+            }
+
+            try (InputStream inputStream = Files.newInputStream(path)) {
+                this.load(NativeImage.read(inputStream));
+            } catch (IOException error) {
+                Snapper.LOGGER.error("Invalid icon for screenshot {}", new File(String.valueOf(path)).getName(), error);
+            }
+        });
     }
 
     public static ScreenshotIcon forScreenshot(TextureManager textureManager, String screenshotName) {
