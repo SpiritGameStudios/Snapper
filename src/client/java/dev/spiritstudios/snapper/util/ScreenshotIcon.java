@@ -25,14 +25,14 @@ public class ScreenshotIcon implements AutoCloseable {
     @Nullable
     private NativeImageBackedTexture texture;
     private boolean closed;
-    private static MinecraftClient client = MinecraftClient.getInstance();
+    private static final MinecraftClient client = MinecraftClient.getInstance();
 
     private ScreenshotIcon(TextureManager textureManager, Identifier id) {
         this.textureManager = textureManager;
         this.id = id;
     }
 
-    private ScreenshotIcon(TextureManager textureManager, Identifier id, File screenshot, boolean FuckIt) {
+    private ScreenshotIcon(TextureManager textureManager, Identifier id, File screenshot) {
         this.textureManager = textureManager;
         this.id = id;
         this.loadIcon(screenshot.toPath());
@@ -44,8 +44,7 @@ public class ScreenshotIcon implements AutoCloseable {
                 Identifier.ofVanilla(
                         "screenshots/" + Util.replaceInvalidChars(screenshot.getName(), Identifier::isPathCharacterValid) + "/icon"
                 ),
-                screenshot,
-                true
+                screenshot
         );
     }
 

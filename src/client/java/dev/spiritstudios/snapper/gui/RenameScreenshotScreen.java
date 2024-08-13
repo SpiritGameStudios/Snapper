@@ -3,7 +3,6 @@ package dev.spiritstudios.snapper.gui;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.screen.ScreenTexts;

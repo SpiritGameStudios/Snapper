@@ -19,7 +19,7 @@ public class KeyboardMixin {
      * @reason Change message logic to show an overlay instead of chat message
      */
     @Overwrite
-    public void method_1464(Text text) {
+    private void method_1464(Text text) {
         MutableText message = Text.translatable("text.snapper.screenshot_instructions", text, Snapper.RECENT_SCREENSHOT_KEY.getBoundKeyLocalizedText());
         this.client.inGameHud.setOverlayMessage(message, false);
     }

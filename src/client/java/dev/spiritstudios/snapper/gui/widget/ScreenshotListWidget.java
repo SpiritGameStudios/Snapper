@@ -10,7 +10,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.LoadingDisplay;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.sound.SoundEvents;
@@ -45,9 +44,9 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     private final Screen parent;
 
-    public CompletableFuture<List<ScreenshotEntry>> loadFuture;
+    public final CompletableFuture<List<ScreenshotEntry>> loadFuture;
 
-    public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, ScreenshotListWidget previous, Screen parent) throws IOException {
+    public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, ScreenshotListWidget previous, Screen parent) {
         super(client, width, height, y, itemHeight);
         this.parent = parent;
         this.addEntry(new LoadingEntry(client));
@@ -161,9 +160,9 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         public final ScreenshotIcon icon;
         public final String iconFileName;
         public Path iconPath;
-        public Screen screenParent;
+        public final Screen screenParent;
         private long time;
-        public File screenshot;
+        public final File screenshot;
 
 
         public ScreenshotEntry(File screenshot, MinecraftClient client, Screen parent) {

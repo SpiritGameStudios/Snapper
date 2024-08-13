@@ -12,7 +12,7 @@
 		"sources": "https://github.com/SpiritGameStudios/Snapper",
 		"issues": "https://github.com/SpiritGameStudios/Snapper/issues"
 	},
-	"license": "ARR-FOR-NOW",
+	"license": "MPL-2.0",
 	"icon": "assets/snapper/icon.png",
 	"environment": "client",
 	"entrypoints": {

@@ -41,13 +41,7 @@ public class ScreenshotScreen extends Screen {
     protected void init() {
         if (client == null) return;
 
-        try {
-            screenshotList = this.addDrawableChild(new ScreenshotListWidget(client, width, height - 48 - 68, 48, 36, screenshotList, this));
-        } catch (IOException e) {
-            Snapper.LOGGER.error("Failed to load screenshots", e);
-            client.setScreen(parent);
-            return;
-        }
+        screenshotList = this.addDrawableChild(new ScreenshotListWidget(client, width, height - 48 - 68, 48, 36, screenshotList, this));
 
         ButtonWidget folderButton = addDrawableChild(
                 ButtonWidget.builder(Text.translatable("button.snapper.folder"), button ->
