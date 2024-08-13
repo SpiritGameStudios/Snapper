@@ -6,8 +6,10 @@ import dev.spiritstudios.snapper.util.ScreenshotIcon;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,7 @@ public class Snapper implements ClientModInitializer {
     private final MinecraftClient client = MinecraftClient.getInstance();
     public static final String MODID = "snapper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
+    public static final boolean IS_IRIS_INSTALLED = FabricLoader.getInstance().isModLoaded("iris");
 
     private static final KeyBinding SCREENSHOT_MENU_KEY = KeyBindingHelper.registerKeyBinding(
             new KeyBinding(
@@ -29,7 +32,7 @@ public class Snapper implements ClientModInitializer {
                     "key.categories.misc"
             ));
 
-    private static final KeyBinding RECENT_SCREENSHOT_KEY = KeyBindingHelper.registerKeyBinding(
+    public static final KeyBinding RECENT_SCREENSHOT_KEY = KeyBindingHelper.registerKeyBinding(
             new KeyBinding(
                     "key.snapper.recent",
                     GLFW.GLFW_KEY_O,
@@ -50,7 +53,12 @@ public class Snapper implements ClientModInitializer {
             while (SCREENSHOT_MENU_KEY.wasPressed()) client.setScreen(new ScreenshotScreen(null));
             while (PANORAMA_KEY.wasPressed()) {
                 if (client.player == null) continue;
-                client.player.sendMessage(client.takePanorama(client.runDirectory, 1024, 1024), true);
+                if (IS_IRIS_INSTALLED) {
+                    client.player.sendMessage(Text.translatable("text.snapper.panorama_failure_iris"), true);
+                    continue;
+                }
+                client.takePanorama(client.runDirectory, 1024, 1024);
+                client.player.sendMessage(Text.translatable("text.snapper.panorama_success", SCREENSHOT_MENU_KEY.getBoundKeyLocalizedText()), true);
             }
             while (RECENT_SCREENSHOT_KEY.wasPressed()) {
                 client.setScreen(new ScreenshotViewerScreen(
