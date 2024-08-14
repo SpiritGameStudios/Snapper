@@ -1,7 +1,7 @@
 package dev.spiritstudios.snapper.gui;
 
 import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.util.ScreenshotIcon;
+import dev.spiritstudios.snapper.util.ScreenshotImage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.CubeMapRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -53,15 +53,15 @@ public class PanoramaViewerScreen extends Screen {
         if (panorama == null) return;
 
         panorama.parallelStream().map(face -> {
-            ScreenshotIcon icon = ScreenshotIcon.forPanoramaFace(client.getTextureManager(), face.getName());
+            ScreenshotImage icon = ScreenshotImage.forPanoramaFace(client.getTextureManager(), face.getName());
             this.loadIcon(icon, face.getName(), Path.of(face.getPath()));
             return icon;
-        }).toList().forEach(ScreenshotIcon::joinLoad);
+        }).toList().forEach(ScreenshotImage::joinLoad);
 
         this.loaded = true;
     }
 
-    private void loadIcon(ScreenshotIcon icon, String fileName, Path filePath) {
+    private void loadIcon(ScreenshotImage icon, String fileName, Path filePath) {
         if (filePath == null || !Files.isRegularFile(filePath)) {
             icon.destroy();
             return;

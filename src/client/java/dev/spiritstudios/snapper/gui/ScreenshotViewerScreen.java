@@ -3,7 +3,7 @@ package dev.spiritstudios.snapper.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
-import dev.spiritstudios.snapper.util.ScreenshotIcon;
+import dev.spiritstudios.snapper.util.ScreenshotImage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -25,7 +25,7 @@ import java.nio.file.Path;
 
 public class ScreenshotViewerScreen extends Screen {
     private final MinecraftClient client = MinecraftClient.getInstance();
-    private final ScreenshotIcon icon;
+    private final ScreenshotImage icon;
     private Path iconPath;
     private final String title;
     private final int imageWidth;
@@ -36,7 +36,7 @@ public class ScreenshotViewerScreen extends Screen {
     private static final Identifier MENU_DECOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_list_background.png");
     private static final Identifier INWORLD_MENU_DECOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/inworld_menu_list_background.png");
 
-    public ScreenshotViewerScreen(ScreenshotIcon icon, File screenshot, Screen parent) {
+    public ScreenshotViewerScreen(ScreenshotImage icon, File screenshot, Screen parent) {
         super(Text.translatable("menu.snapper.viewermenu"));
         this.parent = parent;
 

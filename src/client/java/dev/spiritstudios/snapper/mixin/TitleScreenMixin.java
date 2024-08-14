@@ -35,7 +35,9 @@ public abstract class TitleScreenMixin extends Screen {
         this.addDrawableChild(
                 TextIconButtonWidget.builder(
                         Text.translatable("button.snapper.screenshots"),
-                        button -> this.client.setScreen(new ScreenshotScreen((TitleScreen) ((Object) this))),
+                        button -> {
+                            this.client.setScreen(new ScreenshotScreen((TitleScreen) ((Object) this)));
+                            },
                         true
                 ).width(20).texture(SNAPPER_BUTTON_ICON, 15, 15).build()
         ).setPosition(this.width / 2 - 124, y + spacingY);

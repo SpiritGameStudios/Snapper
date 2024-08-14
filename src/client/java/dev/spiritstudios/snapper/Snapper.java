@@ -2,7 +2,7 @@ package dev.spiritstudios.snapper;
 
 import dev.spiritstudios.snapper.gui.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
-import dev.spiritstudios.snapper.util.ScreenshotIcon;
+import dev.spiritstudios.snapper.util.ScreenshotImage;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -62,7 +62,7 @@ public class Snapper implements ClientModInitializer {
             }
             while (RECENT_SCREENSHOT_KEY.wasPressed()) {
                 client.setScreen(new ScreenshotViewerScreen(
-                        ScreenshotIcon.of(getLatestScreenshot()),
+                        ScreenshotImage.of(getLatestScreenshot()),
                         getLatestScreenshot(),
                         null
                 ));

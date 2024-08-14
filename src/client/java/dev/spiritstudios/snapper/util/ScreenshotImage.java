@@ -16,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
-public class ScreenshotIcon implements AutoCloseable {
+public class ScreenshotImage implements AutoCloseable {
     private static final Identifier UNKNOWN_SERVER_ID = Identifier.ofVanilla("textures/misc/unknown_server.png");
 
     private final TextureManager textureManager;
@@ -27,19 +27,19 @@ public class ScreenshotIcon implements AutoCloseable {
     private boolean closed;
     private static final MinecraftClient client = MinecraftClient.getInstance();
 
-    private ScreenshotIcon(TextureManager textureManager, Identifier id) {
+    private ScreenshotImage(TextureManager textureManager, Identifier id) {
         this.textureManager = textureManager;
         this.id = id;
     }
 
-    private ScreenshotIcon(TextureManager textureManager, Identifier id, File screenshot) {
+    private ScreenshotImage(TextureManager textureManager, Identifier id, File screenshot) {
         this.textureManager = textureManager;
         this.id = id;
         this.loadIcon(screenshot.toPath());
     }
 
-    public static ScreenshotIcon of(File screenshot) {
-        return new ScreenshotIcon(
+    public static ScreenshotImage of(File screenshot) {
+        return new ScreenshotImage(
                 client.getTextureManager(),
                 Identifier.ofVanilla(
                         "screenshots/" + Util.replaceInvalidChars(screenshot.getName(), Identifier::isPathCharacterValid) + "/icon"
@@ -62,8 +62,8 @@ public class ScreenshotIcon implements AutoCloseable {
         });
     }
 
-    public static ScreenshotIcon forScreenshot(TextureManager textureManager, String screenshotName) {
-        return new ScreenshotIcon(
+    public static ScreenshotImage forScreenshot(TextureManager textureManager, String screenshotName) {
+        return new ScreenshotImage(
                 textureManager,
                 Identifier.ofVanilla(
                         "screenshots/" + Util.replaceInvalidChars(screenshotName, Identifier::isPathCharacterValid) + "/icon"
@@ -71,8 +71,8 @@ public class ScreenshotIcon implements AutoCloseable {
         );
     }
 
-    public static ScreenshotIcon forPanoramaFace(TextureManager textureManager, String screenshotName) {
-        return new ScreenshotIcon(
+    public static ScreenshotImage forPanoramaFace(TextureManager textureManager, String screenshotName) {
+        return new ScreenshotImage(
                 textureManager,
                 Identifier.ofVanilla(
                         "screenshots/panorama/" + Util.replaceInvalidChars(screenshotName, Identifier::isPathCharacterValid)
@@ -82,12 +82,14 @@ public class ScreenshotIcon implements AutoCloseable {
 
     public void load(NativeImage image) {
         this.assertOpen();
-        if (this.texture == null) this.texture = new NativeImageBackedTexture(image);
-        else {
-            this.texture.setImage(image);
-            this.texture.upload();
+        if (image != null) {
+            if (this.texture == null) this.texture = new NativeImageBackedTexture(image);
+            else {
+                this.texture.setImage(image);
+                this.texture.upload();
+            }
+            this.textureManager.registerTexture(this.id, this.texture);
         }
-        this.textureManager.registerTexture(this.id, this.texture);
     }
 
     public void joinLoad() {

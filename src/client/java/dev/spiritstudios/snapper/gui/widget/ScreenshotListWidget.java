@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
-import dev.spiritstudios.snapper.util.ScreenshotIcon;
+import dev.spiritstudios.snapper.util.ScreenshotImage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.LoadingDisplay;
@@ -157,7 +157,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         public final long lastModified;
         private final MinecraftClient client;
-        public final ScreenshotIcon icon;
+        public final ScreenshotImage icon;
         public final String iconFileName;
         public Path iconPath;
         public final Screen screenParent;
@@ -168,7 +168,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         public ScreenshotEntry(File screenshot, MinecraftClient client, Screen parent) {
             this.client = client;
             this.screenParent = parent;
-            this.icon = ScreenshotIcon.forScreenshot(this.client.getTextureManager(), screenshot.getName());
+            this.icon = ScreenshotImage.forScreenshot(this.client.getTextureManager(), screenshot.getName());
             this.iconPath = Path.of(screenshot.getPath());
             this.iconFileName = screenshot.getName();
             this.lastModified = screenshot.lastModified();
@@ -213,21 +213,21 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             );
 
             if (this.icon != null) {
-                RenderSystem.enableBlend();
-                context.drawTexture(
-                        this.icon.getTextureId(),
-                        x,
-                        y,
-                        32,
-                        32,
-                        (icon.getHeight()) / 3.0F + 32,
-                        0,
-                        icon.getHeight(),
-                        icon.getHeight(),
-                        icon.getWidth(),
-                        icon.getHeight()
-                );
-                RenderSystem.disableBlend();
+                    RenderSystem.enableBlend();
+                    context.drawTexture(
+                            this.icon.getTextureId(),
+                            x,
+                            y,
+                            32,
+                            32,
+                            (icon.getHeight()) / 3.0F + 32,
+                            0,
+                            icon.getHeight(),
+                            icon.getHeight(),
+                            icon.getWidth(),
+                            icon.getHeight()
+                    );
+                    RenderSystem.disableBlend();
             }
 
             if (this.client.options.getTouchscreen().getValue() || hovered) {
