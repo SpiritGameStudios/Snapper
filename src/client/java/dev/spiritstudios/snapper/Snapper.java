@@ -2,7 +2,7 @@ package dev.spiritstudios.snapper;
 
 import dev.spiritstudios.snapper.gui.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
-import dev.spiritstudios.snapper.util.ScreenshotImage;
+import dev.spiritstudios.snapper.util.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -10,6 +10,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import java.nio.file.Files;
 import java.util.*;
 
 public class Snapper implements ClientModInitializer {
-    private final MinecraftClient client = MinecraftClient.getInstance();
     public static final String MODID = "snapper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
     public static final boolean IS_IRIS_INSTALLED = FabricLoader.getInstance().isModLoaded("iris");
@@ -61,37 +61,22 @@ public class Snapper implements ClientModInitializer {
                 client.player.sendMessage(Text.translatable("text.snapper.panorama_success", SCREENSHOT_MENU_KEY.getBoundKeyLocalizedText()), true);
             }
             while (RECENT_SCREENSHOT_KEY.wasPressed()) {
+                File latestScreenshot = ScreenshotActions.getScreenshots(client).getFirst();
+
                 client.setScreen(new ScreenshotViewerScreen(
-                        ScreenshotImage.of(getLatestScreenshot()),
-                        getLatestScreenshot(),
+                        ScreenshotImage.of(latestScreenshot, client.getTextureManager()),
+                        latestScreenshot,
                         null
                 ));
             }
         });
     }
 
-    private File getLatestScreenshot() {
-        File screenshotDir = new File(client.runDirectory, "screenshots");
-
-        File[] files = screenshotDir.listFiles();
-        List<File> screenshots = new ArrayList<>(List.of(files == null ? new File[0] : files));
-
-        screenshots.removeIf(file -> {
-            if (Files.isDirectory(file.toPath())) return true;
-            String fileType;
-
-            try {
-                fileType = Files.probeContentType(file.toPath());
-            } catch (IOException e) {
-                Snapper.LOGGER.error("Couldn't load screenshot list", e);
-                return true;
-            }
-
-            return !Objects.equals(fileType, "image/png");
-        });
-
-        screenshots.sort(Comparator.comparingLong(File::lastModified).reversed());
-
-        return screenshots.getFirst();
+    public static PlatformHelper getPlatformHelper() {
+        return switch (Util.getOperatingSystem()) {
+            case WINDOWS -> new WindowsActions();
+            case OSX -> new MacActions();
+            default -> new WindowsActions();
+        };
     }
 }

@@ -17,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
-import java.io.IOException;
 
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
@@ -59,12 +58,14 @@ public class ScreenshotScreen extends Screen {
                         .build()
         );
 
-        ButtonWidget doneButton = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close())
-                .width(100)
-                .build()
+        ButtonWidget doneButton = addDrawableChild(
+                ButtonWidget.builder(ScreenTexts.DONE, button -> this.close())
+                        .width(100)
+                        .build()
         );
 
-        this.deleteButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.delete"), button -> {
+        this.deleteButton = addDrawableChild(
+                ButtonWidget.builder(Text.translatable("button.snapper.delete"), button -> {
                             if (selectedScreenshot != null)
                                 ScreenshotActions.deleteScreenshot(selectedScreenshot.screenshot, this);
                         })
@@ -72,7 +73,8 @@ public class ScreenshotScreen extends Screen {
                         .build()
         );
 
-        this.openButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.open"), button -> {
+        this.openButton = addDrawableChild(
+                ButtonWidget.builder(Text.translatable("button.snapper.open"), button -> {
                             if (selectedScreenshot != null)
                                 Util.getOperatingSystem().open(selectedScreenshot.screenshot);
                         })
@@ -80,7 +82,8 @@ public class ScreenshotScreen extends Screen {
                         .build()
         );
 
-        this.renameButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.rename"), button -> {
+        this.renameButton = addDrawableChild(
+                ButtonWidget.builder(Text.translatable("button.snapper.rename"), button -> {
                             if (this.selectedScreenshot != null)
                                 client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.screenshot, this));
                         })
@@ -88,9 +91,10 @@ public class ScreenshotScreen extends Screen {
                         .build()
         );
 
-        this.copyButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.copy"), button -> {
+        this.copyButton = addDrawableChild(
+                ButtonWidget.builder(Text.translatable("button.snapper.copy"), button -> {
                             if (selectedScreenshot != null)
-                                ScreenshotActions.copyScreenshot(selectedScreenshot.screenshot);
+                                Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.screenshot);
                         })
                         .width(74)
                         .build()
@@ -126,28 +130,20 @@ public class ScreenshotScreen extends Screen {
     }
 
     public void imageSelected(@Nullable ScreenshotListWidget.ScreenshotEntry screenshot) {
-        if (screenshot == null) {
-            this.copyButton.active = false;
-            this.deleteButton.active = false;
-            this.openButton.active = false;
-            this.renameButton.active = false;
-            this.viewButton.active = false;
-            this.selectedScreenshot = null;
-        } else {
-            this.copyButton.active = true;
-            this.deleteButton.active = true;
-            this.openButton.active = true;
-            this.renameButton.active = true;
-            this.viewButton.active = true;
-            this.selectedScreenshot = screenshot;
-        }
+        boolean hasScreenshot = screenshot != null;
+        this.copyButton.active = hasScreenshot;
+        this.deleteButton.active = hasScreenshot;
+        this.openButton.active = hasScreenshot;
+        this.renameButton.active = hasScreenshot;
+        this.viewButton.active = hasScreenshot;
+        this.selectedScreenshot = screenshot;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        long handle = MinecraftClient.getInstance().getWindow().getHandle();
         if (super.keyPressed(keyCode, scanCode, modifiers)) return true;
 
+        long handle = MinecraftClient.getInstance().getWindow().getHandle();
         if (keyCode == GLFW.GLFW_KEY_F5) {
             if (client == null) return false;
 
@@ -157,7 +153,7 @@ public class ScreenshotScreen extends Screen {
 
         if ((InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_LEFT_CONTROL) || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_CONTROL)) && InputUtil.isKeyPressed(handle, InputUtil.GLFW_KEY_C)) {
             if (selectedScreenshot != null) {
-                ScreenshotActions.copyScreenshot(selectedScreenshot.screenshot);
+                Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.screenshot);
                 return true;
             }
         }

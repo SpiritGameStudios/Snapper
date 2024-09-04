@@ -115,7 +115,7 @@ public class ScreenshotViewerScreen extends Screen {
 
         // COPY SCREENSHOT
 
-        ButtonWidget copyButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.copy"), button -> ScreenshotActions.copyScreenshot(this.screenshot))
+        ButtonWidget copyButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.copy"), button -> Snapper.getPlatformHelper().copyScreenshot(this.screenshot))
                 .width(100)
                 .build()
         );

@@ -2,7 +2,6 @@ package dev.spiritstudios.snapper.gui;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.CubeMapRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
@@ -32,14 +31,13 @@ public class PanoramaViewerScreen extends Screen {
     protected static final CubeMapRenderer FALLBACK_PANORAMA_RENDERER = new CubeMapRenderer(Identifier.ofVanilla("textures/gui/title/background/panorama"));
     protected static final RotatingCubeMapRenderer PANORAMA_RENDERER_CUBE = new RotatingCubeMapRenderer(PANORAMA_RENDERER);
     protected static final RotatingCubeMapRenderer FALLBACK_PANORAMA_RENDERER_CUBE = new RotatingCubeMapRenderer(FALLBACK_PANORAMA_RENDERER);
-    private static final MinecraftClient client = MinecraftClient.getInstance();
 
     private final String title;
+    private final Screen parent;
     private boolean doBackgroundFade = true;
     private long backgroundFadeStart;
     private boolean loaded;
     private float backgroundAlpha;
-    private final Screen parent;
 
     protected PanoramaViewerScreen(String title, Screen parent) {
         super(Text.translatable("menu.snapper.viewermenu"));
@@ -50,13 +48,13 @@ public class PanoramaViewerScreen extends Screen {
 
     private void load() {
         List<File> panorama = this.loadPanorama();
-        if (panorama == null) return;
+        if (panorama == null || client == null) return;
 
         panorama.parallelStream().map(face -> {
-            ScreenshotImage icon = ScreenshotImage.forPanoramaFace(client.getTextureManager(), face.getName());
+            ScreenshotImage icon = ScreenshotImage.forPanoramaFace(this.client.getTextureManager(), face.getName());
             this.loadIcon(icon, face.getName(), Path.of(face.getPath()));
             return icon;
-        }).toList().forEach(ScreenshotImage::joinLoad);
+        }).forEach(ScreenshotImage::joinLoad);
 
         this.loaded = true;
     }
@@ -76,12 +74,16 @@ public class PanoramaViewerScreen extends Screen {
 
     @Nullable
     private List<File> loadPanorama() {
-        File panoramaDir = new File(client.runDirectory, "screenshots/panorama");
+        if (client == null) return null;
+
+        File panoramaDir = new File(this.client.runDirectory, "screenshots/panorama");
         List<File> panoramaFaces;
         if (!Files.exists(panoramaDir.toPath())) return null;
 
         File[] faceFiles = panoramaDir.listFiles();
-        panoramaFaces = new ArrayList<>(List.of(faceFiles == null ? new File[0] : faceFiles));
+        if (faceFiles == null) return new ArrayList<>();
+        panoramaFaces = new ArrayList<>(List.of(faceFiles));
+
         panoramaFaces.removeIf(file -> {
             if (Files.isDirectory(file.toPath())) return true;
             String fileType;
@@ -101,12 +103,15 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     public void close() {
+        if (client == null) return;
         client.setScreen(this.parent);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     protected void init() {
+        if (client == null) return;
+
         File panoramaDirectory = new File(client.runDirectory, "screenshots/panorama");
         addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.folder"), button -> {
             if (!panoramaDirectory.exists()) new File(String.valueOf(panoramaDirectory)).mkdirs();

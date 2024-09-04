@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
+import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -69,37 +70,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     public CompletableFuture<List<ScreenshotEntry>> load(MinecraftClient client) {
         return CompletableFuture.supplyAsync(() -> {
-            List<File> screenshots = this.loadScreenshots();
+            List<File> screenshots = ScreenshotActions.getScreenshots(client);
             List<ScreenshotEntry> entries = new ArrayList<>();
             screenshots.parallelStream().forEach(file -> entries.add(new ScreenshotEntry(file, client, parent)));
             return entries;
         });
     }
-
-    private List<File> loadScreenshots() {
-        File screenshotDir = new File(client.runDirectory, "screenshots");
-
-        File[] files = screenshotDir.listFiles();
-        List<File> screenshots = new ArrayList<>(List.of(files == null ? new File[0] : files));
-
-        screenshots.removeIf(file -> {
-            if (Files.isDirectory(file.toPath())) return true;
-            String fileType;
-
-            try {
-                fileType = Files.probeContentType(file.toPath());
-            } catch (IOException e) {
-                Snapper.LOGGER.error("Couldn't load screenshot list", e);
-                return true;
-            }
-
-            return !Objects.equals(fileType, "image/png");
-        });
-
-        screenshots.sort(Comparator.comparingLong(File::lastModified).reversed());
-        return screenshots;
-    }
-
     private void setEntrySelected(@Nullable ScreenshotEntry entry) {
         super.setSelected(entry);
         ScreenshotScreen parentScreen = (ScreenshotScreen) this.parent;

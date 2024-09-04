@@ -8,21 +8,20 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 public class ScreenshotActions {
-    private static final Clipboard clipboard = getClipboard();
-
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void deleteScreenshot(File screenshot, Screen screen) {
         if (!screenshot.exists()) return;
@@ -52,41 +51,34 @@ public class ScreenshotActions {
         }
     }
 
-    @Nullable
-    private static Clipboard getClipboard() {
-        if (MinecraftClient.IS_SYSTEM_MAC) return null;
+    public static java.util.List<File> getScreenshots(MinecraftClient client) {
+        File screenshotDir = new File(client.runDirectory, "screenshots");
 
-        try {
-            return Toolkit.getDefaultToolkit().getSystemClipboard();
-        } catch (HeadlessException e) {
-            Snapper.LOGGER.error("Failed to get clipboard", e);
-        }
+        File[] files = screenshotDir.listFiles();
+        java.util.List<File> screenshots = new ArrayList<>(List.of(files == null ? new File[0] : files));
 
-        return null;
-    }
+        screenshots.removeIf(file -> {
+            if (Files.isDirectory(file.toPath())) return true;
+            String fileType;
 
-    public static void copyScreenshot(File screenshot) {
-        if (MinecraftClient.IS_SYSTEM_MAC) {
-            ScreenshotActionsMac.copyScreenshotMac(screenshot.getAbsolutePath());
-            return;
-        }
-
-        if (clipboard != null && screenshot.exists()) {
             try {
-                BufferedImage imageBuffer = ImageIO.read(screenshot);
-
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                clipboard.setContents(new TransferableImage(imageBuffer), null);
+                fileType = Files.probeContentType(file.toPath());
             } catch (IOException e) {
-                Snapper.LOGGER.error(String.format("Copying of image at %s failed", screenshot.toPath()));
+                Snapper.LOGGER.error("Couldn't load screenshot list", e);
+                return true;
             }
-        }
+
+            return !Objects.equals(fileType, "image/png");
+        });
+
+        screenshots.sort(Comparator.comparingLong(File::lastModified).reversed());
+        return screenshots;
     }
 
     record TransferableImage(Image image) implements Transferable {
         @Override
         public DataFlavor[] getTransferDataFlavors() {
-            return new DataFlavor[] {
+            return new DataFlavor[]{
                     DataFlavor.imageFlavor
             };
         }

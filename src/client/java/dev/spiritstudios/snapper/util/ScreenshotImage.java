@@ -1,7 +1,6 @@
 package dev.spiritstudios.snapper.util;
 
 import dev.spiritstudios.snapper.Snapper;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
@@ -18,14 +17,11 @@ import java.util.concurrent.CompletableFuture;
 
 public class ScreenshotImage implements AutoCloseable {
     private static final Identifier UNKNOWN_SERVER_ID = Identifier.ofVanilla("textures/misc/unknown_server.png");
-
     private final TextureManager textureManager;
     private final Identifier id;
-
     @Nullable
     private NativeImageBackedTexture texture;
     private boolean closed;
-    private static final MinecraftClient client = MinecraftClient.getInstance();
 
     private ScreenshotImage(TextureManager textureManager, Identifier id) {
         this.textureManager = textureManager;
@@ -38,28 +34,14 @@ public class ScreenshotImage implements AutoCloseable {
         this.loadIcon(screenshot.toPath());
     }
 
-    public static ScreenshotImage of(File screenshot) {
+    public static ScreenshotImage of(File screenshot, TextureManager textureManager) {
         return new ScreenshotImage(
-                client.getTextureManager(),
+                textureManager,
                 Identifier.ofVanilla(
                         "screenshots/" + Util.replaceInvalidChars(screenshot.getName(), Identifier::isPathCharacterValid) + "/icon"
                 ),
                 screenshot
         );
-    }
-
-    private void loadIcon(Path path) {
-        CompletableFuture.runAsync(() -> {
-            if (path == null || !Files.isRegularFile(path)) {
-                return;
-            }
-
-            try (InputStream inputStream = Files.newInputStream(path)) {
-                this.load(NativeImage.read(inputStream));
-            } catch (IOException error) {
-                Snapper.LOGGER.error("Invalid icon for screenshot {}", new File(String.valueOf(path)).getName(), error);
-            }
-        });
     }
 
     public static ScreenshotImage forScreenshot(TextureManager textureManager, String screenshotName) {
@@ -80,6 +62,18 @@ public class ScreenshotImage implements AutoCloseable {
         );
     }
 
+    private void loadIcon(Path path) {
+        CompletableFuture.runAsync(() -> {
+            if (path == null || !Files.isRegularFile(path)) return;
+
+            try (InputStream inputStream = Files.newInputStream(path)) {
+                this.load(NativeImage.read(inputStream));
+            } catch (IOException error) {
+                Snapper.LOGGER.error("Invalid icon for screenshot {}", new File(String.valueOf(path)).getName(), error);
+            }
+        });
+    }
+
     public void load(NativeImage image) {
         this.assertOpen();
         if (image != null) {
@@ -92,19 +86,21 @@ public class ScreenshotImage implements AutoCloseable {
         }
     }
 
+    /*
+     * Must be called on render thread
+     */
     public void joinLoad() {
-        // must be called on render thread
         if (this.texture == null) return;
         this.texture.setFilter(true, false);
     }
 
     public void destroy() {
         this.assertOpen();
-        if (this.texture != null) {
-            this.textureManager.destroyTexture(this.id);
-            this.texture.close();
-            this.texture = null;
-        }
+        if (this.texture == null) return;
+
+        this.textureManager.destroyTexture(this.id);
+        this.texture.close();
+        this.texture = null;
     }
 
     public int getWidth() {

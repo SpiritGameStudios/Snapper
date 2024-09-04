@@ -3,9 +3,10 @@ package dev.spiritstudios.snapper.util;
 import ca.weblite.objc.Client;
 import ca.weblite.objc.Proxy;
 import dev.spiritstudios.snapper.Snapper;
-import net.minecraft.client.MinecraftClient;
 
-public class ScreenshotActionsMac {
+import java.io.File;
+
+public class MacActions implements PlatformHelper {
 
     /* Screenshot copy logic (ScreenshotActions, ScreenshotActionsMac) heavily inspired by
     ScreenshotViewer by LGatodu47. (https://github.com/LGatodu47/ScreenshotViewer).
@@ -61,13 +62,10 @@ public class ScreenshotActionsMac {
     SOFTWARE.
     */
 
-    public static void copyScreenshotMac(String path) {
-        if (!MinecraftClient.IS_SYSTEM_MAC) {
-            return;
-        }
-
+    @Override
+    public void copyScreenshot(File screenshot) {
         Client client = Client.getInstance();
-        Proxy url = client.sendProxy("NSURL", "fileURLWithPath:", path);
+        Proxy url = client.sendProxy("NSURL", "fileURLWithPath:", screenshot.getAbsoluteFile());
 
         Proxy image = client.sendProxy("NSImage", "alloc");
         image.send("initWithContentsOfURL:", url);
