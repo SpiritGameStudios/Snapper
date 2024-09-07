@@ -27,6 +27,7 @@
   "text.snapper.rename_invalid": "New name for screenshot invalid",
   "text.snapper.rename_invalid_png": "Name must end with '.png'",
   "text.snapper.screenshot_instructions": "%s. View by pressing %s",
+  "text.snapper.screenshot_failure_open": "Take a screenshot in order to view it",
   "panorama.snapper.failure": "Couldn't save panorama: %s",
   "panorama.snapper.success": "Saved screenshot as %s"
 }
