@@ -43,18 +43,17 @@ public class PanoramaViewerScreen extends Screen {
         super(Text.translatable("menu.snapper.viewermenu"));
         this.title = title;
         this.parent = parent;
-        this.load();
     }
 
     private void load() {
         List<File> panorama = this.loadPanorama();
-        if (panorama == null || client == null) return;
+        if (panorama == null) return;
 
         panorama.parallelStream().map(face -> {
             ScreenshotImage icon = ScreenshotImage.forPanoramaFace(this.client.getTextureManager(), face.getName());
             this.loadIcon(icon, face.getName(), Path.of(face.getPath()));
             return icon;
-        }).forEach(ScreenshotImage::joinLoad);
+        }).toList().forEach(ScreenshotImage::joinLoad); // MUST be joined & called on render thread!
 
         this.loaded = true;
     }
@@ -74,8 +73,6 @@ public class PanoramaViewerScreen extends Screen {
 
     @Nullable
     private List<File> loadPanorama() {
-        if (client == null) return null;
-
         File panoramaDir = new File(this.client.runDirectory, "screenshots/panorama");
         List<File> panoramaFaces;
         if (!Files.exists(panoramaDir.toPath())) return null;
@@ -103,15 +100,13 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     public void close() {
-        if (client == null) return;
         client.setScreen(this.parent);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     protected void init() {
-        if (client == null) return;
-
+        if (client == null) throw new RuntimeException("Attempted loading panorama screen without client set.");
         File panoramaDirectory = new File(client.runDirectory, "screenshots/panorama");
         addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.folder"), button -> {
             if (!panoramaDirectory.exists()) new File(String.valueOf(panoramaDirectory)).mkdirs();
@@ -119,6 +114,7 @@ public class PanoramaViewerScreen extends Screen {
         }).dimensions(width / 2 - 150 - 4, height - 32, 150, 20).build());
 
         addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, button -> this.close()).dimensions(width / 2 + 4, height - 32, 150, 20).build());
+        this.load();
     }
 
     @Override

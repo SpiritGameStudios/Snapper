@@ -6,7 +6,8 @@
     "GameMenuMixin",
     "KeyboardMixin",
     "MinecraftClientMixin",
-    "TitleScreenMixin"
+    "TitleScreenMixin",
+    "ScreenshotRecorderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
