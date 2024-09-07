@@ -1,15 +1,26 @@
 package dev.spiritstudios.snapper.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import dev.spiritstudios.snapper.mixinsupport.ImageTransferable;
+import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+//import java.awt.datatransfer.Tra
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -27,5 +38,16 @@ public class ScreenshotRecorderMixin {
     private static void lookBeforeYouLeap(NativeImage nativeImage, File screenshotFile, Consumer<Text> messageReceiver, CallbackInfo ci) throws IOException {
         screenshotFile.getParentFile().mkdirs();
         screenshotFile.createNewFile();
+    }
+
+    @Inject(
+            method = "method_1661",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Text;literal(Ljava/lang/String;)Lnet/minecraft/text/MutableText;", shift = At.Shift.AFTER)
+    )
+    private static void saveWrittenFileToClipboard(NativeImage nativeImage, File screenshotFile, Consumer<Text> messageReceiver, CallbackInfo ci) throws IOException {
+        if (!screenshotFile.getAbsolutePath().contains("/panorama/")) {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(new ImageTransferable(ImageIO.read(screenshotFile)), null);
+        }
     }
 }
