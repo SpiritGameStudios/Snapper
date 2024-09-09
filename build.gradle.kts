@@ -15,10 +15,17 @@ class Dependencies {
 	val yarn = property("deps.yarn").toString()
 
 	val fabricApi = property("deps.fabricapi").toString()
+	val specter = property("deps.specter").toString()
 }
+
 
 val mod = ModInfo()
 val deps = Dependencies()
+
+version = mod.version
+group = mod.group
+
+base.archivesName = "${mod.id}-${mod.version}"
 
 loom {
 	splitEnvironmentSourceSets()
@@ -29,6 +36,11 @@ loom {
 	}
 }
 
+repositories {
+	mavenCentral()
+	maven("https://maven.callmeecho.dev/releases/")
+}
+
 dependencies {
 	minecraft("com.mojang:minecraft:${deps.minecraft}")
 	mappings("net.fabricmc:yarn:${deps.yarn}:v2")
@@ -36,6 +48,15 @@ dependencies {
 
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${deps.fabricApi}")
 
+	fun specterModule(name: String) {
+		include("dev.spiritstudios.specter:specter-$name:${deps.specter}")
+		modImplementation("dev.spiritstudios.specter:specter-$name:${deps.specter}")
+	}
+
+	specterModule("config")
+	specterModule("core")
+
+	// TODO: Find a way to use the macOS clipboard without this.
 	implementation("ca.weblite:java-objc-bridge:1.0.0")
 }
 
