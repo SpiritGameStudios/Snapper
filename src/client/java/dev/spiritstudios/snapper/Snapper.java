@@ -61,7 +61,12 @@ public class Snapper implements ClientModInitializer {
                 client.player.sendMessage(Text.translatable("text.snapper.panorama_success", SCREENSHOT_MENU_KEY.getBoundKeyLocalizedText()), true);
             }
             while (RECENT_SCREENSHOT_KEY.wasPressed()) {
-                File latestScreenshot = ScreenshotActions.getScreenshots(client).getFirst();
+                List<File> screenshots = ScreenshotActions.getScreenshots(client);
+                if (screenshots.size() == 0) {
+                    if (client.player != null) client.player.sendMessage(Text.translatable("text.snapper.screenshot_failure_open"), true);
+                    continue;
+                }
+                File latestScreenshot = screenshots.getFirst();
 
                 client.setScreen(new ScreenshotViewerScreen(
                         ScreenshotImage.of(latestScreenshot, client.getTextureManager()),

@@ -3,10 +3,13 @@
   "package": "dev.spiritstudios.snapper.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "accessor.CameraAccessor",
+    "CameraMixin",
     "GameMenuMixin",
     "KeyboardMixin",
     "MinecraftClientMixin",
-    "TitleScreenMixin"
+    "TitleScreenMixin",
+    "ScreenshotRecorderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
