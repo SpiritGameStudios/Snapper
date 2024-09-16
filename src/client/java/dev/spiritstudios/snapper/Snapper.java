@@ -3,11 +3,11 @@ package dev.spiritstudios.snapper;
 import dev.spiritstudios.snapper.gui.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.*;
+import dev.spiritstudios.specter.api.ModMenuHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
@@ -16,8 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 
 public class Snapper implements ClientModInitializer {
@@ -49,6 +47,8 @@ public class Snapper implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ModMenuHelper.addConfig(Snapper.MODID, SnapperConfig.INSTANCE.getId());
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (SCREENSHOT_MENU_KEY.wasPressed()) client.setScreen(new ScreenshotScreen(null));
             while (PANORAMA_KEY.wasPressed()) {

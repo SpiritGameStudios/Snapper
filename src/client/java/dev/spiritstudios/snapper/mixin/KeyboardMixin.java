@@ -1,6 +1,7 @@
 package dev.spiritstudios.snapper.mixin;
 
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.SnapperConfig;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.MutableText;
@@ -21,6 +22,8 @@ public class KeyboardMixin {
     @Overwrite
     private void method_1464(Text text) {
         MutableText message = Text.translatable("text.snapper.screenshot_instructions", text, Snapper.RECENT_SCREENSHOT_KEY.getBoundKeyLocalizedText());
+        MutableText message_copy = Text.translatable("text.snapper.screenshot_instructions_copy", text, Snapper.RECENT_SCREENSHOT_KEY.getBoundKeyLocalizedText());
+        if (SnapperConfig.INSTANCE.copyTakenScreenshot.get()) { this.client.inGameHud.setOverlayMessage(message_copy, false); return;}
         this.client.inGameHud.setOverlayMessage(message, false);
     }
 }

@@ -34,7 +34,6 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import static dev.spiritstudios.snapper.Snapper.MODID;

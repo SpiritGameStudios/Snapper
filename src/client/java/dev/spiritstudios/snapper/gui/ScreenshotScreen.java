@@ -1,8 +1,10 @@
 package dev.spiritstudios.snapper.gui;
 
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
+import dev.spiritstudios.specter.impl.config.gui.ConfigScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,6 +24,7 @@ import static dev.spiritstudios.snapper.Snapper.MODID;
 
 public class ScreenshotScreen extends Screen {
     private static final Identifier PANORAMA_BUTTON_ICON = Identifier.of(MODID, "screenshots/panorama");
+    private static final Identifier SETTINGS_ICON = Identifier.of(MODID, "screenshots/settings");
     private final Screen parent;
     ScreenshotListWidget screenshotList;
     private ButtonWidget deleteButton;
@@ -115,6 +118,15 @@ public class ScreenshotScreen extends Screen {
 
         verticalButtonLayout.refreshPositions();
         SimplePositioningWidget.setPos(verticalButtonLayout, 0, this.height - 66, this.width, 64);
+
+        TextIconButtonWidget settings_button = addDrawableChild(
+                TextIconButtonWidget.builder(
+                        Text.translatable("config.snapper.snapper.title"),
+                        button -> this.client.setScreen(new ConfigScreen(SnapperConfig.INSTANCE, this)),
+                        true
+                ).width(20).texture(SETTINGS_ICON, 15, 15).build()
+        );
+        settings_button.setPosition(width / 2 - 178, height - 32);
 
         TextIconButtonWidget panorama_button = addDrawableChild(
                 TextIconButtonWidget.builder(
