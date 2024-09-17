@@ -4,7 +4,9 @@ import dev.spiritstudios.snapper.util.ScreenshotActions;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 
@@ -27,18 +29,21 @@ public class RenameScreenshotScreen extends Screen {
 
     @Override
     protected void init() {
-        this.addDrawableChild(new TextWidget(RENAME_INPUT_TEXT, textRenderer)).setPosition(this.width / 2 - textRenderer.getWidth(RENAME_INPUT_TEXT) / 2, this.height / 2 - 20);
-        this.addDrawableChild(this.renameInput).setPosition(this.width / 2 - 100, this.height / 2);
-        this.renameInput.setText(this.screenshot.getName());
-        this.addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.rename"), button -> this.renameScreenshot(this.renameInput.getText()))
-                .dimensions(width / 2 - 150 - 4, height - 32, 150, 20)
-                .build()
-        );
+        this.addDrawableChild(new TextWidget(RENAME_INPUT_TEXT, textRenderer))
+                .setPosition(this.width / 2 - textRenderer.getWidth(RENAME_INPUT_TEXT) / 2, this.height / 2 - 20);
 
-        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, button -> this.close())
-                .dimensions(width / 2 + 4, height - 32, 150, 20)
-                .build()
-        );
+        this.addDrawableChild(this.renameInput).setPosition(this.width / 2 - 100, this.height / 2);
+
+        this.renameInput.setText(this.screenshot.getName());
+        this.addDrawableChild(ButtonWidget.builder(
+                Text.translatable("button.snapper.rename"),
+                button -> this.renameScreenshot(this.renameInput.getText())
+        ).dimensions(width / 2 - 150 - 4, height - 32, 150, 20).build());
+
+        this.addDrawableChild(ButtonWidget.builder(
+                ScreenTexts.CANCEL,
+                button -> this.close()
+        ).dimensions(width / 2 + 4, height - 32, 150, 20).build());
     }
 
     private void renameScreenshot(String newName) {

@@ -48,6 +48,7 @@ public class PanoramaViewerScreen extends Screen {
     private void load() {
         List<File> panorama = this.loadPanorama();
         if (panorama == null) return;
+        Objects.requireNonNull(this.client);
 
         panorama.parallelStream().map(face -> {
             ScreenshotImage icon = ScreenshotImage.forPanoramaFace(this.client.getTextureManager(), face.getName());
@@ -73,6 +74,8 @@ public class PanoramaViewerScreen extends Screen {
 
     @Nullable
     private List<File> loadPanorama() {
+        Objects.requireNonNull(this.client);
+
         File panoramaDir = new File(this.client.runDirectory, "screenshots/panorama");
         List<File> panoramaFaces;
         if (!Files.exists(panoramaDir.toPath())) return null;
@@ -100,6 +103,8 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     public void close() {
+        Objects.requireNonNull(this.client);
+
         client.setScreen(this.parent);
     }
 
@@ -145,6 +150,7 @@ public class PanoramaViewerScreen extends Screen {
             FALLBACK_PANORAMA_RENDERER_CUBE.render(context, this.width, this.height, this.backgroundAlpha, delta);
             context.drawCenteredTextWithShadow(textRenderer, Text.translatable("text.snapper.panorama_encourage"), this.width / 2, this.height / 2, 0xFFFFFF);
         }
+        
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xffffff);
     }
 

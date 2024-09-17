@@ -1,6 +1,5 @@
 package dev.spiritstudios.snapper.mixin;
 
-import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.mixinsupport.ImageTransferable;
 import net.minecraft.client.texture.NativeImage;
@@ -22,8 +21,9 @@ import java.util.function.Consumer;
 public class ScreenshotRecorderMixin {
     /**
      * @author hama
-     * @reason check if pano file exists before writing to it
+     * @reason check if panorama file exists before writing to it
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Inject(
             method = "method_1661",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/NativeImage;writeTo(Ljava/io/File;)V")

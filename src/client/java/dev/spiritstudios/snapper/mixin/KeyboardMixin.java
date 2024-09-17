@@ -4,7 +4,6 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +12,9 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Keyboard.class)
 public class KeyboardMixin {
-    @Shadow @Final private MinecraftClient client;
+    @Shadow
+    @Final
+    private MinecraftClient client;
 
     /**
      * @author CallMeEcho
@@ -21,9 +22,12 @@ public class KeyboardMixin {
      */
     @Overwrite
     private void method_1464(Text text) {
-        MutableText message = Text.translatable("text.snapper.screenshot_instructions", text, Snapper.RECENT_SCREENSHOT_KEY.getBoundKeyLocalizedText());
-        MutableText message_copy = Text.translatable("text.snapper.screenshot_instructions_copy", text, Snapper.RECENT_SCREENSHOT_KEY.getBoundKeyLocalizedText());
-        if (SnapperConfig.INSTANCE.copyTakenScreenshot.get()) { this.client.inGameHud.setOverlayMessage(message_copy, false); return;}
-        this.client.inGameHud.setOverlayMessage(message, false);
+        this.client.inGameHud.setOverlayMessage(Text.translatable(
+                SnapperConfig.INSTANCE.copyTakenScreenshot.get() ?
+                        "text.snapper.screenshot_instructions_copy" :
+                        "text.snapper.screenshot_instructions",
+                text,
+                Snapper.RECENT_SCREENSHOT_KEY.getBoundKeyLocalizedText()
+        ), false);
     }
 }

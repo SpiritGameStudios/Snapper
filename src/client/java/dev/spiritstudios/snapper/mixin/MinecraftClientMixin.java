@@ -24,9 +24,7 @@ import java.io.File;
 import java.util.function.Consumer;
 
 @Mixin(MinecraftClient.class)
-
 public class MinecraftClientMixin {
-
     @Final
     @Shadow
     public static boolean IS_SYSTEM_MAC;
@@ -55,9 +53,7 @@ public class MinecraftClientMixin {
             at = @At("TAIL")
     )
     private void init(RunArgs args, CallbackInfo ci) {
-        if (!IS_SYSTEM_MAC) {
-            System.setProperty("java.awt.headless", "false");
-        }
+        if (!IS_SYSTEM_MAC) System.setProperty("java.awt.headless", "false");
     }
 
     @WrapOperation(
@@ -65,11 +61,8 @@ public class MinecraftClientMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;setYaw(F)V")
     )
     private void captureSetYaw(ClientPlayerEntity player, float value, Operation<Void> op, @Share("yaw")LocalFloatRef yaw) {
-        if (!this.options.getPerspective().isFirstPerson()) {
-            yaw.set(value);
-        } else {
-            op.call(player, value);
-        }
+        if (!this.options.getPerspective().isFirstPerson()) yaw.set(value);
+        else op.call(player, value);
     }
 
     @WrapOperation(
@@ -77,11 +70,9 @@ public class MinecraftClientMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;setPitch(F)V")
     )
     private void applyThirdPersonCameraRotation(ClientPlayerEntity player, float value, Operation<Void> op, @Share("yaw")LocalFloatRef yaw) {
-        if (!this.options.getPerspective().isFirstPerson()) {
-            ((CameraAccessor)this.gameRenderer.getCamera()).invokeSetRotation(yaw.get(), value);
-        } else {
-            op.call(player, value);
-        }
+        if (!this.options.getPerspective().isFirstPerson())
+            ((CameraAccessor) this.gameRenderer.getCamera()).invokeSetRotation(yaw.get(), value);
+        else op.call(player, value);
     }
 
 }
