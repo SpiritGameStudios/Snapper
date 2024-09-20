@@ -12,4 +12,12 @@ public class SnapperConfig extends Config<SnapperConfig> {
     public Value<Boolean> copyTakenScreenshot = booleanValue(false)
             .comment("Whether to copy screenshots to clipboard when taken.")
             .build();
+
+    public Value<Boolean> gridMode = booleanValue(false)
+            .comment("Whether to view screenshots in a grid or not.")
+            .build();
+
+    public Value<Integer> gameMenuDisplayPosition = intValue(1)
+            .comment("Where to display Snapper button on game menu.")
+            .build();
 }

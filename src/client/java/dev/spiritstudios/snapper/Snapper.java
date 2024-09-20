@@ -1,6 +1,6 @@
 package dev.spiritstudios.snapper;
 
-import dev.spiritstudios.snapper.gui.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.SnapperScreen;
 import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.*;
 import dev.spiritstudios.specter.api.ModMenuHelper;
@@ -54,7 +54,7 @@ public class Snapper implements ClientModInitializer {
     public void onInitializeClient() {
         ModMenuHelper.addConfig(Snapper.MODID, SnapperConfig.INSTANCE.getId());
 
-        ClientKeybindEvents.pressed(SCREENSHOT_MENU_KEY).register(client -> client.setScreen(new ScreenshotScreen(null)));
+        ClientKeybindEvents.pressed(SCREENSHOT_MENU_KEY).register(client -> client.setScreen(new SnapperScreen(null)));
 
         ClientKeybindEvents.pressed(PANORAMA_KEY).register(client -> {
             if (client.player == null) return;

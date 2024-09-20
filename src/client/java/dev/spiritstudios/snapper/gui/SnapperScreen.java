@@ -8,6 +8,8 @@ import dev.spiritstudios.specter.impl.config.gui.ConfigScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tab.GridScreenTab;
+import net.minecraft.client.gui.tab.TabManager;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.util.InputUtil;
@@ -22,7 +24,7 @@ import java.io.File;
 
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
-public class ScreenshotScreen extends Screen {
+public class SnapperScreen extends Screen {
     private static final Identifier PANORAMA_BUTTON_ICON = Identifier.of(MODID, "screenshots/panorama");
     private static final Identifier SETTINGS_ICON = Identifier.of(MODID, "screenshots/settings");
     private final Screen parent;
@@ -32,23 +34,34 @@ public class ScreenshotScreen extends Screen {
     private ButtonWidget viewButton;
     private ButtonWidget copyButton;
     private ButtonWidget openButton;
+
+    private TabNavigationWidget navigation;
+    private final TabManager navManager = new TabManager(this::addDrawableChild, this::remove);
+
     private ScreenshotListWidget.@Nullable ScreenshotEntry selectedScreenshot = null;
 
-    public ScreenshotScreen(Screen parent) {
+    public SnapperScreen(Screen parent) {
         super(Text.translatable("menu.snapper.screenshotmenu"));
         this.parent = parent;
     }
 
     @Override
     protected void init() {
+
+        this.navigation = TabNavigationWidget.builder(navManager, this.width).tabs(new ScreenshotsTab(Text.translatable("menu.snapper.screenshotmenu"))).build();
+        this.addDrawableChild(navigation);
+
         if (client == null) return;
+
+        int itemHeight = 36;
+        if (SnapperConfig.INSTANCE.gridMode.get()) itemHeight = 72;
 
         screenshotList = this.addDrawableChild(new ScreenshotListWidget(
                 client,
                 width,
                 height - 48 - 68,
                 48,
-                36,
+                itemHeight,
                 screenshotList,
                 this
         ));
@@ -151,6 +164,9 @@ public class ScreenshotScreen extends Screen {
         panoramaButton.setTooltip(Tooltip.of(Text.translatable("button.snapper.panorama.tooltip")));
 
         this.imageSelected(null);
+
+        this.navigation.selectTab(0, false);
+        //this.initTabNavigation();
     }
 
     public void imageSelected(@Nullable ScreenshotListWidget.ScreenshotEntry screenshot) {
@@ -171,7 +187,7 @@ public class ScreenshotScreen extends Screen {
         if (keyCode == GLFW.GLFW_KEY_F5) {
             if (client == null) return false;
 
-            client.setScreen(new ScreenshotScreen(this.parent));
+            client.setScreen(new SnapperScreen(this.parent));
             return true;
         }
 
@@ -192,5 +208,11 @@ public class ScreenshotScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xffffff);
+    }
+
+    class ScreenshotsTab extends GridScreenTab {
+        ScreenshotsTab(Text title) {
+            super(Text.translatable(String.valueOf(title)));
+        }
     }
 }

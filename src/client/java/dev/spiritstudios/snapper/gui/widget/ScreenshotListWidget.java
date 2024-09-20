@@ -2,7 +2,8 @@ package dev.spiritstudios.snapper.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.gui.ScreenshotScreen;
+import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.gui.SnapperScreen;
 import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
@@ -62,6 +63,15 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     }
 
     @Override
+    public int getRowWidth() {
+        if (SnapperConfig.INSTANCE.gridMode.get()) {
+            if (this.width >= 400) return 400;
+            return this.width - 36;
+        }
+        return 220;
+    }
+
+    @Override
     protected void clearEntries() {
         this.children().forEach(Entry::close);
         super.clearEntries();
@@ -75,9 +85,10 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             return entries;
         });
     }
+
     private void setEntrySelected(@Nullable ScreenshotEntry entry) {
         super.setSelected(entry);
-        ScreenshotScreen parentScreen = (ScreenshotScreen) this.parent;
+        SnapperScreen parentScreen = (SnapperScreen) this.parent;
         parentScreen.imageSelected(entry);
     }
 
@@ -125,6 +136,24 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         }
     }
 
+    public class GridRow extends Entry implements AutoCloseable {
+
+        public GridRow() {
+
+        }
+
+        @Override
+        public Text getNarration() {
+            return null;
+        }
+
+        @Override
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            context.drawCenteredTextWithShadow(client.textRenderer, "Send help.", width / 2, 0, 0xFFFFFF);
+        }
+
+    }
+
     public class ScreenshotEntry extends Entry implements AutoCloseable {
         public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter
                 .ofLocalizedDateTime(FormatStyle.SHORT)
@@ -160,7 +189,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             try {
                 creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException e) {
-                client.setScreen(new ScreenshotScreen(screenParent));
+                client.setScreen(new SnapperScreen(screenParent));
             }
 
             if (creationTime != -1L)
@@ -188,21 +217,21 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             );
 
             if (this.icon != null) {
-                    RenderSystem.enableBlend();
-                    context.drawTexture(
-                            this.icon.getTextureId(),
-                            x,
-                            y,
-                            32,
-                            32,
-                            (icon.getHeight()) / 3.0F + 32,
-                            0,
-                            icon.getHeight(),
-                            icon.getHeight(),
-                            icon.getWidth(),
-                            icon.getHeight()
-                    );
-                    RenderSystem.disableBlend();
+                RenderSystem.enableBlend();
+                context.drawTexture(
+                        this.icon.getTextureId(),
+                        x,
+                        y,
+                        32,
+                        32,
+                        (icon.getHeight()) / 3.0F + 32,
+                        0,
+                        icon.getHeight(),
+                        icon.getHeight(),
+                        icon.getWidth(),
+                        icon.getHeight()
+                );
+                RenderSystem.disableBlend();
             }
 
             if (this.client.options.getTouchscreen().getValue() || hovered) {

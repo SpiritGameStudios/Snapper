@@ -1,6 +1,6 @@
 package dev.spiritstudios.snapper.mixin;
 
-import dev.spiritstudios.snapper.gui.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.SnapperScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
@@ -35,7 +35,7 @@ public abstract class TitleScreenMixin extends Screen {
         this.addDrawableChild(
                 TextIconButtonWidget.builder(
                         Text.translatable("button.snapper.screenshots"),
-                        button -> this.client.setScreen(new ScreenshotScreen((TitleScreen) ((Object) this))),
+                        button -> this.client.setScreen(new SnapperScreen((TitleScreen) ((Object) this))),
                         true
                 ).width(20).texture(SNAPPER_BUTTON_ICON, 15, 15).build()
         ).setPosition(this.width / 2 - 124, y + spacingY);
