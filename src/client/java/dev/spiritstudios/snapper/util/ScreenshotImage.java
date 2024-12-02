@@ -1,5 +1,6 @@
 package dev.spiritstudios.snapper.util;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -9,7 +10,6 @@ import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -68,22 +68,33 @@ public class ScreenshotImage implements AutoCloseable {
 
             try (InputStream inputStream = Files.newInputStream(path)) {
                 this.load(NativeImage.read(inputStream));
-            } catch (IOException error) {
+            } catch (Throwable error) {
                 Snapper.LOGGER.error("Invalid icon for screenshot {}", new File(String.valueOf(path)).getName(), error);
             }
         });
     }
 
     public void load(NativeImage image) {
-        this.assertOpen();
-        if (image != null) {
-            if (this.texture == null) this.texture = new NativeImageBackedTexture(image);
-            else {
-                this.texture.setImage(image);
-                this.texture.upload();
+        Runnable load = () -> {
+            try {
+                this.assertOpen();
+                if (image != null) {
+                    if (this.texture == null) this.texture = new NativeImageBackedTexture(image);
+                    else {
+                        this.texture.setImage(image);
+                        this.texture.upload();
+                    }
+                    this.textureManager.registerTexture(this.id, this.texture);
+                }
+            } catch (Throwable e) {
+                image.close();
+                this.destroy();
+                throw e;
             }
-            this.textureManager.registerTexture(this.id, this.texture);
-        }
+        };
+
+        if (RenderSystem.isOnRenderThread()) load.run();
+        else RenderSystem.recordRenderCall(load::run);
     }
 
     /*

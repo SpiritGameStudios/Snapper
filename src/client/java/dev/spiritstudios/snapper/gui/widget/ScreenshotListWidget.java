@@ -6,11 +6,13 @@ import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
+import dev.spiritstudios.specter.api.core.exception.UnreachableException;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.LoadingDisplay;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
+import net.minecraft.client.input.KeyCodes;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.sound.SoundEvents;
@@ -36,18 +38,17 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static dev.spiritstudios.snapper.Snapper.MODID;
-
 public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
-    private static final Identifier VIEW_TEXTURE = Identifier.of(MODID, "screenshots/view");
-    private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Identifier.of(MODID, "screenshots/view_highlighted");
+    private static final Identifier VIEW_TEXTURE = Snapper.id("screenshots/view");
+    private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Snapper.id("screenshots/view_highlighted");
 
     private final Screen parent;
 
     public final CompletableFuture<List<ScreenshotEntry>> loadFuture;
 
-    public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, ScreenshotListWidget previous, Screen parent) {
+    public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, @Nullable ScreenshotListWidget previous, Screen parent) {
         super(client, width, height, y, itemHeight);
+
         this.parent = parent;
         this.addEntry(new LoadingEntry(client));
 
@@ -66,6 +67,16 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         super.clearEntries();
     }
 
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (KeyCodes.isToggle(keyCode)) {
+            Entry entry = this.getSelectedOrNull();
+            if (entry instanceof ScreenshotEntry screenshotEntry) return screenshotEntry.click();
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
     public CompletableFuture<List<ScreenshotEntry>> load(MinecraftClient client) {
         return CompletableFuture.supplyAsync(() -> {
             List<File> screenshots = ScreenshotActions.getScreenshots(client);
@@ -77,8 +88,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     private void setEntrySelected(@Nullable ScreenshotEntry entry) {
         super.setSelected(entry);
-        ScreenshotScreen parentScreen = (ScreenshotScreen) this.parent;
-        parentScreen.imageSelected(entry);
+        if (this.parent instanceof ScreenshotScreen screenshotScreen)
+            screenshotScreen.imageSelected(entry);
     }
 
     public abstract static class Entry extends AlwaysSelectedEntryListWidget.Entry<Entry> implements AutoCloseable {
@@ -140,7 +151,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            if (this.client.currentScreen == null) throw new IllegalStateException("How did we get here?");
+            if (this.client.currentScreen == null) throw new UnreachableException();
 
             context.drawText(
                     this.client.textRenderer,
@@ -253,7 +264,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
                 try (InputStream inputStream = Files.newInputStream(this.iconPath)) {
                     this.icon.load(NativeImage.read(inputStream));
-                } catch (IOException error) {
+                } catch (Throwable error) {
                     Snapper.LOGGER.error("Invalid icon for screenshot {}", iconFileName, error);
                     this.iconPath = null;
                 }
@@ -274,6 +285,10 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 return super.mouseClicked(mouseX, mouseY, button);
             }
 
+            return click();
+        }
+
+        public boolean click() {
             if (this.icon == null) return false;
             this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 

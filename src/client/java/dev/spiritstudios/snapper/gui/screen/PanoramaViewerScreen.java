@@ -67,7 +67,7 @@ public class PanoramaViewerScreen extends Screen {
 
         try (InputStream inputStream = Files.newInputStream(filePath)) {
             icon.load(NativeImage.read(inputStream));
-        } catch (IOException error) {
+        } catch (Throwable error) {
             Snapper.LOGGER.error("Invalid face for panorama {}", fileName, error);
         }
     }

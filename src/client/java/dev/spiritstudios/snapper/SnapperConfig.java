@@ -4,7 +4,7 @@ import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.Value;
 
-public class SnapperConfig extends Config<SnapperConfig> {
+public final class SnapperConfig extends Config<SnapperConfig> {
     public static final ConfigHolder<SnapperConfig, ?> HOLDER = ConfigHolder.builder(
             Snapper.id("snapper"), SnapperConfig.class
     ).build();
