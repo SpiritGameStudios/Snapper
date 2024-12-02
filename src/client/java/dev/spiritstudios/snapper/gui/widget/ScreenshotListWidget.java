@@ -125,6 +125,34 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         }
     }
 
+    public static class EmptyEntry extends Entry implements AutoCloseable {
+        private static final Text EMPTY_LIST_TEXT = Text.translatable("text.snapper.empty");
+        private final MinecraftClient client;
+
+        public EmptyEntry(MinecraftClient client) {
+            this.client = client;
+        }
+
+        @Override
+        public Text getNarration() {
+            return EMPTY_LIST_TEXT;
+        }
+
+        @Override
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            if (this.client.currentScreen == null) throw new IllegalStateException("How did we get here?");
+
+            context.drawText(
+                    this.client.textRenderer,
+                    EMPTY_LIST_TEXT,
+                    (this.client.currentScreen.width - this.client.textRenderer.getWidth(EMPTY_LIST_TEXT)) / 2,
+                    y + entryHeight / 2,
+                    0xFFFFFF,
+                    false
+            );
+        }
+    }
+
     public class ScreenshotEntry extends Entry implements AutoCloseable {
         public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter
                 .ofLocalizedDateTime(FormatStyle.SHORT)

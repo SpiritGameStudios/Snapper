@@ -4,6 +4,7 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
+import dev.spiritstudios.snapper.util.ScreenshotImage;
 import dev.spiritstudios.specter.api.config.RootConfigScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -42,7 +43,6 @@ public class ScreenshotScreen extends Screen {
     @Override
     protected void init() {
         if (client == null) return;
-
         screenshotList = this.addDrawableChild(new ScreenshotListWidget(
                 client,
                 width,
@@ -183,6 +183,11 @@ public class ScreenshotScreen extends Screen {
         ) {
             Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.screenshot);
             return true;
+        }
+
+        if (keyCode == GLFW.GLFW_KEY_ENTER && selectedScreenshot != null) {
+            if (client == null) return false;
+            client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.screenshot, this));
         }
 
         return false;
