@@ -34,6 +34,9 @@
   "panorama.snapper.success": "Saved screenshot as %s",
   "config.snapper.snapper.title": "Snapper Settings",
   "config.snapper.snapper.copyTakenScreenshot": "Auto-Clipboard",
+  "config.snapper.snapper.copyTakenScreenshot.tooltip": "Copy screenshot to clipboard when taken",
   "config.snapper.snapper.showSnapperTitleScreen": "Title Screen Button",
-  "config.snapper.snapper.showSnapperGameMenu": "Game Menu Button"
+  "config.snapper.snapper.showSnapperTitleScreen.tooltip": "Show Snapper button on title screen",
+  "config.snapper.snapper.showSnapperGameMenu": "Game Menu Button",
+  "config.snapper.snapper.showSnapperGameMenu.tooltip": "Show Snapper button in game menu"
 }
