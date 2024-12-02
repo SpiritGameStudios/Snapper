@@ -24,10 +24,10 @@ public class GameMenuMixin extends Screen {
     private static final Identifier SNAPPER_BUTTON_ICON = Identifier.of(MODID, "screenshots/screenshot");
 
     @Inject(
-            method = "init",
+            method = "initWidgets",
             at = @At("TAIL")
     )
-    protected void head(CallbackInfo ci) {
+    protected void initWidgets(CallbackInfo ci) {
         this.addDrawableChild(
                 TextIconButtonWidget.builder(
                         Text.translatable("button.snapper.screenshots"),
