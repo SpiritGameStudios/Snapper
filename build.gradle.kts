@@ -38,7 +38,7 @@ loom {
 
 repositories {
 	mavenCentral()
-	maven("https://maven.callmeecho.dev/releases/")
+	maven("https://maven.spiritstudios.dev/releases/")
 }
 
 dependencies {

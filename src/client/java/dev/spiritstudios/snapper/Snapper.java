@@ -3,13 +3,14 @@ package dev.spiritstudios.snapper;
 import dev.spiritstudios.snapper.gui.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.*;
-import dev.spiritstudios.specter.api.ModMenuHelper;
+import dev.spiritstudios.specter.api.config.ModMenuHelper;
 import dev.spiritstudios.specter.api.core.util.ClientKeybindEvents;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class Snapper implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ModMenuHelper.addConfig(Snapper.MODID, SnapperConfig.INSTANCE.getId());
+        ModMenuHelper.addConfig(Snapper.MODID, SnapperConfig.HOLDER.id());
 
         ClientKeybindEvents.pressed(SCREENSHOT_MENU_KEY).register(client -> client.setScreen(new ScreenshotScreen(null)));
 
@@ -86,5 +87,9 @@ public class Snapper implements ClientModInitializer {
                     client.currentScreen
             ));
         });
+    }
+
+    public static Identifier id(String path) {
+        return Identifier.of(MODID, path);
     }
 }

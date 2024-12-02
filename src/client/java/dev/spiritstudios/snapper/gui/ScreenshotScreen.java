@@ -4,7 +4,8 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
-import dev.spiritstudios.specter.impl.config.gui.ConfigScreen;
+import dev.spiritstudios.specter.api.config.ConfigScreen;
+import dev.spiritstudios.specter.api.config.RootConfigScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -135,7 +136,8 @@ public class ScreenshotScreen extends Screen {
 
         TextIconButtonWidget settingsButton = addDrawableChild(TextIconButtonWidget.builder(
                 Text.translatable("config.snapper.snapper.title"),
-                button -> this.client.setScreen(new ConfigScreen(SnapperConfig.INSTANCE, this)),
+                button -> this.client.setScreen(
+                        new RootConfigScreen(SnapperConfig.HOLDER, this)),
                 true
         ).width(20).texture(SETTINGS_ICON, 15, 15).build());
 

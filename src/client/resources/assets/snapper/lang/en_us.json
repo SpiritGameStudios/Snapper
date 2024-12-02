@@ -32,5 +32,7 @@
   "panorama.snapper.failure": "Couldn't save panorama: %s",
   "panorama.snapper.success": "Saved screenshot as %s",
   "config.snapper.snapper.title": "Snapper Settings",
-  "config.snapper.snapper.copyTakenScreenshot": "Copy screenshot to clipboard when taken"
+  "config.snapper.snapper.copyTakenScreenshot": "Copy screenshot to clipboard when taken",
+  "config.snapper.snapper.showSnapperTitleScreen": "Show Snapper button on title screen",
+  "config.snapper.snapper.showSnapperGameMenu": "Show Snapper button in game menu."
 }
