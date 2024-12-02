@@ -2,8 +2,8 @@ package dev.spiritstudios.snapper.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.gui.ScreenshotScreen;
-import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
 import net.minecraft.client.MinecraftClient;
@@ -31,10 +31,10 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
@@ -51,10 +51,9 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         this.parent = parent;
         this.addEntry(new LoadingEntry(client));
 
-        if (previous != null) this.loadFuture = previous.loadFuture;
-        else this.loadFuture = load(client);
+        this.loadFuture = previous != null ? previous.loadFuture : load(client);
 
-        this.loadFuture.thenAccept((entries) -> {
+        this.loadFuture.thenAccept(entries -> {
             this.clearEntries();
             entries.sort(Comparator.comparingLong(ScreenshotEntry::lastModified).reversed());
             entries.forEach(this::addEntry);
@@ -70,11 +69,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     public CompletableFuture<List<ScreenshotEntry>> load(MinecraftClient client) {
         return CompletableFuture.supplyAsync(() -> {
             List<File> screenshots = ScreenshotActions.getScreenshots(client);
-            List<ScreenshotEntry> entries = new ArrayList<>();
-            screenshots.parallelStream().forEach(file -> entries.add(new ScreenshotEntry(file, client, parent)));
-            return entries;
+            return screenshots.parallelStream()
+                    .map(file -> new ScreenshotEntry(file, client, parent))
+                    .collect(Collectors.toList());
         });
     }
+
     private void setEntrySelected(@Nullable ScreenshotEntry entry) {
         super.setSelected(entry);
         ScreenshotScreen parentScreen = (ScreenshotScreen) this.parent;
@@ -139,7 +139,6 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         private long time;
         public final File screenshot;
 
-
         public ScreenshotEntry(File screenshot, MinecraftClient client, Screen parent) {
             this.client = client;
             this.screenParent = parent;
@@ -188,21 +187,21 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             );
 
             if (this.icon != null) {
-                    RenderSystem.enableBlend();
-                    context.drawTexture(
-                            this.icon.getTextureId(),
-                            x,
-                            y,
-                            32,
-                            32,
-                            (icon.getHeight()) / 3.0F + 32,
-                            0,
-                            icon.getHeight(),
-                            icon.getHeight(),
-                            icon.getWidth(),
-                            icon.getHeight()
-                    );
-                    RenderSystem.disableBlend();
+                RenderSystem.enableBlend();
+                context.drawTexture(
+                        this.icon.getTextureId(),
+                        x,
+                        y,
+                        32,
+                        32,
+                        (icon.getHeight()) / 3.0F + 32,
+                        0,
+                        icon.getHeight(),
+                        icon.getHeight(),
+                        icon.getWidth(),
+                        icon.getHeight()
+                );
+                RenderSystem.disableBlend();
             }
 
             if (this.client.options.getTouchscreen().getValue() || hovered) {
@@ -245,14 +244,13 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             if (!(mouseX - (double) ScreenshotListWidget.this.getRowLeft() <= 32.0) && Util.getMeasuringTimeMs() - this.time >= 250L) {
                 this.time = Util.getMeasuringTimeMs();
                 return super.mouseClicked(mouseX, mouseY, button);
-            } else {
-                if (this.icon == null) return false;
-                this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-
-                this.client.setScreen(new ScreenshotViewerScreen(this.icon, this.screenshot, this.screenParent));
-                return true;
             }
 
+            if (this.icon == null) return false;
+            this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+
+            this.client.setScreen(new ScreenshotViewerScreen(this.icon, this.screenshot, this.screenParent));
+            return true;
         }
 
         @Override

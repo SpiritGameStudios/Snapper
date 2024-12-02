@@ -10,15 +10,15 @@ public class SnapperConfig extends Config<SnapperConfig> {
     ).build();
     public static final SnapperConfig INSTANCE = HOLDER.get();
 
-    public Value<Boolean> copyTakenScreenshot = booleanValue(false)
+    public final Value<Boolean> copyTakenScreenshot = booleanValue(false)
             .comment("Whether to copy screenshots to clipboard when taken.")
             .build();
 
-    public Value<Boolean> showSnapperTitleScreen = booleanValue(true)
+    public final Value<Boolean> showSnapperTitleScreen = booleanValue(true)
             .comment("Whether to show Snapper button on title screen.")
             .build();
 
-    public Value<Boolean> showSnapperGameMenu = booleanValue(true)
+    public final Value<Boolean> showSnapperGameMenu = booleanValue(true)
             .comment("Whether to show Snapper button in game menu.")
             .build();
 }

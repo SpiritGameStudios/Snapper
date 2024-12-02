@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Keyboard.class)
-public class KeyboardMixin {
+public abstract class KeyboardMixin {
     @Shadow
     @Final
     private MinecraftClient client;

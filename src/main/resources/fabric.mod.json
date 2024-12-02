@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "snapper",
-	"version": "${version}",
+	"version": "${mod_version}",
 	"name": "Snapper",
 	"description": "Screenshots, made simple.",
 	"authors": [
@@ -24,7 +24,7 @@
 		"snapper.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=${loader_version}",
+		"fabricloader": ">=${fabric_loader_version}",
 		"minecraft": "~${minecraft_version}-",
 		"fabric-api": "*",
 		"java": ">=21",

@@ -1,7 +1,7 @@
 package dev.spiritstudios.snapper.mixin;
 
 import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.gui.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
 @Mixin(GameMenuScreen.class)
-public class GameMenuMixin extends Screen {
+public abstract class GameMenuMixin extends Screen {
     protected GameMenuMixin(Text title) {
         super(title);
     }

@@ -6,7 +6,9 @@ Screenshots, made simple
 
 <img alt="Won't support Forge" src="https://raw.githubusercontent.com/intergrav/devins-badges/v3/assets/compact/unsupported/forge_vector.svg">
 
-<img alt="Made by Spirit Studios" src="https://badger-api-staging.worldwidepixel.ca/compact?gradientStart=310092&gradientEnd=2e005e&lineOne=Made%20by&lineTwo=Spirit&colourOne=FFFFFF&colourTwo=b300ff&iconUrl=https%3A%2F%2Frounder.worldwidepixel.ca%2F%3Fr%3D80%26url%3Dhttps%3A%2F%2Fcdn.modrinth.com%2Fdata%2F3N4V1sd0%2Feb038a251ef1bb4c3330d4a8d79de4be700fb815.png">
+<img alt="Made by Spirit Studios" src="https://raw.githubusercontent.com/SpiritGameStudios/.github/main/assets/brand/badge/compact.svg">
+
+<img alt="As seen on ModFest 1.21" height="40" src="https://badger-api-staging.worldwidepixel.ca/compact?gradientStart=4B2018&gradientEnd=220D09&lineOne=As+seen+on&lineTwo=ModFest+1.21&colourOne=FFFFFF&colourTwo=de634c&iconUrl=https://raw.githubusercontent.com/ModFest/art/refs/heads/v2/icon/svg/1.21/transparent.svg">
 
 ## 📖 About
 
@@ -16,17 +18,18 @@ Snapper includes:
 - A screenshot managment menu, accessible from the title screen or ingame
 - The ability to view latest screenshot with just a keybind
 - Options to rename, delete, copy, and externally open images ingame
-- The ability to and view panoramic screenshots ingame
+- The ability to create and view panoramic screenshots ingame
+- ~~Not having to install a mod from an EXE~~
 
 ## ❓ FAQ
 * Forge? <br/>
-No. Please do not ask us for a forge port.
+  No. Please do not ask us for a forge port.
 
 * Do you plan to / Could you add `X`? <br/>
-If you want to suggest something, join the [discord](https://discord.gg/TTmx7d2axf).
+  If you want to suggest something, join the [discord](https://discord.gg/TTmx7d2axf).
 
 * Can you port/backport to `X` version? <br/>
-Probably not. Multi-version projects are hard :<
+  Probably not. Multi-version projects are hard :<
 
 Special thanks to our original beta testers:
 - [Blurryface](https://blurry.gay)

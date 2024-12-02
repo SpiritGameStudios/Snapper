@@ -1,10 +1,9 @@
-package dev.spiritstudios.snapper.gui;
+package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
-import dev.spiritstudios.specter.api.config.ConfigScreen;
 import dev.spiritstudios.specter.api.config.RootConfigScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;

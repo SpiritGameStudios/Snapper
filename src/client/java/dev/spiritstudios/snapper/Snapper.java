@@ -1,7 +1,7 @@
 package dev.spiritstudios.snapper;
 
-import dev.spiritstudios.snapper.gui.ScreenshotScreen;
-import dev.spiritstudios.snapper.gui.ScreenshotViewerScreen;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.*;
 import dev.spiritstudios.specter.api.config.ModMenuHelper;
 import dev.spiritstudios.specter.api.core.util.ClientKeybindEvents;
