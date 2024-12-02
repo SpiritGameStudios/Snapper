@@ -1,0 +1,38 @@
+[versions]
+fabric_loom = "1.8-SNAPSHOT"
+minotaur = "2.+"
+
+minecraft = "1.21"
+yarn = "1.21+build.9"
+
+fabric_loader = "0.16.5"
+fabric_api = "0.110.0+1.21.1"
+
+specter = "1.0.6"
+objc_bridge = "1.0.0"
+
+[plugins]
+fabric_loom = { id = "fabric-loom", version.ref = "fabric_loom" }
+minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
+
+[libraries]
+minecraft = { group = "mojang", name = "minecraft", version.ref = "minecraft" }
+yarn = { group = "net.fabricmc", name = "yarn", version.ref = "yarn" }
+
+fabric_loader = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fabric_loader" }
+fabric_api = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.ref = "fabric_api" }
+
+specter_config = { group = "dev.spiritstudios.specter", name = "specter-config", version.ref = "specter" }
+specter_core = { group = "dev.spiritstudios.specter", name = "specter-core", version.ref = "specter" }
+specter_serialization = { group = "dev.spiritstudios.specter", name = "specter-serialization", version.ref = "specter" }
+specter_gui = { group = "dev.spiritstudios.specter", name = "specter-gui", version.ref = "specter" }
+
+objc_bridge = { group = "ca.weblite", name = "java-objc-bridge", version.ref = "objc_bridge" }
+
+[bundles]
+specter = [
+    "specter_serialization",
+    "specter_core",
+    "specter_config",
+    "specter_gui"
+]

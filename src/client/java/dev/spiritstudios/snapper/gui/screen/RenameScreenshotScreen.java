@@ -1,4 +1,4 @@
-package dev.spiritstudios.snapper.gui;
+package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import net.minecraft.client.MinecraftClient;

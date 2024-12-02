@@ -1,4 +1,4 @@
-package dev.spiritstudios.snapper.gui;
+package dev.spiritstudios.snapper.gui.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;

@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 @Mixin(ScreenshotRecorder.class)
-public class ScreenshotRecorderMixin {
+public abstract class ScreenshotRecorderMixin {
     /**
      * @author hama
      * @reason check if panorama file exists before writing to it

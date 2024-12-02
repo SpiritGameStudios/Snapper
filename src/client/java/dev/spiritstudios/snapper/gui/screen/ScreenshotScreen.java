@@ -1,10 +1,11 @@
-package dev.spiritstudios.snapper.gui;
+package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
-import dev.spiritstudios.specter.impl.config.gui.ConfigScreen;
+import dev.spiritstudios.snapper.util.ScreenshotImage;
+import dev.spiritstudios.specter.api.config.RootConfigScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -42,7 +43,6 @@ public class ScreenshotScreen extends Screen {
     @Override
     protected void init() {
         if (client == null) return;
-
         screenshotList = this.addDrawableChild(new ScreenshotListWidget(
                 client,
                 width,
@@ -135,7 +135,8 @@ public class ScreenshotScreen extends Screen {
 
         TextIconButtonWidget settingsButton = addDrawableChild(TextIconButtonWidget.builder(
                 Text.translatable("config.snapper.snapper.title"),
-                button -> this.client.setScreen(new ConfigScreen(SnapperConfig.INSTANCE, this)),
+                button -> this.client.setScreen(
+                        new RootConfigScreen(SnapperConfig.HOLDER, this)),
                 true
         ).width(20).texture(SETTINGS_ICON, 15, 15).build());
 
@@ -182,6 +183,11 @@ public class ScreenshotScreen extends Screen {
         ) {
             Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.screenshot);
             return true;
+        }
+
+        if (keyCode == GLFW.GLFW_KEY_ENTER && selectedScreenshot != null) {
+            if (client == null) return false;
+            client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.screenshot, this));
         }
 
         return false;

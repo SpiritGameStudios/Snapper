@@ -1,4 +1,4 @@
-package dev.spiritstudios.snapper.gui;
+package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
@@ -67,7 +67,7 @@ public class PanoramaViewerScreen extends Screen {
 
         try (InputStream inputStream = Files.newInputStream(filePath)) {
             icon.load(NativeImage.read(inputStream));
-        } catch (IOException error) {
+        } catch (Throwable error) {
             Snapper.LOGGER.error("Invalid face for panorama {}", fileName, error);
         }
     }
@@ -150,7 +150,7 @@ public class PanoramaViewerScreen extends Screen {
             FALLBACK_PANORAMA_RENDERER_CUBE.render(context, this.width, this.height, this.backgroundAlpha, delta);
             context.drawCenteredTextWithShadow(textRenderer, Text.translatable("text.snapper.panorama_encourage"), this.width / 2, this.height / 2, 0xFFFFFF);
         }
-        
+
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xffffff);
     }
 

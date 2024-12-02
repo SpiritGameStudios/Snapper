@@ -2,7 +2,7 @@
   "key.snapper.panorama": "Take Panoramic Screenshots",
   "key.snapper.huge": "Take Huge Screenshot",
   "key.snapper.screenshot_menu": "View Screenshots",
-  "key.snapper.recent": "Open latest screenshot",
+  "key.snapper.recent": "Open Latest Screenshot",
   "menu.snapper.screenshotmenu": "Screenshots",
   "menu.snapper.viewermenu": "Viewer",
   "menu.snapper.panorama": "View Panorama",
@@ -17,6 +17,7 @@
   "text.snapper.created": "Created",
   "text.snapper.generic": "Screenshot",
   "text.snapper.loading": "Loading Screenshots",
+  "text.snapper.empty": "Take a screenshot in-game to see it here!",
   "text.snapper.panorama_encourage": "Take a panorama in-game to see it here!",
   "text.snapper.panorama_success": "Panorama saved. View by pressing %s",
   "text.snapper.panorama_failure_iris": "Due to a bug in Iris, panoramas cannot be taken while it's installed.",
@@ -28,9 +29,14 @@
   "text.snapper.rename_invalid_png": "Name must end with '.png'",
   "text.snapper.screenshot_instructions": "%s. View by pressing %s",
   "text.snapper.screenshot_instructions_copy": "%s. Automagically copied to clipboard.",
-  "text.snapper.screenshot_failure_open": "Take a screenshot in order to view it",
+  "text.snapper.screenshot_failure_open": "Take a screenshot in order to view it!",
   "panorama.snapper.failure": "Couldn't save panorama: %s",
   "panorama.snapper.success": "Saved screenshot as %s",
   "config.snapper.snapper.title": "Snapper Settings",
-  "config.snapper.snapper.copyTakenScreenshot": "Copy screenshot to clipboard when taken"
+  "config.snapper.snapper.copyTakenScreenshot": "Auto-Clipboard",
+  "config.snapper.snapper.copyTakenScreenshot.tooltip": "Copy screenshot to clipboard when taken",
+  "config.snapper.snapper.showSnapperTitleScreen": "Title Screen Button",
+  "config.snapper.snapper.showSnapperTitleScreen.tooltip": "Show Snapper button on title screen",
+  "config.snapper.snapper.showSnapperGameMenu": "Game Menu Button",
+  "config.snapper.snapper.showSnapperGameMenu.tooltip": "Show Snapper button in game menu"
 }

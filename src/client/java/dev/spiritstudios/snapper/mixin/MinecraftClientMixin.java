@@ -24,7 +24,7 @@ import java.io.File;
 import java.util.function.Consumer;
 
 @Mixin(MinecraftClient.class)
-public class MinecraftClientMixin {
+public abstract class MinecraftClientMixin {
     @Final
     @Shadow
     public static boolean IS_SYSTEM_MAC;
