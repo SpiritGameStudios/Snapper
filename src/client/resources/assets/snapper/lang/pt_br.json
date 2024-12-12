@@ -25,7 +25,7 @@
   "text.snapper.delete_warning": "'%s' será perdido para sempre! (é muito tempo!)",
   "text.snapper.rename": "Renomear Captura de Tela",
   "text.snapper.rename_input": "Digite o novo nome aqui",
-  "text.snapper.rename_invalid": "Novo nome para a Captura de Tela inválida",
+  "text.snapper.rename_invalid": "Novo nome para a Captura de Tela inválido",
   "text.snapper.rename_invalid_png": "O nome deve terminar com '.png'",
   "text.snapper.screenshot_instructions": "%s. Visualizar pressionando %s",
   "text.snapper.screenshot_instructions_copy": "%s. Copiado automaticamente para a área de transferência.",
