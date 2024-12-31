@@ -18,19 +18,19 @@ public final class SnapperKeybindings {
     public static final KeyBinding PANORAMA_KEY = new KeyBinding(
             "key.snapper.panorama",
             GLFW.GLFW_KEY_F8,
-            "key.categories.misc"
+            "key.categories.snapper"
     );
 
     public static final KeyBinding RECENT_SCREENSHOT_KEY = new KeyBinding(
             "key.snapper.recent",
             GLFW.GLFW_KEY_O,
-            "key.categories.misc"
+            "key.categories.snapper"
     );
 
     public static final KeyBinding SCREENSHOT_MENU_KEY = new KeyBinding(
             "key.snapper.screenshot_menu",
             GLFW.GLFW_KEY_V,
-            "key.categories.misc"
+            "key.categories.snapper"
     );
 
     public static void init() {
