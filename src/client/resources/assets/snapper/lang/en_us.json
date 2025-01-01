@@ -39,5 +39,6 @@
   "config.snapper.snapper.showSnapperTitleScreen": "Title Screen Button",
   "config.snapper.snapper.showSnapperTitleScreen.tooltip": "Show Snapper button on title screen",
   "config.snapper.snapper.showSnapperGameMenu": "Game Menu Button",
-  "config.snapper.snapper.showSnapperGameMenu.tooltip": "Show Snapper button in game menu"
+  "config.snapper.snapper.showSnapperGameMenu.tooltip": "Show Snapper button in game menu",
+  "config.snapper.snapper.view_mode": "View Mode"
 }

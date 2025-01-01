@@ -9,6 +9,7 @@ import dev.spiritstudios.snapper.util.ScreenshotImage;
 import dev.spiritstudios.specter.api.core.exception.UnreachableException;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.navigation.NavigationDirection;
 import net.minecraft.client.gui.screen.LoadingDisplay;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
@@ -21,6 +22,7 @@ import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -36,15 +38,19 @@ import java.time.format.FormatStyle;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
     private static final Identifier VIEW_TEXTURE = Snapper.id("screenshots/view");
     private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Snapper.id("screenshots/view_highlighted");
+    private static final int NUM_COLUMNS = 6;
 
     private final Screen parent;
 
     public final CompletableFuture<List<ScreenshotEntry>> loadFuture;
+
+    private boolean showGrid = true;
 
     public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, @Nullable ScreenshotListWidget previous, Screen parent) {
         super(client, width, height, y, itemHeight);
@@ -96,9 +102,99 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             screenshotScreen.imageSelected(entry);
     }
 
+    @Override
+    protected void renderList(DrawContext context, int mouseX, int mouseY, float delta) {
+        if (showGrid) {int rowLeft = this.getRowLeft();
+            int rowWidth = this.getRowWidth();
+            int entryHeight = this.itemHeight - 4;
+            int entryWidth = showGrid ? entryHeight : rowWidth;
+            int entryCount = this.getEntryCount();
+            int spacing = showGrid ? (rowWidth - (NUM_COLUMNS * entryWidth)) / (NUM_COLUMNS - 1) : 0;
+
+            for (int index = 0; index < entryCount; index++) {
+                int rowTop = this.getRowTop(index);
+                int rowBottom = this.getRowBottom(index);
+                int colIndex = index % NUM_COLUMNS;
+                int leftOffset = colIndex * (entryWidth + spacing);
+
+                if (rowBottom >= this.getY() && rowTop <= this.getBottom()) {
+                    this.renderEntry(context, mouseX, mouseY, delta, index, rowLeft + leftOffset, rowTop, entryWidth, entryHeight);
+                }
+            }
+        } else {
+            super.renderList(context, mouseX, mouseY, delta);
+        }
+    }
+
+    @Override
+    protected int getRowTop(int index) {
+        return super.getRowTop(showGrid ? index / NUM_COLUMNS : index);
+    }
+
+    @Override
+    protected void drawSelectionHighlight(DrawContext context, int y, int entryWidth, int entryHeight, int borderColor, int fillColor) {
+        // let elements handle it
+    }
+
+    @Override
+    protected int getMaxPosition() {
+        return showGrid ? getEntryCount() * itemHeight / 3 + headerHeight : super.getMaxPosition();
+    }
+
+    public void toggleGrid() {
+        this.showGrid = !this.showGrid;
+        for (var entry : this.children()) if (entry instanceof ScreenshotEntry sc) sc.setShowGrid(this.showGrid);
+    }
+
+    @Override
+    protected @Nullable Entry getEntryAtPosition(double x, double y) {
+        if (!showGrid) return super.getEntryAtPosition(x, y);
+
+        int rowWidth = this.getRowWidth();
+        int relX = MathHelper.floor(x - this.getRowLeft());
+        int relY = MathHelper.floor(y - (double)this.getY()) - this.headerHeight;
+
+        if (relX < 0 || relX > rowWidth || relY < 0 || relY > getBottom()) return null;
+
+        int rowIndex = (relY + (int)this.getScrollAmount()) / this.itemHeight;
+        int colIndex = MathHelper.floor(((float)relX / (float)rowWidth) * (float)NUM_COLUMNS);
+        int entryIndex = rowIndex * NUM_COLUMNS + colIndex;
+
+        return entryIndex >= 0 && entryIndex < getEntryCount() ? getEntry(entryIndex) : null;
+    }
+
     public abstract static class Entry extends AlwaysSelectedEntryListWidget.Entry<Entry> implements AutoCloseable {
         public void close() {
         }
+    }
+
+    @Override
+    protected @Nullable Entry getNeighboringEntry(NavigationDirection direction, Predicate<Entry> predicate, @Nullable Entry selected) {
+        if (!showGrid) return super.getNeighboringEntry(direction, predicate, selected);
+        int offset = switch (direction) {
+            case LEFT -> -1;
+            case RIGHT -> 1;
+            case UP -> -NUM_COLUMNS;
+            case DOWN -> NUM_COLUMNS;
+        };
+
+        if (getEntryCount() > 0) {
+            int entryIndex;
+            if (selected == null) {
+                entryIndex = offset > 0 ? 0 : getEntryCount() - 1;
+            } else {
+                entryIndex = this.children().indexOf(selected) + offset;
+            }
+
+            for (int k = entryIndex; k >= 0 && k < this.children().size(); k += offset) {
+                Entry entry = getEntry(k);
+                if (predicate.test(entry)) {
+                    return entry;
+                }
+            }
+        }
+
+        return null;
     }
 
     public static class LoadingEntry extends Entry implements AutoCloseable {
@@ -181,8 +277,10 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         public final Screen screenParent;
         private long time;
         public final File screenshot;
+        private boolean showGrid;
 
         public ScreenshotEntry(File screenshot, MinecraftClient client, Screen parent) {
+            this.showGrid = ScreenshotListWidget.this.showGrid;
             this.client = client;
             this.screenParent = parent;
             this.icon = ScreenshotImage.forScreenshot(this.client.getTextureManager(), screenshot.getName());
@@ -193,50 +291,57 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             this.loadIcon();
         }
 
+        public void setShowGrid(boolean showGrid) {
+            this.showGrid = showGrid;
+        }
+
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            String fileName = this.iconFileName;
-            String creationString = "undefined";
+            if (!this.showGrid) {
+                String fileName = this.iconFileName;
+                String creationString = "undefined";
 
-            long creationTime = 0;
-            try {
-                creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
-            } catch (IOException e) {
-                client.setScreen(new ScreenshotScreen(screenParent));
+                long creationTime = 0;
+                try {
+                    creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
+                } catch (IOException e) {
+                    client.setScreen(new ScreenshotScreen(screenParent));
+                }
+
+                if (creationTime != -1L)
+                    creationString = Text.translatable("text.snapper.created").getString() + " " + DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
+
+                if (StringHelper.isEmpty(fileName))
+                    fileName = Text.translatable("text.snapper.generic") + " " + (index + 1);
+
+                context.drawText(
+                        this.client.textRenderer,
+                        fileName,
+                        x + 32 + 3,
+                        y + 1,
+                        0xFFFFFF,
+                        false
+                );
+
+                context.drawText(
+                        this.client.textRenderer,
+                        creationString,
+                        x + 35,
+                        y + 12,
+                        Colors.GRAY,
+                        false
+                );
             }
-
-            if (creationTime != -1L)
-                creationString = Text.translatable("text.snapper.created").getString() + " " + DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
-
-            if (StringHelper.isEmpty(fileName))
-                fileName = Text.translatable("text.snapper.generic") + " " + (index + 1);
-
-            context.drawText(
-                    this.client.textRenderer,
-                    fileName,
-                    x + 32 + 3,
-                    y + 1,
-                    0xFFFFFF,
-                    false
-            );
-
-            context.drawText(
-                    this.client.textRenderer,
-                    creationString,
-                    x + 35,
-                    y + 12,
-                    Colors.GRAY,
-                    false
-            );
 
             if (this.icon != null) {
                 RenderSystem.enableBlend();
+                int iconSize = entryHeight;
                 context.drawTexture(
                         this.icon.getTextureId(),
                         x,
                         y,
-                        32,
-                        32,
+                        iconSize,
+                        iconSize,
                         (icon.getHeight()) / 3.0F + 32,
                         0,
                         icon.getHeight(),
@@ -247,7 +352,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 RenderSystem.disableBlend();
             }
 
-            if (this.client.options.getTouchscreen().getValue() || hovered) {
+            if (!this.showGrid && (this.client.options.getTouchscreen().getValue() || hovered)) {
                 context.fill(x, y, x + 32, y + 32, 0xA0909090);
                 context.drawGuiTexture(
                         mouseX - x < 32 && this.icon != null ? ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
@@ -276,6 +381,14 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         }
 
         @Override
+        public void drawBorder(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            if (isSelectedEntry(index) && isFocused()) {
+                context.fill(x - 2, y - 2, x + entryWidth + 2, y + entryHeight + 2, -1);
+                context.fill(x - 1, y - 1, x + entryWidth + 1, y + entryHeight + 1, -16777216);
+            }
+        }
+
+        @Override
         public Text getNarration() {
             return Text.literal(this.iconFileName);
         }
@@ -284,7 +397,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             ScreenshotListWidget.this.setEntrySelected(this);
 
-            if (!(mouseX - (double) ScreenshotListWidget.this.getRowLeft() <= 32.0) && Util.getMeasuringTimeMs() - this.time >= 250L) {
+            boolean clickThrough = !this.showGrid && mouseX - (double) ScreenshotListWidget.this.getRowLeft() <= 32.0;
+            if (!clickThrough && Util.getMeasuringTimeMs() - this.time >= 250L) {
                 this.time = Util.getMeasuringTimeMs();
                 return super.mouseClicked(mouseX, mouseY, button);
             }

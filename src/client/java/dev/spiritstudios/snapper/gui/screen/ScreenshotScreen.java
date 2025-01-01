@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -26,6 +27,7 @@ import static dev.spiritstudios.snapper.Snapper.MODID;
 public class ScreenshotScreen extends Screen {
     private static final Identifier PANORAMA_BUTTON_ICON = Identifier.of(MODID, "screenshots/panorama");
     private static final Identifier SETTINGS_ICON = Identifier.of(MODID, "screenshots/settings");
+    private static final Identifier VIEW_MODE_ICON = Identifier.of(MODID, "screenshots/show_list");
     private final Screen parent;
     ScreenshotListWidget screenshotList;
     private ButtonWidget deleteButton;
@@ -141,6 +143,18 @@ public class ScreenshotScreen extends Screen {
         ).width(20).texture(SETTINGS_ICON, 15, 15).build());
 
         settingsButton.setPosition(width / 2 - 178, height - 32);
+
+
+        TextIconButtonWidget viewModeButton = addDrawableChild(TextIconButtonWidget.builder(
+                Text.translatable("config.snapper.snapper.view_mode"),
+                button -> {
+                    screenshotList.toggleGrid();
+                    screenshotList.refreshScroll();
+                },
+                true
+        ).width(20).texture(VIEW_MODE_ICON, 15, 15).build());
+
+        viewModeButton.setPosition(width / 2 - 178, height - 56);
 
         TextIconButtonWidget panoramaButton = addDrawableChild(TextIconButtonWidget.builder(
                 Text.translatable("button.snapper.screenshots"),

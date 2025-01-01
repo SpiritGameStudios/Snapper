@@ -24,6 +24,8 @@ loom {
 		sourceSet(sourceSets["main"])
 		sourceSet(sourceSets["client"])
 	}
+
+	accessWidenerPath = file("src/main/resources/snapper.accesswidener")
 }
 
 repositories {
