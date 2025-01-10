@@ -27,7 +27,7 @@ import static dev.spiritstudios.snapper.Snapper.MODID;
 public class ScreenshotScreen extends Screen {
     private static final Identifier PANORAMA_BUTTON_ICON = Identifier.of(MODID, "screenshots/panorama");
     private static final Identifier SETTINGS_ICON = Identifier.of(MODID, "screenshots/settings");
-    private static final Identifier VIEW_MODE_ICON = Identifier.of(MODID, "screenshots/show_list");
+    private static Identifier VIEW_MODE_ICON;
     private final Screen parent;
     ScreenshotListWidget screenshotList;
     private ButtonWidget deleteButton;
@@ -35,11 +35,16 @@ public class ScreenshotScreen extends Screen {
     private ButtonWidget viewButton;
     private ButtonWidget copyButton;
     private ButtonWidget openButton;
+    private TextIconButtonWidget viewModeButton;
     private ScreenshotListWidget.@Nullable ScreenshotEntry selectedScreenshot = null;
+    private boolean showGrid = false;
 
     public ScreenshotScreen(Screen parent) {
         super(Text.translatable("menu.snapper.screenshotmenu"));
         this.parent = parent;
+
+        this.showGrid = SnapperConfig.INSTANCE.viewMode.get();
+        VIEW_MODE_ICON = showGrid ? Identifier.of(MODID, "screenshots/show_list") : Identifier.of(MODID, "screenshots/show_grid");
     }
 
     @Override
@@ -145,11 +150,10 @@ public class ScreenshotScreen extends Screen {
         settingsButton.setPosition(width / 2 - 178, height - 32);
 
 
-        TextIconButtonWidget viewModeButton = addDrawableChild(TextIconButtonWidget.builder(
-                Text.translatable("config.snapper.snapper.view_mode"),
+        this.viewModeButton = addDrawableChild(TextIconButtonWidget.builder(
+                Text.translatable("config.snapper.snapper.viewMode"),
                 button -> {
-                    screenshotList.toggleGrid();
-                    screenshotList.refreshScroll();
+                    this.toggleGrid();
                 },
                 true
         ).width(20).texture(VIEW_MODE_ICON, 15, 15).build());
@@ -176,6 +180,23 @@ public class ScreenshotScreen extends Screen {
         this.renameButton.active = hasScreenshot;
         this.viewButton.active = hasScreenshot;
         this.selectedScreenshot = screenshot;
+    }
+
+    public void toggleGrid() {
+        screenshotList.toggleGrid();
+        screenshotList.refreshScroll();
+        this.showGrid = !this.showGrid;
+        VIEW_MODE_ICON = showGrid ? Identifier.of(MODID, "screenshots/show_list") : Identifier.of(MODID, "screenshots/show_grid");
+
+        remove(this.viewModeButton);
+        this.viewModeButton = addDrawableChild(TextIconButtonWidget.builder(
+                Text.translatable("config.snapper.snapper.viewMode"),
+                button -> {
+                    this.toggleGrid();
+                },
+                true
+        ).width(20).texture(VIEW_MODE_ICON, 15, 15).build());
+        viewModeButton.setPosition(width / 2 - 178, height - 56);
     }
 
     @Override
@@ -207,6 +228,11 @@ public class ScreenshotScreen extends Screen {
         return false;
     }
 
+    @Override
+    public void close() {
+        SnapperConfig.HOLDER.save();
+        super.close();
+    }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {

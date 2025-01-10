@@ -16,12 +16,15 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 public class ScreenshotViewerScreen extends Screen {
     private static final Identifier MENU_DECOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_list_background.png");
@@ -33,9 +36,15 @@ public class ScreenshotViewerScreen extends Screen {
     private final int imageHeight;
     private final Screen parent;
     private final File screenshot;
+    private final @Nullable List<File> screenshots;
+    private final int screenshotIndex;
     private Path iconPath;
 
     public ScreenshotViewerScreen(ScreenshotImage icon, File screenshot, Screen parent) {
+        this(icon, screenshot, parent, null);
+    }
+
+    public ScreenshotViewerScreen(ScreenshotImage icon, File screenshot, Screen parent, @Nullable List<File> screenshots) {
         super(Text.translatable("menu.snapper.viewermenu"));
         this.parent = parent;
 
@@ -62,6 +71,13 @@ public class ScreenshotViewerScreen extends Screen {
         this.imageHeight = image != null ? image.getHeight() : 0;
 
         this.screenshot = screenshot;
+        this.screenshots = screenshots;
+
+        if (this.screenshots != null) {
+            this.screenshotIndex = this.screenshots.indexOf(this.screenshot);
+        } else {
+            this.screenshotIndex = -1;
+        }
     }
 
     @Override
@@ -72,6 +88,13 @@ public class ScreenshotViewerScreen extends Screen {
     @Override
     protected void init() {
 
+        // OPEN IMAGE EXTERNALLY
+
+        ButtonWidget openButton = addDrawableChild(ButtonWidget.builder(
+                Text.translatable("button.snapper.open"),
+                button -> Util.getOperatingSystem().open(this.iconPath)
+        ).width(100).build());
+
         // OPEN FOLDER
 
         ButtonWidget folderButton = addDrawableChild(ButtonWidget.builder(
@@ -81,13 +104,6 @@ public class ScreenshotViewerScreen extends Screen {
                         .width(100)
                         .build()
         );
-
-        // OPEN IMAGE EXTERNALLY
-
-        ButtonWidget openButton = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("button.snapper.open"),
-                button -> Util.getOperatingSystem().open(this.iconPath)
-        ).width(100).build());
 
         // EXIT PAGE
 
@@ -257,5 +273,33 @@ public class ScreenshotViewerScreen extends Screen {
         );
 
         RenderSystem.disableBlend();
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        Snapper.LOGGER.debug(String.format("SCROLL DEBUG 1 %s %s", this.screenshotIndex, this.screenshots == null));
+        if (this.screenshotIndex != -1 && this.screenshots != null) {
+            Snapper.LOGGER.debug(String.format("SCROLL DEBUG 2 %s %s", this.screenshots.size(), this.screenshotIndex));
+            if (keyCode == GLFW.GLFW_KEY_LEFT) {
+                File previousImageFile = screenshots.getLast();;
+                if (this.screenshotIndex >= 1) {
+                    previousImageFile = screenshots.get(screenshotIndex - 1);
+                }
+                ScreenshotImage previousImage = ScreenshotImage.of(previousImageFile, client.getTextureManager());
+                Snapper.LOGGER.debug(String.format("SCROLL DEBUG 3a %s", previousImageFile.getName()));
+                client.setScreen(new ScreenshotViewerScreen(previousImage, previousImageFile, this.parent, this.screenshots));
+            }
+            if (keyCode == GLFW.GLFW_KEY_RIGHT) {
+                File nextImageFile = screenshots.getFirst();
+                if (this.screenshotIndex < this.screenshots.size() - 1) {
+                    nextImageFile = screenshots.get(screenshotIndex + 1);
+                }
+                ScreenshotImage nextImage = ScreenshotImage.of(nextImageFile, client.getTextureManager());
+                Snapper.LOGGER.debug(String.format("SCROLL DEBUG 3b %s", nextImageFile.getName()));
+                client.setScreen(new ScreenshotViewerScreen(nextImage, nextImageFile, this.parent, this.screenshots));
+            }
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

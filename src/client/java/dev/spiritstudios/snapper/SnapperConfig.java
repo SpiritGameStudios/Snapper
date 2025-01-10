@@ -21,4 +21,8 @@ public final class SnapperConfig extends Config<SnapperConfig> {
     public final Value<Boolean> showSnapperGameMenu = booleanValue(true)
             .comment("Whether to show Snapper button in game menu.")
             .build();
+
+    public final Value<Boolean> viewMode = booleanValue(false)
+            .comment("Whether to show screenshot menu with grid or list.")
+            .build();
 }

@@ -40,5 +40,6 @@
   "config.snapper.snapper.showSnapperTitleScreen.tooltip": "Show Snapper button on title screen",
   "config.snapper.snapper.showSnapperGameMenu": "Game Menu Button",
   "config.snapper.snapper.showSnapperGameMenu.tooltip": "Show Snapper button in game menu",
-  "config.snapper.snapper.view_mode": "View Mode"
+  "config.snapper.snapper.viewMode": "View Mode",
+  "config.snapper.snapper.viewMode.tooltip": "Show screenshot menu with grid or list"
 }

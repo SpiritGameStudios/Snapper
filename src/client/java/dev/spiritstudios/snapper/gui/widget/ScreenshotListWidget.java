@@ -2,6 +2,7 @@ package dev.spiritstudios.snapper.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
@@ -50,7 +51,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     public final CompletableFuture<List<ScreenshotEntry>> loadFuture;
 
-    private boolean showGrid = true;
+    private boolean showGrid = false;
 
     public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, @Nullable ScreenshotListWidget previous, Screen parent) {
         super(client, width, height, y, itemHeight);
@@ -69,6 +70,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 this.addEntry(new EmptyEntry(client));
             }
         });
+
+        this.showGrid = SnapperConfig.INSTANCE.viewMode.get();
     }
 
     @Override
@@ -91,7 +94,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         return CompletableFuture.supplyAsync(() -> {
             List<File> screenshots = ScreenshotActions.getScreenshots(client);
             return screenshots.parallelStream()
-                    .map(file -> new ScreenshotEntry(file, client, parent))
+                    .map(file -> new ScreenshotEntry(file, client, parent, screenshots))
                     .collect(Collectors.toList());
         });
     }
@@ -144,6 +147,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     public void toggleGrid() {
         this.showGrid = !this.showGrid;
         for (var entry : this.children()) if (entry instanceof ScreenshotEntry sc) sc.setShowGrid(this.showGrid);
+
+        SnapperConfig.INSTANCE.viewMode.set(this.showGrid);
     }
 
     @Override
@@ -278,8 +283,9 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         private long time;
         public final File screenshot;
         private boolean showGrid;
+        private final List<File> screenshots;
 
-        public ScreenshotEntry(File screenshot, MinecraftClient client, Screen parent) {
+        public ScreenshotEntry(File screenshot, MinecraftClient client, Screen parent, List<File> screenshots) {
             this.showGrid = ScreenshotListWidget.this.showGrid;
             this.client = client;
             this.screenParent = parent;
@@ -288,6 +294,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             this.iconFileName = screenshot.getName();
             this.lastModified = screenshot.lastModified();
             this.screenshot = screenshot;
+            this.screenshots = screenshots;
             this.loadIcon();
         }
 
@@ -410,7 +417,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             if (this.icon == null) return false;
             this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
-            this.client.setScreen(new ScreenshotViewerScreen(this.icon, this.screenshot, this.screenParent));
+            this.client.setScreen(new ScreenshotViewerScreen(this.icon, this.screenshot, this.screenParent, this.screenshots));
             return true;
         }
 
