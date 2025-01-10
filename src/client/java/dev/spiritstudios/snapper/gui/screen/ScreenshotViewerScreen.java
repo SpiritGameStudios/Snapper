@@ -186,6 +186,16 @@ public class ScreenshotViewerScreen extends Screen {
                 finalHeight
         );
 
+        if (screenshotIndex != -1 && screenshots != null) {
+            context.drawCenteredTextWithShadow(
+                    this.textRenderer,
+                    "Screenshot %d/%d".formatted(screenshotIndex + 1, screenshots.size()),
+                    this.width / 2,
+                    30,
+                    0xFFFFFF
+            );
+        }
+
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) renderDebugInfo(context);
     }
 
@@ -199,7 +209,7 @@ public class ScreenshotViewerScreen extends Screen {
                 this.textRenderer,
                 "Image Size: %dx%d".formatted(imageWidth, imageHeight),
                 this.width / 2,
-                30,
+                40,
                 0xFFFFFF
         );
 
@@ -207,14 +217,14 @@ public class ScreenshotViewerScreen extends Screen {
                 this.textRenderer,
                 "Screen Size: %dx%d".formatted(this.width, this.height),
                 this.width / 2,
-                40,
+                50,
                 0xFFFFFF
         );
 
         context.drawCenteredTextWithShadow(this.textRenderer,
                 "Scale Factor: %s".formatted(scaleFactor),
                 this.width / 2,
-                50,
+                60,
                 0xFFFFFF
         );
 
@@ -222,7 +232,7 @@ public class ScreenshotViewerScreen extends Screen {
                 this.textRenderer,
                 "Scaled Size: %dx%d".formatted(finalWidth, finalHeight),
                 this.width / 2,
-                60,
+                70,
                 0xFFFFFF
         );
     }
