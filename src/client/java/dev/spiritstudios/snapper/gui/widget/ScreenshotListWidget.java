@@ -5,6 +5,7 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
+import dev.spiritstudios.snapper.mixin.EntryListWidgetAccessor;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
 import dev.spiritstudios.specter.api.core.exception.UnreachableException;
@@ -51,6 +52,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     public final CompletableFuture<List<ScreenshotEntry>> loadFuture;
 
+    private final int gridItemHeight = 48;
+    private final int listItemHeight = 36;
     private boolean showGrid = false;
 
     public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, @Nullable ScreenshotListWidget previous, Screen parent) {
@@ -72,6 +75,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         });
 
         this.showGrid = SnapperConfig.INSTANCE.viewMode.get();
+        ((EntryListWidgetAccessor) (Object) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
     }
 
     @Override
@@ -107,7 +111,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     @Override
     protected void renderList(DrawContext context, int mouseX, int mouseY, float delta) {
-        if (showGrid) {int rowLeft = this.getRowLeft();
+        if (showGrid) {
+            int rowLeft = this.getRowLeft();
             int rowWidth = this.getRowWidth();
             int entryHeight = this.itemHeight - 4;
             int entryWidth = showGrid ? entryHeight : rowWidth;
@@ -146,6 +151,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     public void toggleGrid() {
         this.showGrid = !this.showGrid;
+        ((EntryListWidgetAccessor) (Object) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
         for (var entry : this.children()) if (entry instanceof ScreenshotEntry sc) sc.setShowGrid(this.showGrid);
 
         SnapperConfig.INSTANCE.viewMode.set(this.showGrid);
@@ -157,12 +163,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         int rowWidth = this.getRowWidth();
         int relX = MathHelper.floor(x - this.getRowLeft());
-        int relY = MathHelper.floor(y - (double)this.getY()) - this.headerHeight;
+        int relY = MathHelper.floor(y - (double) this.getY()) - this.headerHeight;
 
         if (relX < 0 || relX > rowWidth || relY < 0 || relY > getBottom()) return null;
 
-        int rowIndex = (relY + (int)this.getScrollAmount()) / this.itemHeight;
-        int colIndex = MathHelper.floor(((float)relX / (float)rowWidth) * (float)NUM_COLUMNS);
+        int rowIndex = (relY + (int) this.getScrollAmount()) / this.itemHeight;
+        int colIndex = MathHelper.floor(((float) relX / (float) rowWidth) * (float) NUM_COLUMNS);
         int entryIndex = rowIndex * NUM_COLUMNS + colIndex;
 
         return entryIndex >= 0 && entryIndex < getEntryCount() ? getEntry(entryIndex) : null;
@@ -304,6 +310,80 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            if (this.showGrid) {
+                renderGrid(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+                return;
+            }
+            renderList(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
+        }
+
+        public void renderList(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            String fileName = this.iconFileName;
+            String creationString = "undefined";
+
+            long creationTime = 0;
+            try {
+                creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
+            } catch (IOException e) {
+                client.setScreen(new ScreenshotScreen(screenParent));
+            }
+
+            if (creationTime != -1L)
+                creationString = Text.translatable("text.snapper.created").getString() + " " + DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
+
+            if (StringHelper.isEmpty(fileName))
+                fileName = Text.translatable("text.snapper.generic") + " " + (index + 1);
+
+            context.drawText(
+                    this.client.textRenderer,
+                    fileName,
+                    x + 32 + 3,
+                    y + 1,
+                    0xFFFFFF,
+                    false
+            );
+
+            context.drawText(
+                    this.client.textRenderer,
+                    creationString,
+                    x + 35,
+                    y + 12,
+                    Colors.GRAY,
+                    false
+            );
+
+
+            if (this.icon != null) {
+                RenderSystem.enableBlend();
+                context.drawTexture(
+                        this.icon.getTextureId(),
+                        x,
+                        y,
+                        entryHeight,
+                        entryHeight,
+                        (icon.getHeight()) / 3.0F + 32,
+                        0,
+                        icon.getHeight(),
+                        icon.getHeight(),
+                        icon.getWidth(),
+                        icon.getHeight()
+                );
+                RenderSystem.disableBlend();
+            }
+
+            if (this.client.options.getTouchscreen().getValue() || hovered) {
+                context.fill(x, y, x + 32, y + 32, 0xA0909090);
+                context.drawGuiTexture(
+                        mouseX - x < 32 && this.icon != null ? ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
+                        x,
+                        y,
+                        32,
+                        32
+                );
+            }
+        }
+
+        public void renderGrid(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             if (!this.showGrid) {
                 String fileName = this.iconFileName;
                 String creationString = "undefined";
@@ -342,13 +422,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             if (this.icon != null) {
                 RenderSystem.enableBlend();
-                int iconSize = entryHeight;
                 context.drawTexture(
                         this.icon.getTextureId(),
                         x,
                         y,
-                        iconSize,
-                        iconSize,
+                        entryHeight,
+                        entryHeight,
                         (icon.getHeight()) / 3.0F + 32,
                         0,
                         icon.getHeight(),
