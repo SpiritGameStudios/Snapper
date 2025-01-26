@@ -9,6 +9,7 @@
 		"CallMeEcho"
 	],
 	"contact": {
+		"homepage": "https://spiritstudios.dev",
 		"sources": "https://github.com/SpiritGameStudios/Snapper",
 		"issues": "https://github.com/SpiritGameStudios/Snapper/issues"
 	},
@@ -29,5 +30,12 @@
 		"fabric-api": "*",
 		"java": ">=21",
 		"specter-config": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/TTmx7d2axf"
+			}
+		}
 	}
 }

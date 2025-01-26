@@ -8,6 +8,7 @@ import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.mixin.EntryListWidgetAccessor;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.specter.api.core.exception.UnreachableException;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -75,6 +76,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         });
 
         this.showGrid = SnapperConfig.INSTANCE.viewMode.get();
+
         ((EntryListWidgetAccessor) (Object) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
     }
 
@@ -433,10 +435,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 int centreX = x + entryWidth / 2;
                 int centreY = y + entryHeight / 2;
                 context.drawGuiTexture(
-                        mouseX > centreX - 16 &&
-                                mouseX < centreX + 16 &&
-                                mouseY > centreY - 16 &&
-                                mouseY < centreY + 16 &&
+                        SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY) &&
                                 this.icon != null ?
                                 ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
                         centreX - 16,
@@ -451,7 +450,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                         x + 5,
                         y + 6,
                         0xFFFFFF,
-                        false
+                        true
                 );
 
                 context.drawText(
@@ -460,7 +459,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                         x + 5,
                         y + entryHeight - 22,
                         Colors.LIGHT_GRAY,
-                        false
+                        true
                 );
 
                 context.drawText(
@@ -469,9 +468,11 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                         x + 5,
                         y + entryHeight - 12,
                         Colors.LIGHT_GRAY,
-                        false
+                        true
                 );
+
             }
+            context.fill(getX() + getWidth() / 2 - 16, getY() + getHeight() / 2 - 16, getX() + getWidth() / 2 + 16, getY() + getHeight() / 2 + 16, 0xFF0000);
         }
 
         private void loadIcon() {
@@ -507,10 +508,10 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             ScreenshotListWidget.this.setEntrySelected(this);
 
-            double centreX = getX() + (double) getWidth() / 2;
-            double centreY = getY() + (double) getHeight() / 2;
+            double centreX = getRight() - (double) getWidth() / 2;
+            double centreY = getBottom() - (double) getHeight() / 2;
 
-            Snapper.LOGGER.info("MOUSE CLICKIE CLICK %sX %sY".formatted(centreX,centreY));
+            Snapper.LOGGER.info("MOUSE CLICKIE CLICK %sX %sY %sX2 %sY2 %sW %sH".formatted(centreX, centreY, mouseX, mouseY, getWidth(), getHeight()));
 
             boolean clickThrough =
                     (
@@ -519,10 +520,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     ) ||
                             (
                                     this.showGrid &&
-                                            mouseX > centreX - 16 &&
-                                            mouseX < centreX + 16 &&
-                                            mouseY > centreY - 16 &&
-                                            mouseY < centreY + 16
+                                            SnapperUtil.inBoundingBox(getX() + getWidth() / 2 - 16, getY() + getHeight() / 2 - 16, 32, 32, mouseX, mouseY)
                             );
             if (!clickThrough && Util.getMeasuringTimeMs() - this.time >= 250L) {
                 this.time = Util.getMeasuringTimeMs();
