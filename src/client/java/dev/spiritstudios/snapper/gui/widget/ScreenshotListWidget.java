@@ -46,13 +46,13 @@ import java.util.stream.Collectors;
 public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
     private static final Identifier VIEW_TEXTURE = Snapper.id("screenshots/view");
     private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Snapper.id("screenshots/view_highlighted");
-    private static final int NUM_COLUMNS = 6;
+    private static final int NUM_COLUMNS = 3;
 
     private final Screen parent;
 
     public final CompletableFuture<List<ScreenshotEntry>> loadFuture;
 
-    private final int gridItemHeight = 48;
+    private final int gridItemHeight = 81;
     private final int listItemHeight = 36;
     private boolean showGrid = false;
 
@@ -110,12 +110,18 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     }
 
     @Override
+    public int getRowWidth() {
+        return showGrid ? 440 : 220;
+    }
+
+    @Override
     protected void renderList(DrawContext context, int mouseX, int mouseY, float delta) {
         if (showGrid) {
             int rowLeft = this.getRowLeft();
             int rowWidth = this.getRowWidth();
             int entryHeight = this.itemHeight - 4;
-            int entryWidth = showGrid ? entryHeight : rowWidth;
+            int gridItemWidth = 144;
+            int entryWidth = showGrid ? gridItemWidth : rowWidth;
             int entryCount = this.getEntryCount();
             int spacing = showGrid ? (rowWidth - (NUM_COLUMNS * entryWidth)) / (NUM_COLUMNS - 1) : 0;
 
@@ -384,41 +390,21 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         }
 
         public void renderGrid(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            if (!this.showGrid) {
-                String fileName = this.iconFileName;
-                String creationString = "undefined";
+            String fileName = this.iconFileName;
+            String creationString = "undefined";
 
-                long creationTime = 0;
-                try {
-                    creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
-                } catch (IOException e) {
-                    client.setScreen(new ScreenshotScreen(screenParent));
-                }
-
-                if (creationTime != -1L)
-                    creationString = Text.translatable("text.snapper.created").getString() + " " + DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
-
-                if (StringHelper.isEmpty(fileName))
-                    fileName = Text.translatable("text.snapper.generic") + " " + (index + 1);
-
-                context.drawText(
-                        this.client.textRenderer,
-                        fileName,
-                        x + 32 + 3,
-                        y + 1,
-                        0xFFFFFF,
-                        false
-                );
-
-                context.drawText(
-                        this.client.textRenderer,
-                        creationString,
-                        x + 35,
-                        y + 12,
-                        Colors.GRAY,
-                        false
-                );
+            long creationTime = 0;
+            try {
+                creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
+            } catch (IOException e) {
+                client.setScreen(new ScreenshotScreen(screenParent));
             }
+
+            if (creationTime != -1L)
+                creationString = DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
+
+            if (StringHelper.isEmpty(fileName))
+                fileName = Text.translatable("text.snapper.generic") + " " + (index + 1);
 
             if (this.icon != null) {
                 RenderSystem.enableBlend();
@@ -426,11 +412,11 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                         this.icon.getTextureId(),
                         x,
                         y,
+                        entryWidth,
                         entryHeight,
-                        entryHeight,
-                        (icon.getHeight()) / 3.0F + 32,
                         0,
-                        icon.getHeight(),
+                        0,
+                        icon.getWidth(),
                         icon.getHeight(),
                         icon.getWidth(),
                         icon.getHeight()
@@ -438,14 +424,52 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 RenderSystem.disableBlend();
             }
 
-            if (!this.showGrid && (this.client.options.getTouchscreen().getValue() || hovered)) {
-                context.fill(x, y, x + 32, y + 32, 0xA0909090);
+            if (this.client.options.getTouchscreen().getValue() || (hovered && mouseX < x + entryWidth)) {
+                RenderSystem.enableBlend();
+                Identifier hoverBackground = Identifier.of("snapper", "textures/gui/grid_selection_background.png");
+                context.drawTexture(hoverBackground, x, y, 0, 0, entryWidth, entryHeight);
+                RenderSystem.disableBlend();
+
+                int centreX = x + entryWidth / 2;
+                int centreY = y + entryHeight / 2;
                 context.drawGuiTexture(
-                        mouseX - x < 32 && this.icon != null ? ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
-                        x,
-                        y,
+                        mouseX > centreX - 16 &&
+                                mouseX < centreX + 16 &&
+                                mouseY > centreY - 16 &&
+                                mouseY < centreY + 16 &&
+                                this.icon != null ?
+                                ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
+                        centreX - 16,
+                        centreY - 16,
                         32,
                         32
+                );
+
+                context.drawText(
+                        this.client.textRenderer,
+                        fileName,
+                        x + 5,
+                        y + 6,
+                        0xFFFFFF,
+                        false
+                );
+
+                context.drawText(
+                        this.client.textRenderer,
+                        Text.translatable("text.snapper.created"),
+                        x + 5,
+                        y + entryHeight - 22,
+                        Colors.LIGHT_GRAY,
+                        false
+                );
+
+                context.drawText(
+                        this.client.textRenderer,
+                        creationString,
+                        x + 5,
+                        y + entryHeight - 12,
+                        Colors.LIGHT_GRAY,
+                        false
                 );
             }
         }
@@ -483,7 +507,23 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             ScreenshotListWidget.this.setEntrySelected(this);
 
-            boolean clickThrough = !this.showGrid && mouseX - (double) ScreenshotListWidget.this.getRowLeft() <= 32.0;
+            double centreX = getX() + (double) getWidth() / 2;
+            double centreY = getY() + (double) getHeight() / 2;
+
+            Snapper.LOGGER.info("MOUSE CLICKIE CLICK %sX %sY".formatted(centreX,centreY));
+
+            boolean clickThrough =
+                    (
+                            !this.showGrid &&
+                                    mouseX - (double) ScreenshotListWidget.this.getRowLeft() <= 32.0
+                    ) ||
+                            (
+                                    this.showGrid &&
+                                            mouseX > centreX - 16 &&
+                                            mouseX < centreX + 16 &&
+                                            mouseY > centreY - 16 &&
+                                            mouseY < centreY + 16
+                            );
             if (!clickThrough && Util.getMeasuringTimeMs() - this.time >= 250L) {
                 this.time = Util.getMeasuringTimeMs();
                 return super.mouseClicked(mouseX, mouseY, button);
