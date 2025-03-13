@@ -298,6 +298,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         public final File screenshot;
         private boolean showGrid;
         private final List<File> screenshots;
+        private boolean clickthroughHovered = false;
 
         public ScreenshotEntry(File screenshot, MinecraftClient client, Screen parent, List<File> screenshots) {
             this.showGrid = ScreenshotListWidget.this.showGrid;
@@ -395,6 +396,11 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             String fileName = this.iconFileName;
             String creationString = "undefined";
 
+            int centreX = x + entryWidth / 2;
+            int centreY = y + entryHeight / 2;
+
+            clickthroughHovered = SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY);
+
             long creationTime = 0;
             try {
                 creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
@@ -432,10 +438,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 context.drawTexture(hoverBackground, x, y, 0, 0, entryWidth, entryHeight);
                 RenderSystem.disableBlend();
 
-                int centreX = x + entryWidth / 2;
-                int centreY = y + entryHeight / 2;
                 context.drawGuiTexture(
-                        SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY) &&
+                        clickthroughHovered &&
                                 this.icon != null ?
                                 ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
                         centreX - 16,
@@ -472,7 +476,6 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 );
 
             }
-            context.fill(getX() + getWidth() / 2 - 16, getY() + getHeight() / 2 - 16, getX() + getWidth() / 2 + 16, getY() + getHeight() / 2 + 16, 0xFF0000);
         }
 
         private void loadIcon() {
@@ -508,11 +511,6 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             ScreenshotListWidget.this.setEntrySelected(this);
 
-            double centreX = getRight() - (double) getWidth() / 2;
-            double centreY = getBottom() - (double) getHeight() / 2;
-
-            Snapper.LOGGER.info("MOUSE CLICKIE CLICK %sX %sY %sX2 %sY2 %sW %sH".formatted(centreX, centreY, mouseX, mouseY, getWidth(), getHeight()));
-
             boolean clickThrough =
                     (
                             !this.showGrid &&
@@ -520,7 +518,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     ) ||
                             (
                                     this.showGrid &&
-                                            SnapperUtil.inBoundingBox(getX() + getWidth() / 2 - 16, getY() + getHeight() / 2 - 16, 32, 32, mouseX, mouseY)
+                                            clickthroughHovered
                             );
             if (!clickThrough && Util.getMeasuringTimeMs() - this.time >= 250L) {
                 this.time = Util.getMeasuringTimeMs();

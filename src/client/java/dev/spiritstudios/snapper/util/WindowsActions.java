@@ -1,7 +1,6 @@
 package dev.spiritstudios.snapper.util;
 
 import dev.spiritstudios.snapper.Snapper;
-import net.minecraft.client.MinecraftClient;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
