@@ -47,7 +47,6 @@ import java.util.stream.Collectors;
 public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
     private static final Identifier VIEW_TEXTURE = Snapper.id("screenshots/view");
     private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Snapper.id("screenshots/view_highlighted");
-    private static final int NUM_COLUMNS = 3;
 
     private final Screen parent;
 
@@ -111,9 +110,24 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             screenshotScreen.imageSelected(entry);
     }
 
+    private int getColumnCount() {
+        if (client.currentScreen != null) {
+            int width = client.currentScreen.width;
+
+            if (width < 480) {
+                return 2;
+            }
+            if (width < 720) {
+                return 3;
+            }
+            return 4;
+        }
+        return 3;
+    }
+
     @Override
     public int getRowWidth() {
-        return showGrid ? 440 : 220;
+        return showGrid ? 144 * getColumnCount() + 4 * (getColumnCount() - 1) : 220;
     }
 
     @Override
@@ -125,12 +139,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             int gridItemWidth = 144;
             int entryWidth = showGrid ? gridItemWidth : rowWidth;
             int entryCount = this.getEntryCount();
-            int spacing = showGrid ? (rowWidth - (NUM_COLUMNS * entryWidth)) / (NUM_COLUMNS - 1) : 0;
+            int spacing = showGrid ? (rowWidth - (getColumnCount() * entryWidth)) / (getColumnCount() - 1) : 0;
 
             for (int index = 0; index < entryCount; index++) {
                 int rowTop = this.getRowTop(index);
                 int rowBottom = this.getRowBottom(index);
-                int colIndex = index % NUM_COLUMNS;
+                int colIndex = index % getColumnCount();
                 int leftOffset = colIndex * (entryWidth + spacing);
 
                 if (rowBottom >= this.getY() && rowTop <= this.getBottom()) {
@@ -144,7 +158,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     @Override
     protected int getRowTop(int index) {
-        return super.getRowTop(showGrid ? index / NUM_COLUMNS : index);
+        return super.getRowTop(showGrid ? index / getColumnCount() : index);
     }
 
     @Override
@@ -154,7 +168,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     @Override
     protected int getMaxPosition() {
-        return showGrid ? getEntryCount() * itemHeight / 3 + headerHeight : super.getMaxPosition();
+        int totalRows = (int) (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
+        return showGrid ? totalRows * itemHeight : super.getMaxPosition();
     }
 
     public void toggleGrid() {
@@ -176,8 +191,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         if (relX < 0 || relX > rowWidth || relY < 0 || relY > getBottom()) return null;
 
         int rowIndex = (relY + (int) this.getScrollAmount()) / this.itemHeight;
-        int colIndex = MathHelper.floor(((float) relX / (float) rowWidth) * (float) NUM_COLUMNS);
-        int entryIndex = rowIndex * NUM_COLUMNS + colIndex;
+        int colIndex = MathHelper.floor(((float) relX / (float) rowWidth) * (float) getColumnCount());
+        int entryIndex = rowIndex * getColumnCount() + colIndex;
 
         return entryIndex >= 0 && entryIndex < getEntryCount() ? getEntry(entryIndex) : null;
     }
@@ -193,8 +208,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         int offset = switch (direction) {
             case LEFT -> -1;
             case RIGHT -> 1;
-            case UP -> -NUM_COLUMNS;
-            case DOWN -> NUM_COLUMNS;
+            case UP -> -getColumnCount();
+            case DOWN -> getColumnCount();
         };
 
         if (getEntryCount() > 0) {
