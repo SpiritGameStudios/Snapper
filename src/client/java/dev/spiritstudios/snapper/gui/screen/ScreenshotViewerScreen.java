@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
+import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -88,6 +89,8 @@ public class ScreenshotViewerScreen extends Screen {
     @Override
     protected void init() {
 
+        int firstRowButtonWidth = 74;
+
         // OPEN IMAGE EXTERNALLY
 
         ButtonWidget openButton = addDrawableChild(ButtonWidget.builder(
@@ -117,7 +120,7 @@ public class ScreenshotViewerScreen extends Screen {
         ButtonWidget deleteButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.delete"),
                 button -> ScreenshotActions.deleteScreenshot(this.screenshot, this.parent)
-        ).width(100).build());
+        ).width(firstRowButtonWidth).build());
 
         // RENAME SCREENSHOT
 
@@ -127,14 +130,24 @@ public class ScreenshotViewerScreen extends Screen {
                     if (this.screenshot != null)
                         client.setScreen(new RenameScreenshotScreen(this.screenshot, this.parent));
                 }
-        ).width(100).build());
+        ).width(firstRowButtonWidth).build());
 
         // COPY SCREENSHOT
 
         ButtonWidget copyButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.copy"),
                 button -> Snapper.getPlatformHelper().copyScreenshot(this.screenshot)
-        ).width(100).build());
+        ).width(firstRowButtonWidth).build());
+
+        // UPLOAD SCREENSHOT
+
+        ButtonWidget uploadButton = addDrawableChild(ButtonWidget.builder(
+                Text.translatable("button.snapper.upload"),
+                button -> {
+                    button.active = false;
+					ScreenshotUploading.getInstance().upload(iconPath).thenRun(() -> button.active = true);
+				}
+        ).width(firstRowButtonWidth).build());
 
         DirectionalLayoutWidget verticalButtonLayout = DirectionalLayoutWidget.vertical().spacing(4);
 
@@ -147,6 +160,7 @@ public class ScreenshotViewerScreen extends Screen {
         firstRowWidget.add(deleteButton);
         firstRowWidget.add(renameButton);
         firstRowWidget.add(copyButton);
+        firstRowWidget.add(uploadButton);
 
         AxisGridWidget secondRowWidget = verticalButtonLayout.add(new AxisGridWidget(
                 308,
@@ -291,7 +305,7 @@ public class ScreenshotViewerScreen extends Screen {
         if (this.screenshotIndex != -1 && this.screenshots != null) {
             Snapper.LOGGER.debug(String.format("SCROLL DEBUG 2 %s %s", this.screenshots.size(), this.screenshotIndex));
             if (keyCode == GLFW.GLFW_KEY_LEFT) {
-                File previousImageFile = screenshots.getLast();;
+                File previousImageFile = screenshots.getLast();
                 if (this.screenshotIndex >= 1) {
                     previousImageFile = screenshots.get(screenshotIndex - 1);
                 }

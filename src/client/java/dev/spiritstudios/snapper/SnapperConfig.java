@@ -3,9 +3,8 @@ package dev.spiritstudios.snapper;
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.Value;
+import io.github.axolotlclient.api.Options;
 import net.minecraft.client.MinecraftClient;
-
-import java.nio.file.Path;
 
 public final class SnapperConfig extends Config<SnapperConfig> {
     private final MinecraftClient client = MinecraftClient.getInstance();
@@ -30,6 +29,12 @@ public final class SnapperConfig extends Config<SnapperConfig> {
     public final Value<Boolean> viewMode = booleanValue(false)
             .comment("Whether to show screenshot menu with grid or list.")
             .build();
+
+    public final Value<Options.PrivacyPolicyState> termsAccepted = enumValue(Options.PrivacyPolicyState.UNSET, Options.PrivacyPolicyState.class)
+            .comment("Whether the terms of AxolotlClient have been accepted.")
+            .build();
+
+
     //public final Value<String> screenshotFolder = stringValue(String.valueOf(Path.of(client.runDirectory.getPath(), "screenshots")))
     //        .build();
 }

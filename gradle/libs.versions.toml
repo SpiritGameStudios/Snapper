@@ -1,15 +1,18 @@
 [versions]
-fabric_loom = "1.8-SNAPSHOT"
+fabric_loom = "1.10-SNAPSHOT"
 minotaur = "2.+"
 
 minecraft = "1.21"
 yarn = "1.21+build.9"
 
-fabric_loader = "0.16.5"
+fabric_loader = "0.16.14"
 fabric_api = "0.110.0+1.21.1"
 
 specter = "1.0.6"
 objc_bridge = "1.0.0"
+
+axolotlclient = "3.1.3"
+axolotlclient_config = "3.0.7"
 
 [plugins]
 fabric_loom = { id = "fabric-loom", version.ref = "fabric_loom" }
@@ -29,10 +32,17 @@ specter_gui = { group = "dev.spiritstudios.specter", name = "specter-gui", versi
 
 objc_bridge = { group = "ca.weblite", name = "java-objc-bridge", version.ref = "objc_bridge" }
 
+axolotlclient = { group = "io.github.axolotlclient.AxolotlClient", name = "AxolotlClient-common", version.ref = "axolotlclient" }
+axolotlclient_config = { group = "io.github.axolotlclient.AxolotlClient-config", name = "AxolotlClientConfig-common", version.ref = "axolotlclient_config" }
+
 [bundles]
 specter = [
     "specter_serialization",
     "specter_core",
     "specter_config",
     "specter_gui"
+]
+axolotlclient = [
+    "axolotlclient",
+    "axolotlclient_config"
 ]

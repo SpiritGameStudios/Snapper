@@ -31,6 +31,12 @@ loom {
 repositories {
 	mavenCentral()
 	maven("https://maven.spiritstudios.dev/releases/")
+	maven("https://moehreag.duckdns.org/maven/releases") {
+		content {
+			includeGroup("io.github.axolotlclient.AxolotlClient")
+			includeGroup("io.github.axolotlclient.AxolotlClient-config")
+		}
+	}
 }
 
 dependencies {
@@ -38,13 +44,16 @@ dependencies {
 	mappings(variantOf(libs.yarn) { classifier("v2") })
 	modImplementation(libs.fabric.loader)
 
-	modImplementation(libs.fabric.api);
+	modImplementation(libs.fabric.api)
 
 	include(libs.bundles.specter)
 	modImplementation(libs.bundles.specter)
 
 	// TODO: Find a way to use the macOS clipboard without this.
 	implementation(libs.objc.bridge)
+
+	include(libs.bundles.axolotlclient)
+	implementation(libs.bundles.axolotlclient)
 }
 
 tasks.processResources {

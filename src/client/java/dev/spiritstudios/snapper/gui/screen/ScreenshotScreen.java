@@ -4,6 +4,7 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
+import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import dev.spiritstudios.specter.api.config.RootConfigScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -33,6 +34,7 @@ public class ScreenshotScreen extends Screen {
     private ButtonWidget viewButton;
     private ButtonWidget copyButton;
     private ButtonWidget openButton;
+    private ButtonWidget uploadButton;
     private TextIconButtonWidget viewModeButton;
     private ScreenshotListWidget.@Nullable ScreenshotEntry selectedScreenshot = null;
     private boolean showGrid = false;
@@ -80,13 +82,15 @@ public class ScreenshotScreen extends Screen {
                 button -> this.close()
         ).width(100).build());
 
+        int firstRowButtonWidth = 59;
+
         this.deleteButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.delete"),
                 button -> {
                     if (selectedScreenshot != null)
                         ScreenshotActions.deleteScreenshot(selectedScreenshot.screenshot, this);
                 }
-        ).width(74).build());
+        ).width(firstRowButtonWidth).build());
 
         this.openButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.open"),
@@ -94,7 +98,7 @@ public class ScreenshotScreen extends Screen {
                     if (selectedScreenshot != null)
                         Util.getOperatingSystem().open(selectedScreenshot.screenshot);
                 }
-        ).width(74).build());
+        ).width(firstRowButtonWidth).build());
 
         this.renameButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.rename"),
@@ -102,7 +106,7 @@ public class ScreenshotScreen extends Screen {
                     if (this.selectedScreenshot != null)
                         client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.screenshot, this));
                 }
-        ).width(74).build());
+        ).width(firstRowButtonWidth).build());
 
         this.copyButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.copy"),
@@ -110,7 +114,15 @@ public class ScreenshotScreen extends Screen {
                     if (selectedScreenshot != null)
                         Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.screenshot);
                 }
-        ).width(74).build());
+        ).width(firstRowButtonWidth).build());
+
+        this.uploadButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.upload"), button -> {
+            if (selectedScreenshot != null) {
+                button.active = false;
+                ScreenshotUploading.getInstance().upload(selectedScreenshot.iconPath)
+                        .thenRun(() -> button.active = true);
+            }
+        }).width(firstRowButtonWidth).build());
 
         DirectionalLayoutWidget verticalButtonLayout = DirectionalLayoutWidget.vertical().spacing(4);
 
@@ -124,6 +136,7 @@ public class ScreenshotScreen extends Screen {
         firstRowWidget.add(this.openButton);
         firstRowWidget.add(this.renameButton);
         firstRowWidget.add(this.copyButton);
+        firstRowWidget.add(this.uploadButton);
 
         AxisGridWidget secondRowWidget = verticalButtonLayout.add(new AxisGridWidget(
                 308,
@@ -178,6 +191,7 @@ public class ScreenshotScreen extends Screen {
         this.renameButton.active = hasScreenshot;
         this.viewButton.active = hasScreenshot;
         this.selectedScreenshot = screenshot;
+        this.uploadButton.active = hasScreenshot;
     }
 
     public void toggleGrid() {

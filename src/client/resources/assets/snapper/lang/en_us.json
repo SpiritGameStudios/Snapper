@@ -15,6 +15,7 @@
   "button.snapper.view": "View Image",
   "button.snapper.copy": "Copy",
   "button.snapper.rename": "Rename",
+  "button.snapper.upload": "Upload",
   "text.snapper.created": "Created",
   "text.snapper.generic": "Screenshot",
   "text.snapper.loading": "Loading Screenshots",
@@ -41,5 +42,13 @@
   "config.snapper.snapper.showSnapperGameMenu": "Game Menu Button",
   "config.snapper.snapper.showSnapperGameMenu.tooltip": "Show Snapper button in game menu",
   "config.snapper.snapper.viewMode": "View Mode",
-  "config.snapper.snapper.viewMode.tooltip": "Show screenshot menu with grid or list"
+  "config.snapper.snapper.viewMode.tooltip": "Show screenshot menu with grid or list",
+  "config.snapper.snapper.termsAccepted": "Privacy Policy Accepted",
+  "config.snapper.snapper.termsAccepted.unset": "Unset",
+  "config.snapper.snapper.termsAccepted.accepted": "Accepted",
+  "config.snapper.snapper.termsAccepted.denied": "Denied",
+  "toast.snapper.upload.success": "Image Uploaded",
+  "toast.snapper.upload.success.description": "A link to the uploaded image has been copied to your clipboard.",
+  "snapper.privacy_notice.description": "Image uploading in Snapper is powered by AxolotlClient. Therefore, this feature is subject to AxolotlClient's terms which you will have to accept in order to upload images. This decision can be updated or changed at any time.",
+  "toast.snapper.upload.axolotlclient.api_disabled": "You didn't accept AxolotlClient's terms, therefore image uploading isn't available."
 }
