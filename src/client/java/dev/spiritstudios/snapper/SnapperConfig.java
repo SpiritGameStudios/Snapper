@@ -1,9 +1,9 @@
 package dev.spiritstudios.snapper;
 
+import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.Value;
-import io.github.axolotlclient.api.Options;
 import net.minecraft.client.MinecraftClient;
 
 public final class SnapperConfig extends Config<SnapperConfig> {
@@ -30,7 +30,7 @@ public final class SnapperConfig extends Config<SnapperConfig> {
             .comment("Whether to show screenshot menu with grid or list.")
             .build();
 
-    public final Value<Options.PrivacyPolicyState> termsAccepted = enumValue(Options.PrivacyPolicyState.UNSET, Options.PrivacyPolicyState.class)
+    public final Value<AxolotlClientApi.TermsAcceptance> termsAccepted = enumValue(AxolotlClientApi.TermsAcceptance.UNSET, AxolotlClientApi.TermsAcceptance.class)
             .comment("Whether the terms of AxolotlClient have been accepted.")
             .build();
 

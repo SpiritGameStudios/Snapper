@@ -52,8 +52,7 @@ dependencies {
 	// TODO: Find a way to use the macOS clipboard without this.
 	implementation(libs.objc.bridge)
 
-	include(libs.bundles.axolotlclient)
-	implementation(libs.bundles.axolotlclient)
+	compileOnly(libs.bundles.axolotlclient)
 }
 
 tasks.processResources {
@@ -80,7 +79,7 @@ tasks.withType<JavaCompile> {
 	options.release = 21
 }
 
-tasks.jar { from("LICENSE") { rename { "${it}_${base.archivesName}" } } }
+tasks.jar { from("LICENSE") { rename { "${it}_${base.archivesName.get()}" } } }
 
 modrinth {
 	token.set(System.getenv("MODRINTH_TOKEN"))

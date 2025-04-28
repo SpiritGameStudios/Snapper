@@ -4,12 +4,11 @@ import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 import dev.spiritstudios.snapper.Snapper;
-import io.github.axolotlclient.api.API;
-import io.github.axolotlclient.api.Options;
-import io.github.axolotlclient.api.util.UUIDHelper;
-import io.github.axolotlclient.modules.auth.Account;
+import dev.spiritstudios.snapper.SnapperConfig;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.toast.SystemToast;
+import net.minecraft.text.Text;
 
 public class ScreenshotUploading {
 	public static final String SNAPPER_WEB_URL = "https://snapper.spiritstudios.dev/img/%s";
@@ -21,57 +20,61 @@ public class ScreenshotUploading {
 		return INSTANCE;
 	}
 
-	private final ImageNetworkingImpl networking = new ImageNetworkingImpl();
+	private final AxolotlClientApi api = new AxolotlClientApi();
 
-	private Account getCurrentAccount() {
-		var client = MinecraftClient.getInstance();
-		return new Account(client.getSession().getUsername(), UUIDHelper.toUndashed(client.getSession().getUuidOrNull()), client.getSession().getAccessToken());
+	private boolean isOfflineAccount() {
+		return MinecraftClient.getInstance().getSession().getAccessToken().length() < 400;
+	}
+
+	private void toast(String title, String description, Object... args) {
+		MinecraftClient.getInstance().getToastManager().add(
+				SystemToast.create(MinecraftClient.getInstance(),
+						SystemToast.Type.WORLD_BACKUP,
+						Text.translatable(title, args),
+						Text.translatable(description, args)));
 	}
 
 	public CompletableFuture<?> upload(Path image) {
-		ApiSupplier.loadAPI();
-
 		if (AXOLOTLCLIENT_LOADED) {
-			if (!API.getInstance().isAuthenticated()) {
-				API.getInstance().getNotificationProvider().addStatus("gallery.image.upload.failure", "toast.snapper.upload.axolotlclient.api_disabled");
+			if (!AxolotlClientCompat.isApiOnline()) {
+				toast("gallery.image.upload.failure", "toast.snapper.upload.axolotlclient.api_disabled");
 				Snapper.LOGGER.info("API is disabled in AxolotlClient's Settings!");
 				return CompletableFuture.completedFuture(null);
 			}
-			return networking.upload(image).thenAccept(this::imageUploaded);
+			return AxolotlClientCompat.upload(image).thenAccept(this::imageUploaded);
 		}
 
-
-		var account = getCurrentAccount();
-		if (account.isOffline()) {
+		if (isOfflineAccount()) {
 			return CompletableFuture.completedFuture(null);
 		}
 
-		API.getInstance().startup(account);
-		return CompletableFuture.supplyAsync(() -> {
-			// The author of the API (me) clearly has done too well at protecting its internals
-			// Therefore we may pick our poison here: either a busy-wait loop or a queue, the latter being
-			// more difficult as we don't really know when to remove things from the queue again
-			while (!API.getInstance().isAuthenticated()) {
-				try {
-					//noinspection BusyWait
-					Thread.sleep(100);
-				} catch (InterruptedException ignored) {
+		if (SnapperConfig.INSTANCE.termsAccepted.get() == AxolotlClientApi.TermsAcceptance.UNSET) {
+			var client = MinecraftClient.getInstance();
+			var cf = new CompletableFuture<>();
+			client.setScreen(new PrivacyNoticeScreen(client.currentScreen, v -> {
+				if (v) {
+					upload(image).thenAccept(cf::complete);
 				}
-				if (API.getInstance().getApiOptions().privacyAccepted.get() == Options.PrivacyPolicyState.DENIED) {
-					API.getInstance().getNotificationProvider().addStatus("gallery.image.upload.failure", "toast.snapper.upload.axolotlclient.api_disabled");
-					return null;
-				}
-			}
-			return networking.upload(image).thenAccept(this::imageUploaded).thenRun(API.getInstance()::shutdown);
-		});
+			}));
+			return cf;
+		}
+
+		if (SnapperConfig.INSTANCE.termsAccepted.get() != AxolotlClientApi.TermsAcceptance.ACCEPTED) {
+			toast("gallery.image.upload.failure", "toast.snapper.upload.axolotlclient.api_disabled");
+			return CompletableFuture.completedFuture(null);
+		}
+
+		return api.run(image).thenAccept(this::imageUploaded);
 	}
 
-	private void imageUploaded(String axolotlClientUrl) {
+	private void imageUploaded(String imageId) {
+		if (imageId == null) {
+			return;
+		}
 		var client = MinecraftClient.getInstance();
-		String id = networking.getIdFromUrl(axolotlClientUrl);
-		String snapperUrl = SNAPPER_WEB_URL.formatted(id);
+		String snapperUrl = SNAPPER_WEB_URL.formatted(imageId);
 		Snapper.LOGGER.info("Uploaded screenshot to: {}", snapperUrl);
 		client.keyboard.setClipboard(snapperUrl);
-		API.getInstance().getNotificationProvider().addStatus("gallery.image.upload.success", "gallery.image.upload.success.description", snapperUrl);
+		toast("toast.snapper.upload.success", "toast.snapper.upload.success.description", snapperUrl);
 	}
 }

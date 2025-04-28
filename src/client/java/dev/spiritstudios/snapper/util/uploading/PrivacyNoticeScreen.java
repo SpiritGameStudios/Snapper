@@ -21,7 +21,7 @@
  */
 
 /*
- * This file is taken from AxolotlClient.
+ * This file is adapted from AxolotlClient.
  * https://github.com/AxolotlClient/AxolotlClient-mod/blob/b2fe6c3f1b96b87bf1d8a50966def994ca18c9a9/1.21/src/main/java/io/github/axolotlclient/api/PrivacyNoticeScreen.java
  * ~ moehreag
  */
@@ -31,28 +31,26 @@ package dev.spiritstudios.snapper.util.uploading;
 import java.net.URI;
 import java.util.function.Consumer;
 
-import io.github.axolotlclient.api.API;
-import io.github.axolotlclient.api.Constants;
-import io.github.axolotlclient.api.Options;
-import io.github.axolotlclient.util.OSUtil;
+import dev.spiritstudios.snapper.SnapperConfig;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
 public class PrivacyNoticeScreen extends Screen {
 
-	private static final URI TERMS_URI = URI.create(Constants.TERMS);
+	private static final URI TERMS_URI = URI.create("https://axolotlclient.com/terms");
 
 	private final Screen parent;
 	private final Consumer<Boolean> accepted;
 	private MultilineText message;
 
 	protected PrivacyNoticeScreen(Screen parent, Consumer<Boolean> accepted) {
-		super(Text.translatable("api.privacyNotice"));
+		super(Text.translatable("snapper.privacy_notice"));
 		this.parent = parent;
 		this.accepted = accepted;
 	}
@@ -68,31 +66,32 @@ public class PrivacyNoticeScreen extends Screen {
 	@Override
 	public Text getNarratedTitle() {
 		return ScreenTexts.joinSentences(super.getNarratedTitle(),
-			Text.translatable("snapper.privacy_notice.description"));
+				Text.translatable("snapper.privacy_notice.description"));
 	}
 
 	@Override
 	protected void init() {
 		message = MultilineText.create(client.textRenderer,
-			Text.translatable("snapper.privacy_notice.description"), width - 50);
+				Text.translatable("snapper.privacy_notice.description"), width - 50);
 		int y = MathHelper.clamp(this.getMessageY() + this.getMessagesHeight() + 20, this.height / 6 + 96, this.height - 24);
 		this.addButtons(y);
 	}
 
 	private void addButtons(int y) {
-		addDrawableChild(ButtonWidget.builder(Text.translatable("api.privacyNotice.accept"), buttonWidget -> {
+		addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.accept"), buttonWidget -> {
 			client.setScreen(parent);
-			API.getInstance().getApiOptions().privacyAccepted.set(Options.PrivacyPolicyState.ACCEPTED);
+			SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.ACCEPTED);
+			SnapperConfig.HOLDER.save();
 			accepted.accept(true);
 		}).dimensions(width / 2 - 50, y, 100, 20).build());
-		addDrawableChild(ButtonWidget.builder(Text.translatable("api.privacyNotice.deny"), buttonWidget -> {
+		addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.deny"), buttonWidget -> {
 			client.setScreen(parent);
-			API.getInstance().getApiOptions().enabled.set(false);
-			API.getInstance().getApiOptions().privacyAccepted.set(Options.PrivacyPolicyState.DENIED);
+			SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.DENIED);
+			SnapperConfig.HOLDER.save();
 			accepted.accept(false);
 		}).dimensions(width / 2 - 50 + 105, y, 100, 20).build());
-		addDrawableChild(ButtonWidget.builder(Text.translatable("api.privacyNotice.openPolicy"), buttonWidget ->
-				OSUtil.getOS().open(TERMS_URI)).dimensions(width / 2 - 50 - 105, y, 100, 20).build());
+		addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.view_terms"), buttonWidget ->
+				Util.getOperatingSystem().open(TERMS_URI)).dimensions(width / 2 - 50 - 105, y, 100, 20).build());
 	}
 
 	private int getTitleY() {
