@@ -44,7 +44,7 @@ public class AxolotlClientApi {
 	private HttpClient client;
 	private String token;
 
-	public CompletableFuture<String> run(Path image) {
+	public CompletableFuture<String> uploadImage(Path image) {
 		try {
 			if (get("global_data", Map.of()).get(1L, TimeUnit.MINUTES)
 					.code != 200) {

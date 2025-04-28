@@ -11,7 +11,7 @@ import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
 
 public class ScreenshotUploading {
-	public static final String SNAPPER_WEB_URL = "https://snapper.spiritstudios.dev/img/%s";
+	public static final String SNAPPER_WEB_URL = "https://api.axolotlclient.com/v1/image/%s/view";
 	public static final boolean AXOLOTLCLIENT_LOADED = FabricLoader.getInstance().isModLoaded("axolotlclient");
 	public static final String SNAPPER_VERSION = FabricLoader.getInstance().getModContainer("snapper").orElseThrow().getMetadata().getVersion().getFriendlyString();
 	private static final ScreenshotUploading INSTANCE = new ScreenshotUploading();
@@ -37,7 +37,7 @@ public class ScreenshotUploading {
 	public CompletableFuture<?> upload(Path image) {
 		if (AXOLOTLCLIENT_LOADED) {
 			if (!AxolotlClientCompat.isApiOnline()) {
-				toast("gallery.image.upload.failure", "toast.snapper.upload.axolotlclient.api_disabled");
+				toast("toast.snapper.upload.failure", "toast.snapper.upload.axolotlclient.api_disabled");
 				Snapper.LOGGER.info("API is disabled in AxolotlClient's Settings!");
 				return CompletableFuture.completedFuture(null);
 			}
@@ -60,15 +60,16 @@ public class ScreenshotUploading {
 		}
 
 		if (SnapperConfig.INSTANCE.termsAccepted.get() != AxolotlClientApi.TermsAcceptance.ACCEPTED) {
-			toast("gallery.image.upload.failure", "toast.snapper.upload.axolotlclient.api_disabled");
+			toast("toast.snapper.upload.failure", "toast.snapper.upload.axolotlclient.api_disabled");
 			return CompletableFuture.completedFuture(null);
 		}
 
-		return api.run(image).thenAccept(this::imageUploaded);
+		return api.uploadImage(image).thenAccept(this::imageUploaded);
 	}
 
 	private void imageUploaded(String imageId) {
 		if (imageId == null) {
+			toast("toast.snapper.upload.failure", "toast.snapper.upload.failure.generic");
 			return;
 		}
 		var client = MinecraftClient.getInstance();
