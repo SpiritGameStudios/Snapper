@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
+import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -52,7 +53,7 @@ public class ScreenshotViewerScreen extends Screen {
             this.iconPath = Path.of(screenshot.getCanonicalPath());
         } catch (IOException e) {
             this.iconPath = null;
-            Snapper.LOGGER.error("FAILED TO GET PATH OF IMAGE");
+            Snapper.LOGGER.error("Failed to get image path.", e);
             client.setScreen(this.parent);
         }
 
@@ -60,7 +61,7 @@ public class ScreenshotViewerScreen extends Screen {
         try {
             image = ImageIO.read(new File(String.valueOf(this.iconPath)));
         } catch (IOException e) {
-            Snapper.LOGGER.error("Image failed to read.");
+            Snapper.LOGGER.error("Failed to read image.", e);
             this.client.setScreen(parent);
         }
 
@@ -73,11 +74,7 @@ public class ScreenshotViewerScreen extends Screen {
         this.screenshot = screenshot;
         this.screenshots = screenshots;
 
-        if (this.screenshots != null) {
-            this.screenshotIndex = this.screenshots.indexOf(this.screenshot);
-        } else {
-            this.screenshotIndex = -1;
-        }
+        this.screenshotIndex = this.screenshots != null ? this.screenshots.indexOf(this.screenshot) : -1;
     }
 
     @Override
@@ -87,6 +84,8 @@ public class ScreenshotViewerScreen extends Screen {
 
     @Override
     protected void init() {
+
+        int firstRowButtonWidth = 74;
 
         // OPEN IMAGE EXTERNALLY
 
@@ -117,7 +116,7 @@ public class ScreenshotViewerScreen extends Screen {
         ButtonWidget deleteButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.delete"),
                 button -> ScreenshotActions.deleteScreenshot(this.screenshot, this.parent)
-        ).width(100).build());
+        ).width(firstRowButtonWidth).build());
 
         // RENAME SCREENSHOT
 
@@ -127,14 +126,24 @@ public class ScreenshotViewerScreen extends Screen {
                     if (this.screenshot != null)
                         client.setScreen(new RenameScreenshotScreen(this.screenshot, this.parent));
                 }
-        ).width(100).build());
+        ).width(firstRowButtonWidth).build());
 
         // COPY SCREENSHOT
 
         ButtonWidget copyButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.copy"),
                 button -> Snapper.getPlatformHelper().copyScreenshot(this.screenshot)
-        ).width(100).build());
+        ).width(firstRowButtonWidth).build());
+
+        // UPLOAD SCREENSHOT
+
+        ButtonWidget uploadButton = addDrawableChild(ButtonWidget.builder(
+                Text.translatable("button.snapper.upload"),
+                button -> {
+                    button.active = false;
+					ScreenshotUploading.upload(iconPath).thenRun(() -> button.active = true);
+				}
+        ).width(firstRowButtonWidth).build());
 
         DirectionalLayoutWidget verticalButtonLayout = DirectionalLayoutWidget.vertical().spacing(4);
 
@@ -147,6 +156,7 @@ public class ScreenshotViewerScreen extends Screen {
         firstRowWidget.add(deleteButton);
         firstRowWidget.add(renameButton);
         firstRowWidget.add(copyButton);
+        firstRowWidget.add(uploadButton);
 
         AxisGridWidget secondRowWidget = verticalButtonLayout.add(new AxisGridWidget(
                 308,
@@ -287,16 +297,16 @@ public class ScreenshotViewerScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        Snapper.LOGGER.debug(String.format("SCROLL DEBUG 1 %s %s", this.screenshotIndex, this.screenshots == null));
+        Snapper.LOGGER.debug("SCROLL DEBUG 1 {} {}", this.screenshotIndex, this.screenshots == null);
         if (this.screenshotIndex != -1 && this.screenshots != null) {
-            Snapper.LOGGER.debug(String.format("SCROLL DEBUG 2 %s %s", this.screenshots.size(), this.screenshotIndex));
+            Snapper.LOGGER.debug("SCROLL DEBUG 2 {} {}", this.screenshots.size(), this.screenshotIndex);
             if (keyCode == GLFW.GLFW_KEY_LEFT) {
-                File previousImageFile = screenshots.getLast();;
+                File previousImageFile = screenshots.getLast();
                 if (this.screenshotIndex >= 1) {
                     previousImageFile = screenshots.get(screenshotIndex - 1);
                 }
                 ScreenshotImage previousImage = ScreenshotImage.of(previousImageFile, client.getTextureManager());
-                Snapper.LOGGER.debug(String.format("SCROLL DEBUG 3a %s", previousImageFile.getName()));
+                Snapper.LOGGER.debug("SCROLL DEBUG 3a {}", previousImageFile.getName());
                 client.setScreen(new ScreenshotViewerScreen(previousImage, previousImageFile, this.parent, this.screenshots));
             }
             if (keyCode == GLFW.GLFW_KEY_RIGHT) {
@@ -305,7 +315,7 @@ public class ScreenshotViewerScreen extends Screen {
                     nextImageFile = screenshots.get(screenshotIndex + 1);
                 }
                 ScreenshotImage nextImage = ScreenshotImage.of(nextImageFile, client.getTextureManager());
-                Snapper.LOGGER.debug(String.format("SCROLL DEBUG 3b %s", nextImageFile.getName()));
+                Snapper.LOGGER.debug("SCROLL DEBUG 3b {}", nextImageFile.getName());
                 client.setScreen(new ScreenshotViewerScreen(nextImage, nextImageFile, this.parent, this.screenshots));
             }
         }

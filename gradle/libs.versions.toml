@@ -1,14 +1,14 @@
 [versions]
-fabric_loom = "1.8-SNAPSHOT"
+fabric_loom = "1.10-SNAPSHOT"
 minotaur = "2.+"
 
-minecraft = "1.21"
-yarn = "1.21+build.9"
+minecraft = "1.21.1"
+yarn = "1.21.1+build.3"
 
-fabric_loader = "0.16.5"
+fabric_loader = "0.16.14"
 fabric_api = "0.110.0+1.21.1"
 
-specter = "1.0.6"
+specter = "1.1.1"
 objc_bridge = "1.0.0"
 
 [plugins]
