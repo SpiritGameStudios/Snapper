@@ -5,7 +5,7 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
-import dev.spiritstudios.snapper.mixin.EntryListWidgetAccessor;
+import dev.spiritstudios.snapper.mixin.accessor.EntryListWidgetAccessor;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
 import dev.spiritstudios.snapper.util.SnapperUtil;

@@ -1,4 +1,4 @@
-package dev.spiritstudios.snapper.mixin;
+package dev.spiritstudios.snapper.mixin.accessor;
 
 import net.minecraft.client.gui.widget.EntryListWidget;
 import org.spongepowered.asm.mixin.Mixin;
