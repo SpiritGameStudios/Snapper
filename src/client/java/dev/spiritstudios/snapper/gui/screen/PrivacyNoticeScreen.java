@@ -26,12 +26,10 @@
  * ~ moehreag
  */
 
-package dev.spiritstudios.snapper.util.uploading;
-
-import java.net.URI;
-import java.util.function.Consumer;
+package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -41,15 +39,18 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 
-public class PrivacyNoticeScreen extends Screen {
+import java.net.URI;
+import java.util.Objects;
+import java.util.function.Consumer;
 
+public class PrivacyNoticeScreen extends Screen {
 	private static final URI TERMS_URI = URI.create("https://axolotlclient.com/terms");
 
 	private final Screen parent;
 	private final Consumer<Boolean> accepted;
 	private MultilineText message;
 
-	protected PrivacyNoticeScreen(Screen parent, Consumer<Boolean> accepted) {
+	public PrivacyNoticeScreen(Screen parent, Consumer<Boolean> accepted) {
 		super(Text.translatable("snapper.privacy_notice"));
 		this.parent = parent;
 		this.accepted = accepted;
@@ -71,25 +72,33 @@ public class PrivacyNoticeScreen extends Screen {
 
 	@Override
 	protected void init() {
+		Objects.requireNonNull(client);
+
 		message = MultilineText.create(client.textRenderer,
 				Text.translatable("snapper.privacy_notice.description"), width - 50);
+
 		int y = MathHelper.clamp(this.getMessageY() + this.getMessagesHeight() + 20, this.height / 6 + 96, this.height - 24);
+
 		this.addButtons(y);
 	}
 
 	private void addButtons(int y) {
+		Objects.requireNonNull(client);
+
 		addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.accept"), buttonWidget -> {
 			client.setScreen(parent);
 			SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.ACCEPTED);
 			SnapperConfig.HOLDER.save();
 			accepted.accept(true);
 		}).dimensions(width / 2 - 50, y, 100, 20).build());
+
 		addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.deny"), buttonWidget -> {
 			client.setScreen(parent);
 			SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.DENIED);
 			SnapperConfig.HOLDER.save();
 			accepted.accept(false);
 		}).dimensions(width / 2 - 50 + 105, y, 100, 20).build());
+
 		addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.view_terms"), buttonWidget ->
 				Util.getOperatingSystem().open(TERMS_URI)).dimensions(width / 2 - 50 - 105, y, 100, 20).build());
 	}

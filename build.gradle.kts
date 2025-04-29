@@ -49,10 +49,7 @@ dependencies {
 	include(libs.bundles.specter)
 	modImplementation(libs.bundles.specter)
 
-	// TODO: Find a way to use the macOS clipboard without this.
 	implementation(libs.objc.bridge)
-
-	compileOnly(libs.bundles.axolotlclient)
 }
 
 tasks.processResources {

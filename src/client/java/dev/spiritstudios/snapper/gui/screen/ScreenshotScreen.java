@@ -37,7 +37,7 @@ public class ScreenshotScreen extends Screen {
     private ButtonWidget uploadButton;
     private TextIconButtonWidget viewModeButton;
     private ScreenshotListWidget.@Nullable ScreenshotEntry selectedScreenshot = null;
-    private boolean showGrid = false;
+    private boolean showGrid;
 
     public ScreenshotScreen(Screen parent) {
         super(Text.translatable("menu.snapper.screenshotmenu"));
@@ -117,11 +117,11 @@ public class ScreenshotScreen extends Screen {
         ).width(firstRowButtonWidth).build());
 
         this.uploadButton = addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.upload"), button -> {
-            if (selectedScreenshot != null) {
-                button.active = false;
-                ScreenshotUploading.getInstance().upload(selectedScreenshot.iconPath)
-                        .thenRun(() -> button.active = true);
-            }
+            if (selectedScreenshot == null) return;
+
+            button.active = false;
+            ScreenshotUploading.upload(selectedScreenshot.iconPath)
+                    .thenRun(() -> button.active = true);
         }).width(firstRowButtonWidth).build());
 
         DirectionalLayoutWidget verticalButtonLayout = DirectionalLayoutWidget.vertical().spacing(4);
@@ -163,9 +163,7 @@ public class ScreenshotScreen extends Screen {
 
         this.viewModeButton = addDrawableChild(TextIconButtonWidget.builder(
                 Text.translatable("config.snapper.snapper.viewMode"),
-                button -> {
-                    this.toggleGrid();
-                },
+                button -> this.toggleGrid(),
                 true
         ).width(20).texture(VIEW_MODE_ICON, 15, 15).build());
 
@@ -203,9 +201,7 @@ public class ScreenshotScreen extends Screen {
         remove(this.viewModeButton);
         this.viewModeButton = addDrawableChild(TextIconButtonWidget.builder(
                 Text.translatable("config.snapper.snapper.viewMode"),
-                button -> {
-                    this.toggleGrid();
-                },
+                button -> this.toggleGrid(),
                 true
         ).width(20).texture(VIEW_MODE_ICON, 15, 15).build());
         viewModeButton.setPosition(width / 2 - 178, height - 56);

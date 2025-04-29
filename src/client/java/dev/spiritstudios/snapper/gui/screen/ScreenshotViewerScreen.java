@@ -53,7 +53,7 @@ public class ScreenshotViewerScreen extends Screen {
             this.iconPath = Path.of(screenshot.getCanonicalPath());
         } catch (IOException e) {
             this.iconPath = null;
-            Snapper.LOGGER.error("FAILED TO GET PATH OF IMAGE");
+            Snapper.LOGGER.error("Failed to get image path.", e);
             client.setScreen(this.parent);
         }
 
@@ -61,7 +61,7 @@ public class ScreenshotViewerScreen extends Screen {
         try {
             image = ImageIO.read(new File(String.valueOf(this.iconPath)));
         } catch (IOException e) {
-            Snapper.LOGGER.error("Image failed to read.");
+            Snapper.LOGGER.error("Failed to read image.", e);
             this.client.setScreen(parent);
         }
 
@@ -74,11 +74,7 @@ public class ScreenshotViewerScreen extends Screen {
         this.screenshot = screenshot;
         this.screenshots = screenshots;
 
-        if (this.screenshots != null) {
-            this.screenshotIndex = this.screenshots.indexOf(this.screenshot);
-        } else {
-            this.screenshotIndex = -1;
-        }
+        this.screenshotIndex = this.screenshots != null ? this.screenshots.indexOf(this.screenshot) : -1;
     }
 
     @Override
@@ -145,7 +141,7 @@ public class ScreenshotViewerScreen extends Screen {
                 Text.translatable("button.snapper.upload"),
                 button -> {
                     button.active = false;
-					ScreenshotUploading.getInstance().upload(iconPath).thenRun(() -> button.active = true);
+					ScreenshotUploading.upload(iconPath).thenRun(() -> button.active = true);
 				}
         ).width(firstRowButtonWidth).build());
 
@@ -301,16 +297,16 @@ public class ScreenshotViewerScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        Snapper.LOGGER.debug(String.format("SCROLL DEBUG 1 %s %s", this.screenshotIndex, this.screenshots == null));
+        Snapper.LOGGER.debug("SCROLL DEBUG 1 {} {}", this.screenshotIndex, this.screenshots == null);
         if (this.screenshotIndex != -1 && this.screenshots != null) {
-            Snapper.LOGGER.debug(String.format("SCROLL DEBUG 2 %s %s", this.screenshots.size(), this.screenshotIndex));
+            Snapper.LOGGER.debug("SCROLL DEBUG 2 {} {}", this.screenshots.size(), this.screenshotIndex);
             if (keyCode == GLFW.GLFW_KEY_LEFT) {
                 File previousImageFile = screenshots.getLast();
                 if (this.screenshotIndex >= 1) {
                     previousImageFile = screenshots.get(screenshotIndex - 1);
                 }
                 ScreenshotImage previousImage = ScreenshotImage.of(previousImageFile, client.getTextureManager());
-                Snapper.LOGGER.debug(String.format("SCROLL DEBUG 3a %s", previousImageFile.getName()));
+                Snapper.LOGGER.debug("SCROLL DEBUG 3a {}", previousImageFile.getName());
                 client.setScreen(new ScreenshotViewerScreen(previousImage, previousImageFile, this.parent, this.screenshots));
             }
             if (keyCode == GLFW.GLFW_KEY_RIGHT) {
@@ -319,7 +315,7 @@ public class ScreenshotViewerScreen extends Screen {
                     nextImageFile = screenshots.get(screenshotIndex + 1);
                 }
                 ScreenshotImage nextImage = ScreenshotImage.of(nextImageFile, client.getTextureManager());
-                Snapper.LOGGER.debug(String.format("SCROLL DEBUG 3b %s", nextImageFile.getName()));
+                Snapper.LOGGER.debug("SCROLL DEBUG 3b {}", nextImageFile.getName());
                 client.setScreen(new ScreenshotViewerScreen(nextImage, nextImageFile, this.parent, this.screenshots));
             }
         }
