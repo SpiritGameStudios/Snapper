@@ -12,7 +12,7 @@ class ModInfo {
 
 val mod = ModInfo()
 
-version = mod.version
+version = "${mod.version}+${libs.versions.minecraft.get()}"
 group = mod.group
 
 base.archivesName = mod.id
