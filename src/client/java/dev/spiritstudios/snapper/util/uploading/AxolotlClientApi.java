@@ -67,7 +67,7 @@ public class AxolotlClientApi implements Closeable {
 
         Session session = MinecraftClient.getInstance().getSession();
         MinecraftSessionService sessionService = MinecraftClient.getInstance().getSessionService();
-        String serverId = new BigInteger(DigestUtils.sha1(RandomStringUtils.random(40).getBytes(StandardCharsets.UTF_8))).toString(16);
+        String serverId = new BigInteger(DigestUtils.sha1(RandomStringUtils.insecure().next(40).getBytes(StandardCharsets.UTF_8))).toString(16);
 
         try {
             sessionService.joinServer(session.getUuidOrNull(), session.getAccessToken(), serverId);
