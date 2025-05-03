@@ -17,10 +17,10 @@ Screenshots, made simple
 Inspired by existing screenshot mods, Snapper strives to bridge the feature-gap that most screenshot mods have, improving the overall experience.
 
 With Snapper, you can:
-- Access an easy-to-use screenshot management menu from the title screen or ingame
+- Access an easy-to-use screenshot management menu from the title screen or in-game
 - View your latest screenshot with just a key press
-- Rename, delete, copy,  and externally open images ingame
-- Create and view panoramic screenshots in-game
+- Rename, delete, copy,  and externally open images
+- Create and view panoramic screenshots
 - Share your screenshots with anyone via uploading
 - ~~Not having to install a mod from an EXE~~
 
