@@ -1,13 +1,15 @@
 package dev.spiritstudios.snapper;
 
+import dev.spiritstudios.snapper.util.SnapperUtil;
+import dev.spiritstudios.snapper.util.config.DirectoryUtils;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.Value;
-import net.minecraft.client.MinecraftClient;
+
+import java.io.File;
 
 public final class SnapperConfig extends Config<SnapperConfig> {
-    private final MinecraftClient client = MinecraftClient.getInstance();
 
     public static final ConfigHolder<SnapperConfig, ?> HOLDER = ConfigHolder.builder(
             Snapper.id("snapper"), SnapperConfig.class
@@ -34,6 +36,9 @@ public final class SnapperConfig extends Config<SnapperConfig> {
             .comment("Whether the terms of AxolotlClient have been accepted.")
             .build();
 
-    //public final Value<String> screenshotFolder = stringValue(String.valueOf(Path.of(client.runDirectory.getPath(), "screenshots")))
-    //        .build();
+    public final Value<Boolean> useCustomScreenshotFolder = booleanValue(false)
+            .build();
+
+    public final Value<File> customScreenshotFolder = DirectoryUtils.fileValue(SnapperUtil.getOSUnifiedFolder().toFile())
+            .build();
 }

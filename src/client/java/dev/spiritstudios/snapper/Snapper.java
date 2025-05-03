@@ -2,6 +2,7 @@ package dev.spiritstudios.snapper;
 
 import dev.spiritstudios.snapper.util.MacActions;
 import dev.spiritstudios.snapper.util.PlatformHelper;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.WindowsActions;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import dev.spiritstudios.specter.api.config.ModMenuHelper;
@@ -12,6 +13,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public final class Snapper implements ClientModInitializer {
     public static final String MODID = "snapper";
@@ -26,6 +31,14 @@ public final class Snapper implements ClientModInitializer {
         ModMenuHelper.addConfig(Snapper.MODID, SnapperConfig.HOLDER.id());
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> ScreenshotUploading.close());
+
+        if (SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() && SnapperConfig.INSTANCE.customScreenshotFolder.get().equals(SnapperUtil.getOSUnifiedFolder())) {
+            try {
+                Files.createDirectories(SnapperUtil.getOSUnifiedFolder());
+            } catch (IOException e) {
+                LOGGER.error("Failed to create Snapper unified screenshot folders at %s".formatted(SnapperUtil.getOSUnifiedFolder()), e);
+            }
+        }
     }
 
     public static Identifier id(String path) {

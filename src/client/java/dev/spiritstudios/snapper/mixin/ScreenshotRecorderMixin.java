@@ -8,6 +8,7 @@ import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.imageio.ImageIO;
@@ -42,5 +43,15 @@ public abstract class ScreenshotRecorderMixin {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(new ImageTransferable(ImageIO.read(screenshotFile)), null);
         }
+    }
+
+    @ModifyArg(method = "saveScreenshot(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;Ljava/util/function/Consumer;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/ScreenshotRecorder;saveScreenshotInner(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;Ljava/util/function/Consumer;)V", ordinal = 0))
+    private static File getConfiguredGameDirectory(File gameDirectory) {
+        File customScreenshotFolder = SnapperConfig.INSTANCE.customScreenshotFolder.get();
+
+        if (SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() && customScreenshotFolder.exists()) {
+            return customScreenshotFolder;
+        }
+        return gameDirectory;
     }
 }
