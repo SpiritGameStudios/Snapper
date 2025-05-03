@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screen.LoadingDisplay;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.input.KeyCodes;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.sound.SoundEvents;
@@ -157,7 +158,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     }
 
     @Override
-    protected int getRowTop(int index) {
+    public int getRowTop(int index) {
         return super.getRowTop(showGrid ? index / getColumnCount() : index);
     }
 
@@ -167,9 +168,9 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     }
 
     @Override
-    protected int getMaxPosition() {
-        int totalRows = (int) (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
-        return showGrid ? totalRows * itemHeight : super.getMaxPosition();
+    public int getMaxScrollY() {
+        int totalRows = (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
+        return showGrid ? totalRows * itemHeight : super.getMaxScrollY();
     }
 
     public void toggleGrid() {
@@ -190,7 +191,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         if (relX < 0 || relX > rowWidth || relY < 0 || relY > getBottom()) return null;
 
-        int rowIndex = (relY + (int) this.getScrollAmount()) / this.itemHeight;
+        int rowIndex = (relY + (int) this.getScrollY()) / this.itemHeight;
         int colIndex = MathHelper.floor(((float) relX / (float) rowWidth) * (float) getColumnCount());
         int entryIndex = rowIndex * getColumnCount() + colIndex;
 
@@ -380,13 +381,14 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             if (this.icon != null) {
                 RenderSystem.enableBlend();
                 context.drawTexture(
+                        RenderLayer::getGuiTextured,
                         this.icon.getTextureId(),
                         x,
                         y,
-                        entryHeight,
-                        entryHeight,
-                        (icon.getHeight()) / 3.0F + 32,
+                        (icon.getHeight()) / 3.0f + 32,
                         0,
+                        entryHeight,
+                        entryHeight,
                         icon.getHeight(),
                         icon.getHeight(),
                         icon.getWidth(),
@@ -398,6 +400,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             if (this.client.options.getTouchscreen().getValue() || hovered) {
                 context.fill(x, y, x + 32, y + 32, 0xA0909090);
                 context.drawGuiTexture(
+                        RenderLayer::getGuiTextured,
                         mouseX - x < 32 && this.icon != null ? ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
                         x,
                         y,
@@ -432,13 +435,14 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             if (this.icon != null) {
                 RenderSystem.enableBlend();
                 context.drawTexture(
+                        RenderLayer::getGuiTextured,
                         this.icon.getTextureId(),
                         x,
                         y,
+                        0,
+                        0,
                         entryWidth,
                         entryHeight,
-                        0,
-                        0,
                         icon.getWidth(),
                         icon.getHeight(),
                         icon.getWidth(),
@@ -449,11 +453,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             if (this.client.options.getTouchscreen().getValue() || (hovered && mouseX < x + entryWidth)) {
                 RenderSystem.enableBlend();
-                Identifier hoverBackground = Identifier.of("snapper", "textures/gui/grid_selection_background.png");
-                context.drawTexture(hoverBackground, x, y, 0, 0, entryWidth, entryHeight);
+                Identifier hoverBackground = Snapper.id("textures/gui/grid_selection_background.png");
+                context.drawTexture(RenderLayer::getGuiTextured, hoverBackground, x, y, 0, 0, entryWidth, entryHeight, entryWidth, entryHeight);
                 RenderSystem.disableBlend();
 
                 context.drawGuiTexture(
+                        RenderLayer::getGuiTextured,
                         clickthroughHovered &&
                                 this.icon != null ?
                                 ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
