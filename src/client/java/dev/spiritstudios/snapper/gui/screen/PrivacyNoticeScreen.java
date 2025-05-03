@@ -44,75 +44,77 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public class PrivacyNoticeScreen extends Screen {
-	private static final URI TERMS_URI = URI.create("https://axolotlclient.com/terms");
+    private static final URI TERMS_URI = URI.create("https://axolotlclient.com/terms");
 
-	private final Screen parent;
-	private final Consumer<Boolean> accepted;
-	private MultilineText message;
+    private final Screen parent;
+    private final Consumer<Boolean> accepted;
+    private MultilineText message;
 
-	public PrivacyNoticeScreen(Screen parent, Consumer<Boolean> accepted) {
-		super(Text.translatable("snapper.privacy_notice"));
-		this.parent = parent;
-		this.accepted = accepted;
-	}
+    public PrivacyNoticeScreen(Screen parent, Consumer<Boolean> accepted) {
+        super(Text.translatable("snapper.privacy_notice"));
+        this.parent = parent;
+        this.accepted = accepted;
+    }
 
-	@Override
-	public void render(DrawContext graphics, int mouseX, int mouseY, float delta) {
-		renderBackground(graphics, mouseX, mouseY, delta);
-		super.render(graphics, mouseX, mouseY, delta);
-		graphics.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, getTitleY(), -1);
-		message.drawCenterWithShadow(graphics, width / 2, getMessageY());
-	}
+    @Override
+    public void render(DrawContext graphics, int mouseX, int mouseY, float delta) {
+        renderBackground(graphics, mouseX, mouseY, delta);
+        super.render(graphics, mouseX, mouseY, delta);
+        graphics.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, getTitleY(), -1);
+        message.drawCenterWithShadow(graphics, width / 2, getMessageY());
+    }
 
-	@Override
-	public Text getNarratedTitle() {
-		return ScreenTexts.joinSentences(super.getNarratedTitle(),
-				Text.translatable("snapper.privacy_notice.description"));
-	}
+    @Override
+    public Text getNarratedTitle() {
+        return ScreenTexts.joinSentences(super.getNarratedTitle(),
+                Text.translatable("snapper.privacy_notice.description"));
+    }
 
-	@Override
-	protected void init() {
-		Objects.requireNonNull(client);
+    @Override
+    protected void init() {
+        Objects.requireNonNull(client);
 
-		message = MultilineText.create(client.textRenderer,
-				Text.translatable("snapper.privacy_notice.description"), width - 50);
+        message = MultilineText.create(client.textRenderer,
+                Text.translatable("snapper.privacy_notice.description"), width - 50);
 
-		int y = MathHelper.clamp(this.getMessageY() + this.getMessagesHeight() + 20, this.height / 6 + 96, this.height - 24);
+        int y = MathHelper.clamp(this.getMessageY() + this.getMessagesHeight() + 20, this.height / 6 + 96, this.height - 24);
 
-		this.addButtons(y);
-	}
+        this.addButtons(y);
+    }
 
-	private void addButtons(int y) {
-		Objects.requireNonNull(client);
+    private void addButtons(int y) {
+        Objects.requireNonNull(client);
 
-		addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.accept"), buttonWidget -> {
-			client.setScreen(parent);
-			SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.ACCEPTED);
-			SnapperConfig.HOLDER.save();
-			accepted.accept(true);
-		}).dimensions(width / 2 - 50, y, 100, 20).build());
+        int buttonWidth = 120;
 
-		addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.deny"), buttonWidget -> {
-			client.setScreen(parent);
-			SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.DENIED);
-			SnapperConfig.HOLDER.save();
-			accepted.accept(false);
-		}).dimensions(width / 2 - 50 + 105, y, 100, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.view_terms"), buttonWidget ->
+                Util.getOperatingSystem().open(TERMS_URI)).dimensions(width / 2 - (buttonWidth / 2) - buttonWidth - 5, y, buttonWidth, 20).build());
 
-		addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.view_terms"), buttonWidget ->
-				Util.getOperatingSystem().open(TERMS_URI)).dimensions(width / 2 - 50 - 105, y, 100, 20).build());
-	}
+        addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.accept"), buttonWidget -> {
+            client.setScreen(parent);
+            SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.ACCEPTED);
+            SnapperConfig.HOLDER.save();
+            accepted.accept(true);
+        }).dimensions(width / 2 - (buttonWidth / 2), y, buttonWidth, 20).build());
 
-	private int getTitleY() {
-		int i = (this.height - this.getMessagesHeight()) / 2;
-		return MathHelper.clamp(i - 20 - 9, 10, 80);
-	}
+        addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.deny"), buttonWidget -> {
+            client.setScreen(parent);
+            SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.DENIED);
+            SnapperConfig.HOLDER.save();
+            accepted.accept(false);
+        }).dimensions(width / 2 - (buttonWidth / 2) + buttonWidth + 5, y, buttonWidth, 20).build());
+    }
 
-	private int getMessageY() {
-		return this.getTitleY() + 20;
-	}
+    private int getTitleY() {
+        int i = (this.height - this.getMessagesHeight()) / 2;
+        return MathHelper.clamp(i - 20 - 9, 10, 80);
+    }
 
-	private int getMessagesHeight() {
-		return this.message.count() * 9;
-	}
+    private int getMessageY() {
+        return this.getTitleY() + 20;
+    }
+
+    private int getMessagesHeight() {
+        return this.message.count() * 9;
+    }
 }

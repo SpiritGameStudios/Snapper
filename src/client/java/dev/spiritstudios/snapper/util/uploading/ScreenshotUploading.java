@@ -23,7 +23,7 @@ public class ScreenshotUploading {
 		return MinecraftClient.getInstance().getSession().getAccessToken().length() < 400;
 	}
 
-	private static void toast(String title, String description, Object... args) {
+	public static void toast(String title, String description, Object... args) {
 		MinecraftClient.getInstance().getToastManager().add(
 				SystemToast.create(MinecraftClient.getInstance(),
 						SystemToast.Type.WORLD_BACKUP,

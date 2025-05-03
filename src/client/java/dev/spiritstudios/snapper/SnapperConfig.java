@@ -34,7 +34,6 @@ public final class SnapperConfig extends Config<SnapperConfig> {
             .comment("Whether the terms of AxolotlClient have been accepted.")
             .build();
 
-
     //public final Value<String> screenshotFolder = stringValue(String.valueOf(Path.of(client.runDirectory.getPath(), "screenshots")))
     //        .build();
 }

@@ -46,7 +46,7 @@ public class ScreenshotViewerScreen extends Screen {
     }
 
     public ScreenshotViewerScreen(ScreenshotImage icon, File screenshot, Screen parent, @Nullable List<File> screenshots) {
-        super(Text.translatable("menu.snapper.viewermenu"));
+        super(Text.translatable("menu.snapper.viewer_menu"));
         this.parent = parent;
 
         try {

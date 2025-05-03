@@ -40,7 +40,7 @@ public class PanoramaViewerScreen extends Screen {
     private float backgroundAlpha;
 
     protected PanoramaViewerScreen(String title, Screen parent) {
-        super(Text.translatable("menu.snapper.viewermenu"));
+        super(Text.translatable("menu.snapper.viewer_menu"));
         this.title = title;
         this.parent = parent;
     }

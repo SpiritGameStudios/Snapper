@@ -16,11 +16,12 @@ Screenshots, made simple
 
 Inspired by existing screenshot mods, Snapper strives to bridge the feature-gap that most screenshot mods have, improving the overall experience.
 
-Snapper includes:
-- An easy-to-use screenshot managment menu, accessible from the title screen or ingame
-- The ability to view latest screenshot with just a keybind
-- Options to rename, delete, copy, and externally open images ingame
-- The ability to create and view panoramic screenshots ingame
+With Snapper, you can:
+- Access an easy-to-use screenshot management menu from the title screen or ingame
+- View your latest screenshot with just a key press
+- Rename, delete, copy,  and externally open images ingame
+- Create and view panoramic screenshots in-game
+- Share your screenshots with anyone via uploading
 - ~~Not having to install a mod from an EXE~~
 
 ## ❓ FAQ
@@ -33,6 +34,10 @@ Snapper includes:
 * Can you port/backport to `X` version? <br/>
   Probably not. Multi-version projects are hard :<
 
+## ➕ Details
+
 Special thanks to our original beta testers:
 - [Blurryface](https://blurry.gay)
 - [ThinkSeal](https://github.com/thinkseal)
+
+Snapper's image uploading is powered by the wonderful (and [open-source](https://github.com/axolotlclient)) [AxolotlClient](https://modrinth.com/mod/axolotlclient) and governed by their [terms of use](https://axolotlclient.com/terms). Agreement is opt-in and you may revoke it at any time.

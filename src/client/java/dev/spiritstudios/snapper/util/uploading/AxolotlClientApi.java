@@ -51,6 +51,8 @@ public class AxolotlClientApi implements Closeable {
             return CompletableFuture.completedFuture(null);
         }
 
+        ScreenshotUploading.toast("toast.snapper.upload.in_progress", "toast.snapper.upload.in_progress.description");
+
         return authenticate()
                 .thenCompose(ignored -> post("image/" + image.getFileName().toString(), bytes))
                 .thenApply(response -> {
