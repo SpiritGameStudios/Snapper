@@ -74,7 +74,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             }
         });
 
-        this.showGrid = SnapperConfig.INSTANCE.viewMode.get();
+        this.showGrid = SnapperConfig.INSTANCE.viewMode.get().equals(ScreenshotViewerScreen.ViewMode.GRID);
 
         ((EntryListWidgetAccessor) (Object) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
     }
@@ -177,7 +177,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         ((EntryListWidgetAccessor) (Object) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
         for (var entry : this.children()) if (entry instanceof ScreenshotEntry sc) sc.setShowGrid(this.showGrid);
 
-        SnapperConfig.INSTANCE.viewMode.set(this.showGrid);
+        SnapperConfig.INSTANCE.viewMode.set(this.showGrid ? ScreenshotViewerScreen.ViewMode.GRID : ScreenshotViewerScreen.ViewMode.LIST);
     }
 
     @Override
@@ -408,26 +408,10 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         }
 
         public void renderGrid(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            String fileName = this.iconFileName;
-            String creationString = "undefined";
-
             int centreX = x + entryWidth / 2;
             int centreY = y + entryHeight / 2;
 
             clickthroughHovered = SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY);
-
-            long creationTime = 0;
-            try {
-                creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
-            } catch (IOException e) {
-                client.setScreen(new ScreenshotScreen(screenParent));
-            }
-
-            if (creationTime != -1L)
-                creationString = DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
-
-            if (StringHelper.isEmpty(fileName))
-                fileName = Text.translatable("text.snapper.generic") + " " + (index + 1);
 
             if (this.icon != null) {
                 RenderSystem.enableBlend();
@@ -447,50 +431,72 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 RenderSystem.disableBlend();
             }
 
-            if (this.client.options.getTouchscreen().getValue() || (hovered && mouseX < x + entryWidth)) {
-                RenderSystem.enableBlend();
-                Identifier hoverBackground = Identifier.of("snapper", "textures/gui/grid_selection_background.png");
-                context.drawTexture(hoverBackground, x, y, 0, 0, entryWidth, entryHeight);
-                RenderSystem.disableBlend();
-
-                context.drawGuiTexture(
-                        clickthroughHovered &&
-                                this.icon != null ?
-                                ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
-                        centreX - 16,
-                        centreY - 16,
-                        32,
-                        32
-                );
-
-                context.drawText(
-                        this.client.textRenderer,
-                        fileName,
-                        x + 5,
-                        y + 6,
-                        0xFFFFFF,
-                        true
-                );
-
-                context.drawText(
-                        this.client.textRenderer,
-                        Text.translatable("text.snapper.created"),
-                        x + 5,
-                        y + entryHeight - 22,
-                        Colors.LIGHT_GRAY,
-                        true
-                );
-
-                context.drawText(
-                        this.client.textRenderer,
-                        creationString,
-                        x + 5,
-                        y + entryHeight - 12,
-                        Colors.LIGHT_GRAY,
-                        true
-                );
-
+            if (this.client.options.getTouchscreen().getValue() || (hovered && mouseX < x + entryWidth) || isSelectedEntry(index)) {
+                renderMetadata(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
             }
+        }
+
+        public void renderMetadata(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            String fileName = this.iconFileName;
+
+            int centreX = x + entryWidth / 2;
+            int centreY = y + entryHeight / 2;
+
+            if (StringHelper.isEmpty(fileName))
+                fileName = Text.translatable("text.snapper.generic") + " " + (index + 1);
+
+            String creationString = "undefined";
+            long creationTime = 0;
+            try {
+                creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
+            } catch (IOException e) {
+                client.setScreen(new ScreenshotScreen(screenParent));
+            }
+
+            if (creationTime != -1L)
+                creationString = DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
+
+            RenderSystem.enableBlend();
+            Identifier hoverBackground = Identifier.of("snapper", "textures/gui/grid_selection_background.png");
+            context.drawTexture(hoverBackground, x, y, 0, 0, entryWidth, entryHeight);
+            RenderSystem.disableBlend();
+
+            context.drawGuiTexture(
+                    clickthroughHovered &&
+                            this.icon != null ?
+                            ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
+                    centreX - 16,
+                    centreY - 16,
+                    32,
+                    32
+            );
+
+            context.drawText(
+                    this.client.textRenderer,
+                    fileName,
+                    x + 5,
+                    y + 6,
+                    0xFFFFFF,
+                    true
+            );
+
+            context.drawText(
+                    this.client.textRenderer,
+                    Text.translatable("text.snapper.created"),
+                    x + 5,
+                    y + entryHeight - 22,
+                    Colors.LIGHT_GRAY,
+                    true
+            );
+
+            context.drawText(
+                    this.client.textRenderer,
+                    creationString,
+                    x + 5,
+                    y + entryHeight - 12,
+                    Colors.LIGHT_GRAY,
+                    true
+            );
         }
 
         private void loadIcon() {
@@ -511,10 +517,18 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         @Override
         public void drawBorder(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            if (isSelectedEntry(index) && isFocused()) {
+            if (isSelectedEntry(index)) {
                 context.fill(x - 2, y - 2, x + entryWidth + 2, y + entryHeight + 2, -1);
                 context.fill(x - 1, y - 1, x + entryWidth + 1, y + entryHeight + 1, -16777216);
             }
+        }
+
+            @Override
+        public void setFocused(boolean focused) {
+            if (focused) {
+                setEntrySelected(this);
+            }
+            super.setFocused(focused);
         }
 
         @Override

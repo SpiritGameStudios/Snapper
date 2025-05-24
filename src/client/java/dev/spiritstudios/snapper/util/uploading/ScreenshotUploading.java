@@ -3,6 +3,7 @@ package dev.spiritstudios.snapper.util.uploading;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.PrivacyNoticeScreen;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
@@ -19,10 +20,6 @@ public class ScreenshotUploading {
 
 	private static final AxolotlClientApi API = new AxolotlClientApi();
 
-	private static boolean isOfflineAccount() {
-		return MinecraftClient.getInstance().getSession().getAccessToken().length() < 400;
-	}
-
 	public static void toast(String title, String description, Object... args) {
 		MinecraftClient.getInstance().getToastManager().add(
 				SystemToast.create(MinecraftClient.getInstance(),
@@ -32,7 +29,7 @@ public class ScreenshotUploading {
 	}
 
 	public static CompletableFuture<Void> upload(Path image) {
-		if (isOfflineAccount()) {
+		if (SnapperUtil.isOfflineAccount()) {
 			toast("toast.snapper.upload.failure", "toast.snapper.upload.offline");
 			return CompletableFuture.failedFuture(new IllegalStateException("Minecraft is currently running in offline mode."));
 		}

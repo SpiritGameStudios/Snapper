@@ -1,8 +1,8 @@
 package dev.spiritstudios.snapper.util;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Util;
 
-import java.io.File;
 import java.nio.file.Path;
 
 public class SnapperUtil {
@@ -17,5 +17,9 @@ public class SnapperUtil {
             case OSX -> Path.of(System.getProperty("user.home") + "/Library/Application Support", "snapper");
             default -> Path.of(System.getProperty("user.home"), ".snapper");
         };
+    }
+
+    public static boolean isOfflineAccount() {
+        return MinecraftClient.getInstance().getSession().getAccessToken().length() < 400;
     }
 }

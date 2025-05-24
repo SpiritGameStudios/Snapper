@@ -4,11 +4,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.AxisGridWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
@@ -75,6 +77,11 @@ public class ScreenshotViewerScreen extends Screen {
         this.screenshots = screenshots;
 
         this.screenshotIndex = this.screenshots != null ? this.screenshots.indexOf(this.screenshot) : -1;
+    }
+
+    public enum ViewMode {
+        LIST,
+        GRID
     }
 
     @Override
@@ -144,6 +151,11 @@ public class ScreenshotViewerScreen extends Screen {
 					ScreenshotUploading.upload(iconPath).thenRun(() -> button.active = true);
 				}
         ).width(firstRowButtonWidth).build());
+
+        if (SnapperUtil.isOfflineAccount()) {
+            uploadButton.active = false;
+            uploadButton.setTooltip(Tooltip.of(Text.translatable("button.snapper.upload.tooltip")));
+        }
 
         DirectionalLayoutWidget verticalButtonLayout = DirectionalLayoutWidget.vertical().spacing(4);
 

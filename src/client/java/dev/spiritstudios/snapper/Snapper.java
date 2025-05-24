@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 public final class Snapper implements ClientModInitializer {
     public static final String MODID = "snapper";
@@ -32,7 +31,12 @@ public final class Snapper implements ClientModInitializer {
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> ScreenshotUploading.close());
 
-        if (SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() && SnapperConfig.INSTANCE.customScreenshotFolder.get().equals(SnapperUtil.getOSUnifiedFolder())) {
+        LOGGER.info(SnapperConfig.INSTANCE.customScreenshotFolder.get().getPath());
+        LOGGER.info(SnapperUtil.getOSUnifiedFolder().toString());
+        LOGGER.info(SnapperConfig.INSTANCE.useCustomScreenshotFolder.get().toString());
+
+        if (SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() && SnapperConfig.INSTANCE.customScreenshotFolder.get().toPath().equals(SnapperUtil.getOSUnifiedFolder())) {
+            LOGGER.debug("Creating default shared Snapper directory");
             try {
                 Files.createDirectories(SnapperUtil.getOSUnifiedFolder());
             } catch (IOException e) {

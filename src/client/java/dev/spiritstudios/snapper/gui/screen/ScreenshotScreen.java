@@ -4,6 +4,7 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import dev.spiritstudios.specter.api.config.RootConfigScreen;
 import net.minecraft.client.MinecraftClient;
@@ -38,12 +39,14 @@ public class ScreenshotScreen extends Screen {
     private TextIconButtonWidget viewModeButton;
     private ScreenshotListWidget.@Nullable ScreenshotEntry selectedScreenshot = null;
     private boolean showGrid;
+    private final boolean isOffline;
 
     public ScreenshotScreen(Screen parent) {
         super(Text.translatable("menu.snapper.screenshot_menu"));
         this.parent = parent;
 
-        this.showGrid = SnapperConfig.INSTANCE.viewMode.get();
+        this.showGrid = SnapperConfig.INSTANCE.viewMode.get().equals(ScreenshotViewerScreen.ViewMode.GRID);
+        this.isOffline = SnapperUtil.isOfflineAccount();
         VIEW_MODE_ICON = showGrid ? Identifier.of(MODID, "screenshots/show_list") : Identifier.of(MODID, "screenshots/show_grid");
     }
 
@@ -127,6 +130,10 @@ public class ScreenshotScreen extends Screen {
                     .thenRun(() -> button.active = true);
         }).width(firstRowButtonWidth).build());
 
+        if (isOffline) {
+            this.uploadButton.setTooltip(Tooltip.of(Text.translatable("button.snapper.upload.tooltip")));
+        }
+
         DirectionalLayoutWidget verticalButtonLayout = DirectionalLayoutWidget.vertical().spacing(4);
 
         AxisGridWidget firstRowWidget = verticalButtonLayout.add(new AxisGridWidget(
@@ -157,7 +164,7 @@ public class ScreenshotScreen extends Screen {
         TextIconButtonWidget settingsButton = addDrawableChild(TextIconButtonWidget.builder(
                 Text.translatable("config.snapper.snapper.title"),
                 button -> this.client.setScreen(
-                        new RootConfigScreen(SnapperConfig.HOLDER, this)),
+                        new RootConfigScreen(SnapperConfig.HOLDER, new ScreenshotScreen(this.parent))),
                 true
         ).width(20).texture(SETTINGS_ICON, 15, 15).build());
 
@@ -192,7 +199,7 @@ public class ScreenshotScreen extends Screen {
         this.renameButton.active = hasScreenshot;
         this.viewButton.active = hasScreenshot;
         this.selectedScreenshot = screenshot;
-        this.uploadButton.active = hasScreenshot;
+        this.uploadButton.active = !isOffline && hasScreenshot;
     }
 
     public void toggleGrid() {

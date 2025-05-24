@@ -7,7 +7,6 @@ import dev.spiritstudios.specter.api.config.Value;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.text.Text;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
@@ -15,7 +14,7 @@ import java.io.File;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-public class DirectoryUtils {
+public class DirectoryUtil {
     public static final Codec<File> FILE_CODEC = Codec.STRING.comapFlatMap(
             string -> {
                 File file = new File(string);
@@ -26,7 +25,7 @@ public class DirectoryUtils {
 
                 return DataResult.success(file);
             },
-            File::getPath
+            file -> escapePath(file.getPath())
     );
 
     public static Value.Builder<File> fileValue(File defaultValue) {
@@ -52,4 +51,8 @@ public class DirectoryUtils {
 
         return widget;
     };
+
+    public static String escapePath(String path) {
+        return path.replace("\\", "/");
+    }
 }
