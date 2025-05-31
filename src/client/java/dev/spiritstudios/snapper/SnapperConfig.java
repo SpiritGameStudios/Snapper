@@ -9,6 +9,7 @@ import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.Value;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public final class SnapperConfig extends Config<SnapperConfig> {
 
@@ -41,7 +42,7 @@ public final class SnapperConfig extends Config<SnapperConfig> {
             .comment("Whether to use a custom screenshot folder instead of Minecraft's default")
             .build();
 
-    public final Value<File> customScreenshotFolder = DirectoryUtil.fileValue(SnapperUtil.getOSUnifiedFolder().toFile())
+    public final Value<File> customScreenshotFolder = DirectoryUtil.fileValue(new File(DirectoryUtil.escapePath(SnapperUtil.getOSUnifiedFolder().toString())))
             .comment("What folder to use if custom screenshot folders are enabled.")
             .build();
 }

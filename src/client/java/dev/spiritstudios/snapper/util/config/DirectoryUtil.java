@@ -2,14 +2,9 @@ package dev.spiritstudios.snapper.util.config;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.util.SnapperUtil;
+import dev.spiritstudios.snapper.gui.widget.FolderSelectWidget;
 import dev.spiritstudios.specter.api.config.Value;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 import java.io.File;
@@ -26,7 +21,7 @@ public class DirectoryUtil {
                 try {
                     Files.createDirectories(file.toPath());
                 } catch (IOException e) {
-                    return DataResult.error(() -> "something something attlerock");
+                    return DataResult.error(() -> "Yarrow, stop using this scroll wall to flirt with my sister (in romantic matters, her density rivals a neutron star’s) and go meet her on the White Hole Station.");
                 }
 
                 if (!file.exists()) {
@@ -48,7 +43,6 @@ public class DirectoryUtil {
         String selectedPath = TinyFileDialogs.tinyfd_selectFolderDialog(title, userHome);
 
         if (selectedPath == null) {
-            Snapper.LOGGER.info("Yarrow, stop using this scroll wall to flirt with my sister (in romantic matters, her density rivals a neutron star’s) and go meet her on the White Hole Station.");
             return Optional.empty();
         }
 
@@ -57,12 +51,18 @@ public class DirectoryUtil {
 
     public static final BiFunction<Value<?>, String, ? extends ClickableWidget> FILE_WIDGET_FACTORY = (configValue, id) -> {
         Value<File> value = (Value<File>) configValue;
-        TextFieldWidget widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 0, 0, Text.of(value.get().getPath()));
 
-        return widget;
+        /*
+        TextFieldWidget widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 0, 0, Text.of(value.get().getPath()));
+        widget.setPlaceholder(Text.translatableWithFallback("%s.placeholder".formatted(configValue.translationKey(id)), "").formatted(Formatting.DARK_GRAY));
+        widget.setMaxLength(Integer.MAX_VALUE);
+        widget.setText(value.get().getPath());
+        widget.setChangedListener(content -> value.set(new File(content)));
+*/
+        return new FolderSelectWidget(0, 0, 10, 10, value, "%s.placeholder".formatted(configValue.translationKey(id)));
     };
 
     public static String escapePath(String path) {
-        return path.replace("\\", "/");
+        return path.replace("\\", "\\\\");
     }
 }
