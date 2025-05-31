@@ -67,7 +67,7 @@ public class ScreenshotScreen extends Screen {
 
         ButtonWidget folderButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.folder"),
-                button -> Util.getOperatingSystem().open(new File(client.runDirectory, "screenshots"))
+                button -> Util.getOperatingSystem().open(SnapperUtil.getConfiguredScreenshotDirectory())
         ).width(secondRowButtonWidth).build());
 
 

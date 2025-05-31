@@ -1,8 +1,10 @@
 package dev.spiritstudios.snapper.util;
 
+import dev.spiritstudios.snapper.SnapperConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Util;
 
+import java.io.File;
 import java.nio.file.Path;
 
 public class SnapperUtil {
@@ -17,6 +19,13 @@ public class SnapperUtil {
             case OSX -> Path.of(System.getProperty("user.home") + "/Library/Application Support", "snapper");
             default -> Path.of(System.getProperty("user.home"), ".snapper");
         };
+    }
+
+    public static File getConfiguredScreenshotDirectory() {
+        File customScreenshotDirectory = new File(SnapperConfig.INSTANCE.customScreenshotFolder.get(), "screenshots");
+        File defaultScreenshotDirectory = new File(MinecraftClient.getInstance().runDirectory, "screenshots");
+
+        return SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() ? customScreenshotDirectory : defaultScreenshotDirectory;
     }
 
     public static boolean isOfflineAccount() {

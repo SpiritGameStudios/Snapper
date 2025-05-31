@@ -21,6 +21,7 @@
   "text.snapper.generic": "Screenshot",
   "text.snapper.loading": "Loading Screenshots",
   "text.snapper.empty": "Take a screenshot in-game to see it here!",
+  "text.snapper.empty.custom": "Can't find your screenshots? Try disabling custom screenshot folders.",
   "text.snapper.panorama_encourage": "Take a panorama in-game to see it here!",
   "text.snapper.panorama_success": "Panorama saved. View by pressing %s",
   "text.snapper.panorama_failure_iris": "Due to a bug in Iris, panoramas cannot be taken while it's installed.",

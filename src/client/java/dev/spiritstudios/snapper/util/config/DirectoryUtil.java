@@ -3,6 +3,8 @@ package dev.spiritstudios.snapper.util.config;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.specter.api.config.Value;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -11,6 +13,8 @@ import net.minecraft.text.Text;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -19,8 +23,14 @@ public class DirectoryUtil {
             string -> {
                 File file = new File(string);
 
+                try {
+                    Files.createDirectories(file.toPath());
+                } catch (IOException e) {
+                    return DataResult.error(() -> "something something attlerock");
+                }
+
                 if (!file.exists()) {
-                    return DataResult.error(() -> "Failed to get file from config string value");
+                    return DataResult.error(() -> "Failed to get file from config string value. Does the directory exist?");
                 }
 
                 return DataResult.success(file);
@@ -45,7 +55,7 @@ public class DirectoryUtil {
         return Optional.of(new File(selectedPath));
     }
 
-    public static final BiFunction<Value<?>, File, ? extends ClickableWidget> FILE_WIDGET_FACTORY = (configValue, id) -> {
+    public static final BiFunction<Value<?>, String, ? extends ClickableWidget> FILE_WIDGET_FACTORY = (configValue, id) -> {
         Value<File> value = (Value<File>) configValue;
         TextFieldWidget widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 0, 0, Text.of(value.get().getPath()));
 

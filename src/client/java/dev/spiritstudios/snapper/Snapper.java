@@ -2,9 +2,10 @@ package dev.spiritstudios.snapper;
 
 import dev.spiritstudios.snapper.util.MacActions;
 import dev.spiritstudios.snapper.util.PlatformHelper;
-import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.WindowsActions;
+import dev.spiritstudios.snapper.util.config.DirectoryUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
+import dev.spiritstudios.specter.api.config.ConfigScreenWidgets;
 import dev.spiritstudios.specter.api.config.ModMenuHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -14,8 +15,7 @@ import net.minecraft.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.File;
 
 public final class Snapper implements ClientModInitializer {
     public static final String MODID = "snapper";
@@ -25,24 +25,12 @@ public final class Snapper implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ConfigScreenWidgets.add(File.class, DirectoryUtil.FILE_WIDGET_FACTORY);
         SnapperKeybindings.init();
 
         ModMenuHelper.addConfig(Snapper.MODID, SnapperConfig.HOLDER.id());
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> ScreenshotUploading.close());
-
-        LOGGER.info(SnapperConfig.INSTANCE.customScreenshotFolder.get().getPath());
-        LOGGER.info(SnapperUtil.getOSUnifiedFolder().toString());
-        LOGGER.info(SnapperConfig.INSTANCE.useCustomScreenshotFolder.get().toString());
-
-        if (SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() && SnapperConfig.INSTANCE.customScreenshotFolder.get().toPath().equals(SnapperUtil.getOSUnifiedFolder())) {
-            LOGGER.debug("Creating default shared Snapper directory");
-            try {
-                Files.createDirectories(SnapperUtil.getOSUnifiedFolder());
-            } catch (IOException e) {
-                LOGGER.error("Failed to create Snapper unified screenshot folders at %s".formatted(SnapperUtil.getOSUnifiedFolder()), e);
-            }
-        }
     }
 
     public static Identifier id(String path) {

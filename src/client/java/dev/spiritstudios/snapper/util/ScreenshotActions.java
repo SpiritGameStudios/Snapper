@@ -1,6 +1,7 @@
 package dev.spiritstudios.snapper.util;
 
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.SnapperConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.ProgressScreen;
@@ -52,7 +53,9 @@ public class ScreenshotActions {
     }
 
     public static java.util.List<File> getScreenshots(MinecraftClient client) {
-        File screenshotDir = new File(client.runDirectory, "screenshots");
+        File customScreenshotDirectory = new File(SnapperConfig.INSTANCE.customScreenshotFolder.get(), "screenshots");
+        File defaultScreenshotDirectory = new File(client.runDirectory, "screenshots");
+        File screenshotDir = SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() ? customScreenshotDirectory : defaultScreenshotDirectory;
 
         File[] files = screenshotDir.listFiles();
         java.util.List<File> screenshots = new ArrayList<>(List.of(files == null ? new File[0] : files));

@@ -272,6 +272,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     public static class EmptyEntry extends Entry implements AutoCloseable {
         private static final Text EMPTY_LIST_TEXT = Text.translatable("text.snapper.empty");
+        private static final Text EMPTY_CUSTOM_LIST_TEXT = Text.translatable("text.snapper.empty.custom");
         private final MinecraftClient client;
 
         public EmptyEntry(MinecraftClient client) {
@@ -292,6 +293,14 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     EMPTY_LIST_TEXT,
                     (this.client.currentScreen.width - this.client.textRenderer.getWidth(EMPTY_LIST_TEXT)) / 2,
                     y + entryHeight / 2,
+                    0xFFFFFF,
+                    false
+            );
+            context.drawText(
+                    this.client.textRenderer,
+                    EMPTY_CUSTOM_LIST_TEXT,
+                    (this.client.currentScreen.width - this.client.textRenderer.getWidth(EMPTY_CUSTOM_LIST_TEXT)) / 2,
+                    y + entryHeight / 2 + 10,
                     0xFFFFFF,
                     false
             );
