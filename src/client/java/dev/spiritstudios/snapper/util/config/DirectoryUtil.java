@@ -63,6 +63,6 @@ public class DirectoryUtil {
     };
 
     public static String escapePath(String path) {
-        return path.replace("\\", "\\\\");
+        return path.replace("\\", "\\\\").trim();
     }
 }

@@ -9,7 +9,6 @@ import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.Value;
 
 import java.io.File;
-import java.nio.file.Path;
 
 public final class SnapperConfig extends Config<SnapperConfig> {
 
