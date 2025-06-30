@@ -8,19 +8,22 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class WindowsActions implements PlatformHelper {
     @Override
-    public void copyScreenshot(File screenshot) {
-        if (getClipboard() == null || !screenshot.exists()) return;
+    public void copyScreenshot(Path path) {
+        if (getClipboard() == null || !Files.exists(path)) return;
 
-        try {
-            BufferedImage imageBuffer = ImageIO.read(screenshot);
+        try (InputStream stream = Files.newInputStream(path)) {
+            BufferedImage imageBuffer = ImageIO.read(stream);
 
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(new ScreenshotActions.TransferableImage(imageBuffer), null);
         } catch (IOException e) {
-            Snapper.LOGGER.error("Copying of image at {} failed", screenshot.toPath());
+            Snapper.LOGGER.error("Copying of image at {} failed", path);
         }
     }
 

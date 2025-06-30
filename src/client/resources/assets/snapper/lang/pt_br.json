@@ -29,7 +29,7 @@
   "text.snapper.rename_invalid_png": "O nome deve terminar com '.png'",
   "text.snapper.screenshot_instructions": "%s. Visualizar pressionando %s",
   "text.snapper.screenshot_instructions_copy": "%s. Copiado automaticamente para a área de transferência.",
-  "text.snapper.screenshot_failure_open": "Fazer uma Captura de Tela para visualizá-la!",
+  "text.snapper.screenshot_not_exists": "Fazer uma Captura de Tela para visualizá-la!",
   "panorama.snapper.failure": "Não foi possível salvar o panorama: %s",
   "panorama.snapper.success": "Captura de Tela salva como %s",
   "config.snapper.snapper.title": "Configurações do Snapper",

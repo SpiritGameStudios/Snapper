@@ -10,17 +10,17 @@ import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class RenameScreenshotScreen extends Screen {
-    private final File screenshot;
+    private final Path screenshot;
     private final TextFieldWidget renameInput;
     private final Text RENAME_INPUT_TEXT = Text.translatable("text.snapper.rename_input");
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final TextRenderer textRenderer = client.textRenderer;
     private final Screen parent;
 
-    protected RenameScreenshotScreen(File screenshot, Screen parent) {
+    protected RenameScreenshotScreen(Path screenshot, Screen parent) {
         super(Text.translatable("text.snapper.rename"));
         this.screenshot = screenshot;
         this.renameInput = new TextFieldWidget(textRenderer, 200, 20, RENAME_INPUT_TEXT);
@@ -34,7 +34,7 @@ public class RenameScreenshotScreen extends Screen {
 
         this.addDrawableChild(this.renameInput).setPosition(this.width / 2 - 100, this.height / 2);
 
-        this.renameInput.setText(this.screenshot.getName());
+        this.renameInput.setText(this.screenshot.getFileName().toString());
         this.addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.rename"),
                 button -> this.renameScreenshot(this.renameInput.getText())
@@ -51,9 +51,6 @@ public class RenameScreenshotScreen extends Screen {
 
         ScreenshotActions.renameScreenshot(screenshot, newName);
         client.setScreen(this.parent);
-
-        // Should I make this an if-else statement just to bug Echo?
-        // no.
     }
 
     @Override

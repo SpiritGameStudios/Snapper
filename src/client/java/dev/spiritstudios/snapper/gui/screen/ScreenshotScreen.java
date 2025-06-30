@@ -20,8 +20,6 @@ import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import java.io.File;
-
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
 public class ScreenshotScreen extends Screen {
@@ -75,7 +73,7 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.open"),
                 button -> {
                     if (selectedScreenshot != null)
-                        Util.getOperatingSystem().open(selectedScreenshot.screenshot);
+                        Util.getOperatingSystem().open(selectedScreenshot.path);
                 }
         ).width(secondRowButtonWidth).build());
 
@@ -85,7 +83,7 @@ public class ScreenshotScreen extends Screen {
                     if (selectedScreenshot != null)
                         this.client.setScreen(new ScreenshotViewerScreen(
                                 selectedScreenshot.icon,
-                                selectedScreenshot.screenshot,
+                                selectedScreenshot.path,
                                 selectedScreenshot.screenParent
                         ));
                 }
@@ -102,7 +100,7 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.delete"),
                 button -> {
                     if (selectedScreenshot != null)
-                        ScreenshotActions.deleteScreenshot(selectedScreenshot.screenshot, this);
+                        ScreenshotActions.deleteScreenshot(selectedScreenshot.path, this);
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -110,7 +108,7 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.rename"),
                 button -> {
                     if (this.selectedScreenshot != null)
-                        client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.screenshot, this));
+                        client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.path, this));
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -118,7 +116,7 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.copy"),
                 button -> {
                     if (selectedScreenshot != null)
-                        Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.screenshot);
+                        Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.path);
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -126,7 +124,7 @@ public class ScreenshotScreen extends Screen {
             if (selectedScreenshot == null) return;
 
             button.active = false;
-            ScreenshotUploading.upload(selectedScreenshot.iconPath)
+            ScreenshotUploading.upload(selectedScreenshot.path)
                     .thenRun(() -> button.active = true);
         }).width(firstRowButtonWidth).build());
 
@@ -234,13 +232,13 @@ public class ScreenshotScreen extends Screen {
                         InputUtil.isKeyPressed(handle, InputUtil.GLFW_KEY_C) &&
                         selectedScreenshot != null
         ) {
-            Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.screenshot);
+            Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.path);
             return true;
         }
 
         if (keyCode == GLFW.GLFW_KEY_ENTER && selectedScreenshot != null) {
             if (client == null) return false;
-            client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.screenshot, this));
+            client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.path, this));
         }
 
         return false;

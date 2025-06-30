@@ -20,14 +20,17 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class ScreenshotViewerScreen extends Screen {
     private static final Identifier MENU_DECOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_list_background.png");
@@ -38,42 +41,36 @@ public class ScreenshotViewerScreen extends Screen {
     private final int imageWidth;
     private final int imageHeight;
     private final Screen parent;
-    private final File screenshot;
-    private final @Nullable List<File> screenshots;
+    private final Path screenshot;
+    private final @Nullable List<Path> screenshots;
     private final int screenshotIndex;
     private Path iconPath;
 
-    public ScreenshotViewerScreen(ScreenshotImage icon, File screenshot, Screen parent) {
+    public ScreenshotViewerScreen(ScreenshotImage icon, Path screenshot, Screen parent) {
         this(icon, screenshot, parent, null);
     }
 
-    public ScreenshotViewerScreen(ScreenshotImage icon, File screenshot, Screen parent, @Nullable List<File> screenshots) {
+    public ScreenshotViewerScreen(ScreenshotImage icon, Path iconPath, Screen parent, @Nullable List<Path> screenshots) {
         super(Text.translatable("menu.snapper.viewer_menu"));
         this.parent = parent;
-
-        try {
-            this.iconPath = Path.of(screenshot.getCanonicalPath());
-        } catch (IOException e) {
-            this.iconPath = null;
-            Snapper.LOGGER.error("Failed to get image path.", e);
-            client.setScreen(this.parent);
-        }
+        this.iconPath = iconPath;
 
         BufferedImage image = null;
-        try {
-            image = ImageIO.read(new File(String.valueOf(this.iconPath)));
+
+        try (InputStream stream = Files.newInputStream(iconPath)) {
+            image = ImageIO.read(stream);
         } catch (IOException e) {
             Snapper.LOGGER.error("Failed to read image.", e);
             this.client.setScreen(parent);
         }
 
         this.icon = icon;
-        this.title = screenshot.getName();
+        this.title = iconPath.getFileName().toString();
 
         this.imageWidth = image != null ? image.getWidth() : 0;
         this.imageHeight = image != null ? image.getHeight() : 0;
 
-        this.screenshot = screenshot;
+        this.screenshot = iconPath;
         this.screenshots = screenshots;
 
         this.screenshotIndex = this.screenshots != null ? this.screenshots.indexOf(this.screenshot) : -1;
@@ -148,8 +145,8 @@ public class ScreenshotViewerScreen extends Screen {
                 Text.translatable("button.snapper.upload"),
                 button -> {
                     button.active = false;
-					ScreenshotUploading.upload(iconPath).thenRun(() -> button.active = true);
-				}
+                    ScreenshotUploading.upload(iconPath).thenRun(() -> button.active = true);
+                }
         ).width(firstRowButtonWidth).build());
 
         if (SnapperUtil.isOfflineAccount()) {
@@ -309,28 +306,26 @@ public class ScreenshotViewerScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        Snapper.LOGGER.debug("SCROLL DEBUG 1 {} {}", this.screenshotIndex, this.screenshots == null);
-        if (this.screenshotIndex != -1 && this.screenshots != null) {
-            Snapper.LOGGER.debug("SCROLL DEBUG 2 {} {}", this.screenshots.size(), this.screenshotIndex);
-            if (keyCode == GLFW.GLFW_KEY_LEFT) {
-                File previousImageFile = screenshots.getLast();
-                if (this.screenshotIndex >= 1) {
-                    previousImageFile = screenshots.get(screenshotIndex - 1);
-                }
-                ScreenshotImage previousImage = ScreenshotImage.of(previousImageFile, client.getTextureManager());
-                Snapper.LOGGER.debug("SCROLL DEBUG 3a {}", previousImageFile.getName());
-                client.setScreen(new ScreenshotViewerScreen(previousImage, previousImageFile, this.parent, this.screenshots));
-            }
-            if (keyCode == GLFW.GLFW_KEY_RIGHT) {
-                File nextImageFile = screenshots.getFirst();
-                if (this.screenshotIndex < this.screenshots.size() - 1) {
-                    nextImageFile = screenshots.get(screenshotIndex + 1);
-                }
-                ScreenshotImage nextImage = ScreenshotImage.of(nextImageFile, client.getTextureManager());
-                Snapper.LOGGER.debug("SCROLL DEBUG 3b {}", nextImageFile.getName());
-                client.setScreen(new ScreenshotViewerScreen(nextImage, nextImageFile, this.parent, this.screenshots));
-            }
-        }
+        if (this.screenshotIndex == -1 || this.screenshots == null) return super.keyPressed(keyCode, scanCode, modifiers);
+
+        Path imagePath = switch (keyCode) {
+            case GLFW_KEY_LEFT -> this.screenshotIndex >= 1 ?
+                    screenshots.get(screenshotIndex - 1) :
+                    screenshots.getLast();
+            case GLFW_KEY_RIGHT -> this.screenshotIndex < this.screenshots.size() - 1 ?
+                    screenshots.get(screenshotIndex + 1) :
+                    screenshots.getFirst();
+            default -> null;
+        };
+
+        if (imagePath == null) return super.keyPressed(keyCode, scanCode, modifiers);
+
+        ScreenshotImage.createScreenshot(client.getTextureManager(), imagePath)
+                .ifPresent(image -> client.setScreen(new ScreenshotViewerScreen(
+                        image, imagePath,
+                        this.parent,
+                        this.screenshots
+                )));
 
         return super.keyPressed(keyCode, scanCode, modifiers);
     }

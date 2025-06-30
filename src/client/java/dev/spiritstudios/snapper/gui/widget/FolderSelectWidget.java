@@ -23,16 +23,14 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import static dev.spiritstudios.snapper.Snapper.LOGGER;
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
 public class FolderSelectWidget extends ContainerWidget implements ParentElement {
-    private final Value<File> value;
-    private final String placeholder_key;
+    private final Value<Path> value;
     private static final Identifier FOLDER_ICON = Identifier.of(MODID, "screenshots/folder");
     private static final Identifier RESET_ICON = Identifier.of(MODID, "screenshots/reset");
 
-    private final TextFieldWidget textFieldWidget;
+    private final TextFieldWidget textField;
     private final TextIconButtonWidget folderSelectButton;
     private final TextIconButtonWidget resetFolderButton;
 
@@ -44,25 +42,29 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
     */
     private static final int WEIRD_FIX_OFFSET = 40;
 
-    public FolderSelectWidget(int x, int y, int width, int height, Value<File> value, String placeholder_key) {
+    public FolderSelectWidget(int x, int y, int width, int height, Value<Path> value, String placeholderKey) {
         super(x, y, width, height, ScreenTexts.EMPTY);
         this.value = value;
-        this.placeholder_key = placeholder_key;
         this.active = false;
 
-        this.textFieldWidget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 25 + 25, 0, 120 - 25 - 25, 20, Text.of(value.get().getPath()));
-        this.textFieldWidget.setPlaceholder(Text.translatableWithFallback(placeholder_key, "").formatted(Formatting.DARK_GRAY));
-        this.textFieldWidget.setMaxLength(Integer.MAX_VALUE);
-        this.textFieldWidget.setText(value.get().getPath());
-        this.textFieldWidget.setChangedListener(content -> {
-            value.set(new File(content));
-        });
-        this.textFieldWidget.setTooltip(Tooltip.of(Text.translatable("config.snapper.snapper.customScreenshotFolder.input")));
+        this.textField = new TextFieldWidget(
+                MinecraftClient.getInstance().textRenderer,
+                25 + 25, 0,
+                120 - 25 - 25,
+                20,
+                Text.of(value.get().toString())
+        );
+
+        this.textField.setPlaceholder(Text.translatableWithFallback(placeholderKey, "").formatted(Formatting.DARK_GRAY));
+        this.textField.setMaxLength(Integer.MAX_VALUE);
+        this.textField.setText(value.get().toString());
+        this.textField.setChangedListener(content -> value.set(Path.of(content)));
+        this.textField.setTooltip(Tooltip.of(Text.translatable("config.snapper.snapper.customScreenshotFolder.input")));
 
         this.folderSelectButton = TextIconButtonWidget.builder(
                 Text.translatable("config.snapper.snapper.customScreenshotFolder.select"),
                 button -> {
-                    Optional<File> folderValue = DirectoryConfigUtil.openFolderSelect(Text.translatable("prompt.snapper.folder_select").getString());
+                    Optional<Path> folderValue = DirectoryConfigUtil.openFolderSelect(Text.translatable("prompt.snapper.folder_select").getString());
                     valueFromSelectDialog(folderValue.orElse(null));
                 },
                 true
@@ -72,8 +74,8 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
         this.resetFolderButton = TextIconButtonWidget.builder(
                 Text.translatable("config.snapper.snapper.customScreenshotFolder.reset"),
                 button -> {
-                    value.set(new File(DirectoryConfigUtil.escapePath(SnapperUtil.getOSUnifiedFolder().toString())));
-                    textFieldWidget.setText(value.get().getPath());
+                    value.reset();
+                    textField.setText(value.get().toString());
                 },
                 true
         ).width(20).texture(RESET_ICON, 15, 15).build();
@@ -84,7 +86,7 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
     @Override
     public List<? extends ClickableWidget> children() {
         List<ClickableWidget> children = List.of(
-                this.folderSelectButton, this.resetFolderButton, this.textFieldWidget
+                this.folderSelectButton, this.resetFolderButton, this.textField
         );
 
         children.forEach(c -> c.setY(WEIRD_FIX_OFFSET));
@@ -92,57 +94,66 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
         return children;
     }
 
-    private void valueFromSelectDialog(@Nullable File value) {
+    private void valueFromSelectDialog(@Nullable Path value) {
         if (value == null) {
             return;
         }
-        if (value.exists()) {
+        if (Files.exists(value)) {
             this.value.set(value);
-            this.textFieldWidget.setText(this.value.get().getPath());
+            this.textField.setText(this.value.get().toString());
         }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        AtomicInteger clicksRan = new AtomicInteger();
-        this.children().forEach(child -> {
+        int clicksRan = 0;
+
+        for (ClickableWidget child : this.children()) {
             if (child.isHovered()) {
-                clicksRan.addAndGet(1);
+                clicksRan += 1;
                 this.playDownSound(MinecraftClient.getInstance().getSoundManager());
-                if (child instanceof TextFieldWidget) {
+                if (child instanceof TextFieldWidget textFieldWidget) {
                     child.setFocused(true);
                     this.setFocused(child);
-                    ((TextFieldWidget) child).setFocusUnlocked(true);
+                    textFieldWidget.setFocusUnlocked(true);
                 }
                 child.onClick(mouseX - this.getX(), mouseY - this.getY() + WEIRD_FIX_OFFSET);
             }
-        });
-        return clicksRan.get() == 1;
+        }
+
+        return clicksRan == 1;
     }
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         // Jank is unavoidable sometimes
-        if (this.width != textFieldWidget.getWidth() + 25 + 25) {
-            textFieldWidget.setWidth(this.width - 25 - 25);
-            int originalCursor = textFieldWidget.getCursor();
-            textFieldWidget.setCursorToStart(false);
-            textFieldWidget.setCursor(originalCursor, false);
+        if (this.width != textField.getWidth() + 25 + 25) {
+            textField.setWidth(this.width - 25 - 25);
+            int originalCursor = textField.getCursor();
+            textField.setCursorToStart(false);
+            textField.setCursor(originalCursor, false);
         }
 
         // Special thanks to Falkreon for this workaround
         this.children().forEach(child -> {
             context.getMatrices().push();
-            context.getMatrices().translate(this.getX(), this.getY() - WEIRD_FIX_OFFSET, 0);
-            child.render(context, mouseX - this.getX(), mouseY - this.getY() + WEIRD_FIX_OFFSET, delta);
+            {
+                context.getMatrices().translate(this.getX(), this.getY() - WEIRD_FIX_OFFSET, 0);
+                child.render(
+                        context,
+                        mouseX - this.getX(), mouseY - this.getY() + WEIRD_FIX_OFFSET,
+                        delta
+                );
+            }
             context.getMatrices().pop();
 
-            if (child instanceof TextFieldWidget) {
-                if (!Files.exists(Path.of(((TextFieldWidget) child).getText()))) {
-                    ((TextFieldWidget) child).setEditableColor(0xFF0000);
+            if (child instanceof TextFieldWidget textFieldWidget) {
+                if (!Files.exists(Path.of(textFieldWidget.getText()))) {
+                    textFieldWidget.setEditableColor(0xFF0000);
                     return;
                 }
-                ((TextFieldWidget) child).setEditableColor(0xFFFFFF);
+
+                textFieldWidget.setEditableColor(0xFFFFFF);
             }
         });
     }

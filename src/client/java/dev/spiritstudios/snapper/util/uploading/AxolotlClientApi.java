@@ -48,7 +48,7 @@ public class AxolotlClientApi implements Closeable {
         try {
             bytes = Files.readAllBytes(image);
         } catch (IOException e) {
-            return CompletableFuture.completedFuture(null);
+            return CompletableFuture.failedFuture(e);
         }
 
         ScreenshotUploading.toast("toast.snapper.upload.in_progress", "toast.snapper.upload.in_progress.description");

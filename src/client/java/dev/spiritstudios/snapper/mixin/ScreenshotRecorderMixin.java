@@ -16,6 +16,8 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.function.Consumer;
 
 @Mixin(ScreenshotRecorder.class)
@@ -47,10 +49,10 @@ public abstract class ScreenshotRecorderMixin {
 
     @ModifyArg(method = "saveScreenshot(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;Ljava/util/function/Consumer;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/ScreenshotRecorder;saveScreenshotInner(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;Ljava/util/function/Consumer;)V", ordinal = 0))
     private static File getConfiguredGameDirectory(File gameDirectory) {
-        File customScreenshotFolder = SnapperConfig.INSTANCE.customScreenshotFolder.get();
+        Path customScreenshotFolder = SnapperConfig.INSTANCE.customScreenshotFolder.get();
 
-        if (SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() && customScreenshotFolder.exists()) {
-            return customScreenshotFolder;
+        if (SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() && Files.exists(customScreenshotFolder)) {
+            return customScreenshotFolder.toFile();
         }
         return gameDirectory;
     }

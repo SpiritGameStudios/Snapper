@@ -18,7 +18,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.input.KeyCodes;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.texture.NativeImage;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -26,14 +25,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
+import org.apache.commons.io.file.FilesUncheck;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -56,7 +55,13 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     private final int listItemHeight = 36;
     private boolean showGrid = false;
 
-    public ScreenshotListWidget(MinecraftClient client, int width, int height, int y, int itemHeight, @Nullable ScreenshotListWidget previous, Screen parent) {
+    public ScreenshotListWidget(
+            MinecraftClient client,
+            int width, int height,
+            int y, int itemHeight,
+            @Nullable ScreenshotListWidget previous,
+            Screen parent
+    ) {
         super(client, width, height, y, itemHeight);
 
         this.parent = parent;
@@ -76,7 +81,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         this.showGrid = SnapperConfig.INSTANCE.viewMode.get().equals(ScreenshotViewerScreen.ViewMode.GRID);
 
-        ((EntryListWidgetAccessor) (Object) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
+        ((EntryListWidgetAccessor) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
     }
 
     @Override
@@ -97,7 +102,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     public CompletableFuture<List<ScreenshotEntry>> load(MinecraftClient client) {
         return CompletableFuture.supplyAsync(() -> {
-            List<File> screenshots = ScreenshotActions.getScreenshots(client);
+            List<Path> screenshots = ScreenshotActions.getScreenshots(client);
             return screenshots.parallelStream()
                     .map(file -> new ScreenshotEntry(file, client, parent, screenshots))
                     .collect(Collectors.toList());
@@ -246,7 +251,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            if (this.client.currentScreen == null) throw new IllegalStateException("How did we get here?");
+            if (this.client.currentScreen == null) throw new UnreachableException();
 
             context.drawText(
                     this.client.textRenderer,
@@ -312,29 +317,27 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 .ofLocalizedDateTime(FormatStyle.SHORT)
                 .withZone(ZoneId.systemDefault());
 
-        public final long lastModified;
+        public final FileTime lastModified;
         private final MinecraftClient client;
         public final ScreenshotImage icon;
         public final String iconFileName;
-        public Path iconPath;
+        public Path path;
         public final Screen screenParent;
         private long time;
-        public final File screenshot;
         private boolean showGrid;
-        private final List<File> screenshots;
+        private final List<Path> screenshots;
         private boolean clickthroughHovered = false;
 
-        public ScreenshotEntry(File screenshot, MinecraftClient client, Screen parent, List<File> screenshots) {
+        public ScreenshotEntry(Path iconPath, MinecraftClient client, Screen parent, List<Path> screenshots) {
             this.showGrid = ScreenshotListWidget.this.showGrid;
             this.client = client;
             this.screenParent = parent;
-            this.icon = ScreenshotImage.forScreenshot(this.client.getTextureManager(), screenshot.getName());
-            this.iconPath = Path.of(screenshot.getPath());
-            this.iconFileName = screenshot.getName();
-            this.lastModified = screenshot.lastModified();
-            this.screenshot = screenshot;
+            this.icon = ScreenshotImage.createScreenshot(this.client.getTextureManager(), iconPath)
+                    .orElse(null);
+            this.path = iconPath;
+            this.iconFileName = iconPath.getFileName().toString();
+            this.lastModified = FilesUncheck.getLastModifiedTime(iconPath);
             this.screenshots = screenshots;
-            this.loadIcon();
         }
 
         public void setShowGrid(boolean showGrid) {
@@ -356,7 +359,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             long creationTime = 0;
             try {
-                creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
+                creationTime = Files.readAttributes(path, BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException e) {
                 client.setScreen(new ScreenshotScreen(screenParent));
             }
@@ -457,7 +460,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             String creationString = "undefined";
             long creationTime = 0;
             try {
-                creationTime = Files.readAttributes(iconPath, BasicFileAttributes.class).creationTime().toMillis();
+                creationTime = Files.readAttributes(path, BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException e) {
                 client.setScreen(new ScreenshotScreen(screenParent));
             }
@@ -508,22 +511,6 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             );
         }
 
-        private void loadIcon() {
-            CompletableFuture.runAsync(() -> {
-                if (this.iconPath == null || !Files.isRegularFile(this.iconPath)) {
-                    this.icon.destroy();
-                    return;
-                }
-
-                try (InputStream inputStream = Files.newInputStream(this.iconPath)) {
-                    this.icon.load(NativeImage.read(inputStream));
-                } catch (Throwable error) {
-                    Snapper.LOGGER.error("Invalid icon for screenshot {}", iconFileName, error);
-                    this.iconPath = null;
-                }
-            });
-        }
-
         @Override
         public void drawBorder(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             if (isSelectedEntry(index)) {
@@ -570,7 +557,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             if (this.icon == null) return false;
             this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
-            this.client.setScreen(new ScreenshotViewerScreen(this.icon, this.screenshot, this.screenParent, this.screenshots));
+            this.client.setScreen(new ScreenshotViewerScreen(this.icon, this.path, this.screenParent, this.screenshots));
             return true;
         }
 
@@ -580,7 +567,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         }
 
         public long lastModified() {
-            return lastModified;
+            return lastModified.toMillis();
         }
     }
 }

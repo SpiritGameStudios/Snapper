@@ -5,6 +5,7 @@ import ca.weblite.objc.Proxy;
 import dev.spiritstudios.snapper.Snapper;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public class MacActions implements PlatformHelper {
 
@@ -63,9 +64,9 @@ public class MacActions implements PlatformHelper {
     */
 
     @Override
-    public void copyScreenshot(File screenshot) {
+    public void copyScreenshot(Path screenshot) {
         Client client = Client.getInstance();
-        Proxy url = client.sendProxy("NSURL", "fileURLWithPath:", screenshot.getAbsoluteFile());
+        Proxy url = client.sendProxy("NSURL", "fileURLWithPath:", screenshot.toAbsolutePath().toString());
 
         Proxy image = client.sendProxy("NSImage", "alloc");
         image.send("initWithContentsOfURL:", url);

@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screen.ProgressScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import org.apache.commons.io.file.FilesUncheck;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -17,6 +18,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -24,8 +26,8 @@ import java.util.Objects;
 
 public class ScreenshotActions {
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void deleteScreenshot(File screenshot, Screen screen) {
-        if (!screenshot.exists()) return;
+    public static void deleteScreenshot(Path path, Screen screen) {
+        if (!Files.exists(path)) return;
 
         MinecraftClient client = MinecraftClient.getInstance();
         client.setScreen(
@@ -33,49 +35,53 @@ public class ScreenshotActions {
                         confirmed -> {
                             if (confirmed) {
                                 client.setScreen(new ProgressScreen(true));
-                                screenshot.delete();
+                                try {
+                                    Files.deleteIfExists(path);
+                                } catch (IOException e) {
+                                    Snapper.LOGGER.error("Failed to delete file", e);
+                                }
                             }
                             client.setScreen(screen);
                         },
                         Text.translatable("text.snapper.delete_question"),
-                        Text.translatable("text.snapper.delete_warning", screenshot.getName()),
+                        Text.translatable("text.snapper.delete_warning", path.getFileName()),
                         Text.translatable("button.snapper.delete"),
                         ScreenTexts.CANCEL
                 )
         );
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void renameScreenshot(File screenshot, String newName) {
-        if (screenshot.exists()) {
-            screenshot.renameTo(new File(screenshot.getParentFile().toPath() + "/" + newName));
+    public static void renameScreenshot(Path screenshot, String newName) {
+        if (Files.exists(screenshot)) {
+            try {
+                Files.move(screenshot, screenshot.getParent().resolve(newName));
+            } catch (IOException e) {
+                Snapper.LOGGER.error("Failed to rename file", e);
+            }
         }
     }
 
-    public static java.util.List<File> getScreenshots(MinecraftClient client) {
-        File customScreenshotDirectory = new File(SnapperConfig.INSTANCE.customScreenshotFolder.get(), "screenshots");
-        File defaultScreenshotDirectory = new File(client.runDirectory, "screenshots");
-        File screenshotDir = SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() ? customScreenshotDirectory : defaultScreenshotDirectory;
+    public static java.util.List<Path> getScreenshots(MinecraftClient client) {
+        Path customScreenshotDirectory = SnapperConfig.INSTANCE.customScreenshotFolder.get().resolve("screenshots");
+        Path defaultScreenshotDirectory = Path.of(client.runDirectory.getPath(), "screenshots");
+        Path screenshotDir = SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() ? customScreenshotDirectory : defaultScreenshotDirectory;
 
-        File[] files = screenshotDir.listFiles();
-        java.util.List<File> screenshots = new ArrayList<>(List.of(files == null ? new File[0] : files));
+        return FilesUncheck.list(screenshotDir)
+                .filter(file -> {
+                    if (Files.isDirectory(file)) return false;
+                    String fileType;
 
-        screenshots.removeIf(file -> {
-            if (Files.isDirectory(file.toPath())) return true;
-            String fileType;
+                    try {
+                        fileType = Files.probeContentType(file);
+                    } catch (IOException e) {
+                        Snapper.LOGGER.error("Couldn't load screenshot list", e);
+                        return false;
+                    }
 
-            try {
-                fileType = Files.probeContentType(file.toPath());
-            } catch (IOException e) {
-                Snapper.LOGGER.error("Couldn't load screenshot list", e);
-                return true;
-            }
-
-            return !Objects.equals(fileType, "image/png");
-        });
-
-        screenshots.sort(Comparator.comparingLong(File::lastModified).reversed());
-        return screenshots;
+                    return Objects.equals(fileType, "image/png");
+                })
+                .sorted(Comparator.<Path>comparingLong(path -> FilesUncheck.getLastModifiedTime(path).toMillis()).reversed())
+                .toList();
     }
 
     record TransferableImage(Image image) implements Transferable {

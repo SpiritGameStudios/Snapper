@@ -15,7 +15,7 @@ import net.minecraft.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public final class Snapper implements ClientModInitializer {
     public static final String MODID = "snapper";
@@ -25,7 +25,7 @@ public final class Snapper implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ConfigScreenWidgets.add(File.class, DirectoryConfigUtil.FILE_WIDGET_FACTORY);
+        ConfigScreenWidgets.add(Path.class, DirectoryConfigUtil.PATH_WIDGET_FACTORY);
         SnapperKeybindings.init();
 
         ModMenuHelper.addConfig(Snapper.MODID, SnapperConfig.HOLDER.id());

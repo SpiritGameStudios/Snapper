@@ -28,7 +28,7 @@
   "text.snapper.rename_invalid_png": "Назва повинна закінчуватися на '.png'",
   "text.snapper.screenshot_instructions": "%s. Перегляньте, натиснувши %s",
   "text.snapper.screenshot_instructions_copy": "%s. Автоматично скопійовано в буфер обміну.",
-  "text.snapper.screenshot_failure_open": "Зробіть скріншот, щоб переглянути його",
+  "text.snapper.screenshot_not_exists": "Зробіть скріншот, щоб переглянути його",
   "panorama.snapper.failure": "Не вдалося зберегти панораму: %s",
   "panorama.snapper.success": "Збережено скріншот як %s",
   "config.snapper.snapper.title": "Налаштування Snapper",

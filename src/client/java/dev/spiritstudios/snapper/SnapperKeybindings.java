@@ -11,7 +11,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 public final class SnapperKeybindings {
@@ -61,18 +61,26 @@ public final class SnapperKeybindings {
     }
 
     private static void openRecentScreenshot(MinecraftClient client) {
-        List<File> screenshots = ScreenshotActions.getScreenshots(client);
+        List<Path> screenshots = ScreenshotActions.getScreenshots(client);
         if (screenshots.isEmpty()) {
             if (client.player != null)
-                client.player.sendMessage(Text.translatable("text.snapper.screenshot_failure_open"), true);
+                client.player.sendMessage(Text.translatable("text.snapper.screenshot_not_exists"), true);
             return;
         }
 
-        File latestScreenshot = screenshots.getFirst();
-        client.setScreen(new ScreenshotViewerScreen(
-                ScreenshotImage.of(latestScreenshot, client.getTextureManager()),
-                latestScreenshot,
-                client.currentScreen
-        ));
+        Path latestPath = screenshots.getFirst();
+        ScreenshotImage.createScreenshot(client.getTextureManager(), latestPath)
+                .ifPresentOrElse(
+                        image -> client.setScreen(new ScreenshotViewerScreen(
+                                image,
+                                latestPath,
+                                client.currentScreen
+                        )),
+                        () -> {
+                            if (client.player != null)
+                                client.player.sendMessage(Text.translatable("text.snapper.screenshot_open_failure"), true);
+                        }
+                );
+
     }
 }
