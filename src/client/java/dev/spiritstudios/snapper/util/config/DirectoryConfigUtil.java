@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-public class DirectoryUtil {
+public class DirectoryConfigUtil {
     public static final Codec<File> FILE_CODEC = Codec.STRING.comapFlatMap(
             string -> {
                 File file = new File(string);
@@ -52,13 +52,6 @@ public class DirectoryUtil {
     public static final BiFunction<Value<?>, String, ? extends ClickableWidget> FILE_WIDGET_FACTORY = (configValue, id) -> {
         Value<File> value = (Value<File>) configValue;
 
-        /*
-        TextFieldWidget widget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 0, 0, Text.of(value.get().getPath()));
-        widget.setPlaceholder(Text.translatableWithFallback("%s.placeholder".formatted(configValue.translationKey(id)), "").formatted(Formatting.DARK_GRAY));
-        widget.setMaxLength(Integer.MAX_VALUE);
-        widget.setText(value.get().getPath());
-        widget.setChangedListener(content -> value.set(new File(content)));
-*/
         return new FolderSelectWidget(0, 0, 10, 10, value, "%s.placeholder".formatted(configValue.translationKey(id)));
     };
 

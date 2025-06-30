@@ -3,7 +3,7 @@ package dev.spiritstudios.snapper;
 import dev.spiritstudios.snapper.util.MacActions;
 import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.WindowsActions;
-import dev.spiritstudios.snapper.util.config.DirectoryUtil;
+import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import dev.spiritstudios.specter.api.config.ConfigScreenWidgets;
 import dev.spiritstudios.specter.api.config.ModMenuHelper;
@@ -25,7 +25,7 @@ public final class Snapper implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ConfigScreenWidgets.add(File.class, DirectoryUtil.FILE_WIDGET_FACTORY);
+        ConfigScreenWidgets.add(File.class, DirectoryConfigUtil.FILE_WIDGET_FACTORY);
         SnapperKeybindings.init();
 
         ModMenuHelper.addConfig(Snapper.MODID, SnapperConfig.HOLDER.id());
