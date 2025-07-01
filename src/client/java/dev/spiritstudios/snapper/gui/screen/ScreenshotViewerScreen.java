@@ -15,6 +15,7 @@ import net.minecraft.client.gui.widget.AxisGridWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.gui.widget.SimplePositioningWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -194,6 +195,7 @@ public class ScreenshotViewerScreen extends Screen {
         int finalWidth = (int) (imageWidth * scaleFactor);
 
         context.drawTexture(
+                RenderLayer::getGuiTextured,
                 this.icon.getTextureId(),
                 (this.width / 2) - (finalWidth / 2),
                 this.height - 68 - finalHeight,
@@ -260,6 +262,7 @@ public class ScreenshotViewerScreen extends Screen {
         RenderSystem.enableBlend();
         Identifier texture = this.client.world == null ? MENU_DECOR_BACKGROUND_TEXTURE : INWORLD_MENU_DECOR_BACKGROUND_TEXTURE;
         context.drawTexture(
+                RenderLayer::getGuiTextured,
                 texture,
                 0,
                 48,
@@ -278,6 +281,7 @@ public class ScreenshotViewerScreen extends Screen {
         Identifier headerTexture = this.client.world == null ? Screen.HEADER_SEPARATOR_TEXTURE : Screen.INWORLD_HEADER_SEPARATOR_TEXTURE;
         Identifier footerTexture = this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE;
         context.drawTexture(
+                RenderLayer::getGuiTextured,
                 headerTexture,
                 0,
                 48 - 2,
@@ -290,6 +294,7 @@ public class ScreenshotViewerScreen extends Screen {
         );
 
         context.drawTexture(
+                RenderLayer::getGuiTextured,
                 footerTexture,
                 0,
                 height - 68,
