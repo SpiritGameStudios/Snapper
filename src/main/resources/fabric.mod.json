@@ -20,6 +20,9 @@
 	"entrypoints": {
 		"client": [
 			"dev.spiritstudios.snapper.Snapper"
+		],
+		"mixinsquared-adjuster": [
+			"dev.spiritstudios.snapper.REMOVETHISAFTER1point21point5"
 		]
 	},
 	"accessWidener": "snapper.accesswidener",
