@@ -64,7 +64,7 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
         this.folderSelectButton = TextIconButtonWidget.builder(
                 Text.translatable("config.snapper.snapper.customScreenshotFolder.select"),
                 button -> {
-                    Optional<Path> folderValue = DirectoryConfigUtil.openFolderSelect(Text.translatable("prompt.snapper.folder_select").getString());
+                    Optional<Path> folderValue = DirectoryConfigUtil.openFolderSelect(Text.translatable("prompt.snapper.folder_select").getString().replaceAll("[^a-zA-Z0-9 .,]", ""));
                     valueFromSelectDialog(folderValue.orElse(null));
                 },
                 true
