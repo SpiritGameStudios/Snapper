@@ -69,6 +69,7 @@
   "toast.snapper.upload.offline": "You are currently offline.",
   "toast.snapper.upload.failure.generic": "More information may be found in the log file.",
   "prompt.snapper.folder_select": "Select a custom screenshot folder for Snapper.",
+  "overlay.snapper.external_dialog.folder": "Folder select dialog opened. Exit with Escape key.",
   "snapper.privacy_notice.description": "Image uploading in Snapper is powered by AxolotlClient. Therefore, this feature is subject to AxolotlClient's terms which you will have to accept in order to upload images. This decision can be updated or changed at any time.",
   "snapper.privacy_notice": "Privacy Notice",
   "snapper.privacy_notice.accept": "Accept",

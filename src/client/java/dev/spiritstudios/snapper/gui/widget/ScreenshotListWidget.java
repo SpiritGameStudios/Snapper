@@ -372,7 +372,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             context.drawText(
                     this.client.textRenderer,
-                    fileName,
+                    truncateFileName(fileName, entryWidth - 32 - 6, 29),
                     x + 32 + 3,
                     y + 1,
                     0xFFFFFF,
@@ -469,8 +469,10 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 creationString = DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
 
             RenderSystem.enableBlend();
-            Identifier hoverBackground = Identifier.of("snapper", "textures/gui/grid_selection_background.png");
-            context.drawTexture(hoverBackground, x, y, 0, 0, entryWidth, entryHeight);
+            {
+                Identifier hoverBackground = Identifier.of("snapper", "textures/gui/transparent_background.png");
+                context.drawTexture(hoverBackground, x, y, 0, 0, entryWidth, entryHeight);
+            }
             RenderSystem.disableBlend();
 
             context.drawGuiTexture(
@@ -485,7 +487,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             context.drawText(
                     this.client.textRenderer,
-                    fileName,
+                    truncateFileName(fileName, entryWidth - 10, 22),
                     x + 5,
                     y + 6,
                     0xFFFFFF,
@@ -509,6 +511,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     Colors.LIGHT_GRAY,
                     true
             );
+        }
+
+        public String truncateFileName(String fileName, int maxWidth, int truncateLength) {
+            String truncatedName = fileName;
+            if (this.client.textRenderer.getWidth(truncatedName) > maxWidth) truncatedName = truncatedName.substring(0, Math.min(fileName.length(), truncateLength)) + "...";
+            return truncatedName;
         }
 
         @Override
