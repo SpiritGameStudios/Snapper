@@ -199,7 +199,7 @@ public class ScreenshotScreen extends Screen {
                 "text.snapper.panorama_encourage")));
 
 
-        this.imageSelected(null);
+        this.imageSelected(selectedScreenshot);
     }
 
     public void imageSelected(@Nullable ScreenshotListWidget.ScreenshotEntry screenshot) {

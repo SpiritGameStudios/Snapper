@@ -37,7 +37,6 @@ public class DirectoryConfigUtil {
 
     public static Optional<Path> openFolderSelect(String title) {
         String selectedPath = TinyFileDialogs.tinyfd_selectFolderDialog(title, SystemProperties.getUserHome());
-
         if (Strings.isNullOrEmpty(selectedPath)) {
             return Optional.empty();
         }

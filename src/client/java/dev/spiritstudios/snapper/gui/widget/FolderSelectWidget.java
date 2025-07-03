@@ -1,7 +1,6 @@
 package dev.spiritstudios.snapper.gui.widget;
 
 import dev.spiritstudios.snapper.gui.overlay.ExternalDialogOverlay;
-import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
 import dev.spiritstudios.specter.api.config.Value;
 import net.minecraft.client.MinecraftClient;
@@ -16,13 +15,11 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static dev.spiritstudios.snapper.Snapper.LOGGER;
@@ -71,6 +68,7 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
                     ExternalDialogOverlay overlay = new ExternalDialogOverlay();
                     CompletableFuture<Boolean> assureRender = CompletableFuture.supplyAsync(() -> {
                         client.setOverlay(overlay);
+                        LOGGER.debug("Opening folder select dialog & overlay"); // THIS SOMEHOW FIXES A BUG; DON'T QUESTION IT
                         return true;
                     });
                     assureRender.thenAccept(e -> {
