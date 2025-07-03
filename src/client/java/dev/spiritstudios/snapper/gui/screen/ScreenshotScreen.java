@@ -20,10 +20,15 @@ import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
 public class ScreenshotScreen extends Screen {
     private static final Identifier PANORAMA_BUTTON_ICON = Identifier.of(MODID, "screenshots/panorama");
+    private static final Identifier PANORAMA_BUTTON_DISABLED_ICON = Identifier.of(MODID, "screenshots/panorama_disabled");
+
     private static final Identifier SETTINGS_ICON = Identifier.of(MODID, "screenshots/settings");
     private static Identifier VIEW_MODE_ICON;
     private final Screen parent;
@@ -177,14 +182,22 @@ public class ScreenshotScreen extends Screen {
 
         viewModeButton.setPosition(width / 2 - 178, height - 56);
 
+        Path panoramaDir = Path.of(this.client.runDirectory.getPath(), "screenshots", "panorama");
+        boolean hasPanorama = Files.exists(panoramaDir);
+
         TextIconButtonWidget panoramaButton = addDrawableChild(TextIconButtonWidget.builder(
                 Text.translatable("button.snapper.screenshots"),
                 button -> this.client.setScreen(new PanoramaViewerScreen(Text.translatable("menu.snapper.panorama").getString(), this)),
                 true
-        ).width(20).texture(PANORAMA_BUTTON_ICON, 15, 15).build());
+        ).width(20).texture(hasPanorama ? PANORAMA_BUTTON_ICON : PANORAMA_BUTTON_DISABLED_ICON, 15, 15).build());
 
+        panoramaButton.active = hasPanorama;
         panoramaButton.setPosition(width / 2 + 158, height - 32);
-        panoramaButton.setTooltip(Tooltip.of(Text.translatable("button.snapper.panorama.tooltip")));
+
+        panoramaButton.setTooltip(Tooltip.of(Text.translatable(hasPanorama ?
+                "button.snapper.panorama.tooltip" :
+                "text.snapper.panorama_encourage")));
+
 
         this.imageSelected(null);
     }
