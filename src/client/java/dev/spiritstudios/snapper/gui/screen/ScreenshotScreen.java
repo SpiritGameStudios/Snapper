@@ -20,7 +20,6 @@ import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static dev.spiritstudios.snapper.Snapper.MODID;
@@ -183,7 +182,7 @@ public class ScreenshotScreen extends Screen {
         viewModeButton.setPosition(width / 2 - 178, height - 56);
 
         Path panoramaDir = Path.of(this.client.runDirectory.getPath(), "screenshots", "panorama");
-        boolean hasPanorama = Files.exists(panoramaDir);
+        boolean hasPanorama = SnapperUtil.panoramaPresent(panoramaDir);
 
         TextIconButtonWidget panoramaButton = addDrawableChild(TextIconButtonWidget.builder(
                 Text.translatable("button.snapper.screenshots"),

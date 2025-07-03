@@ -3,6 +3,7 @@ package dev.spiritstudios.snapper.gui.screen;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.gui.CubeMapRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.RotatingCubeMapRenderer;
@@ -40,7 +41,7 @@ public class PanoramaViewerScreen extends Screen {
         Objects.requireNonNull(this.client);
 
         Path panoramaDir = Path.of(this.client.runDirectory.getPath(), "screenshots", "panorama");
-        if (!Files.exists(panoramaDir)) return null;
+        if (!SnapperUtil.panoramaPresent(panoramaDir)) return null;
 
         try (Stream<Path> stream = Files.list(panoramaDir)) {
             return stream
