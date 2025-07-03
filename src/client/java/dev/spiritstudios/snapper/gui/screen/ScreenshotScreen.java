@@ -61,7 +61,7 @@ public class ScreenshotScreen extends Screen {
                 this
         ));
 
-        int secondRowButtonWidth = 74;
+        int secondRowButtonWidth = 100;
 
         ButtonWidget folderButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.folder"),
@@ -77,24 +77,12 @@ public class ScreenshotScreen extends Screen {
                 }
         ).width(secondRowButtonWidth).build());
 
-        this.viewButton = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("button.snapper.view"),
-                button -> {
-                    if (selectedScreenshot != null)
-                        this.client.setScreen(new ScreenshotViewerScreen(
-                                selectedScreenshot.icon,
-                                selectedScreenshot.path,
-                                selectedScreenshot.screenParent
-                        ));
-                }
-        ).width(secondRowButtonWidth).build());
-
         ButtonWidget doneButton = addDrawableChild(ButtonWidget.builder(
                 ScreenTexts.DONE,
                 button -> this.close()
         ).width(secondRowButtonWidth).build());
 
-        int firstRowButtonWidth = 74;
+        int firstRowButtonWidth = 58;
 
         this.deleteButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.delete"),
@@ -117,6 +105,18 @@ public class ScreenshotScreen extends Screen {
                 button -> {
                     if (selectedScreenshot != null)
                         Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.path);
+                }
+        ).width(firstRowButtonWidth).build());
+
+        this.viewButton = addDrawableChild(ButtonWidget.builder(
+                Text.translatable("button.snapper.view"),
+                button -> {
+                    if (selectedScreenshot != null)
+                        this.client.setScreen(new ScreenshotViewerScreen(
+                                selectedScreenshot.icon,
+                                selectedScreenshot.path,
+                                selectedScreenshot.screenParent
+                        ));
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -143,6 +143,7 @@ public class ScreenshotScreen extends Screen {
         firstRowWidget.add(this.deleteButton);
         firstRowWidget.add(this.renameButton);
         firstRowWidget.add(this.copyButton);
+        firstRowWidget.add(this.viewButton);
         firstRowWidget.add(this.uploadButton);
 
         AxisGridWidget secondRowWidget = verticalButtonLayout.add(new AxisGridWidget(
@@ -153,7 +154,6 @@ public class ScreenshotScreen extends Screen {
 
         secondRowWidget.add(folderButton);
         secondRowWidget.add(this.openButton);
-        secondRowWidget.add(this.viewButton);
         secondRowWidget.add(doneButton);
 
         verticalButtonLayout.refreshPositions();

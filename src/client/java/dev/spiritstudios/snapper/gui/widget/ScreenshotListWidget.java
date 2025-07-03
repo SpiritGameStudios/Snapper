@@ -47,8 +47,6 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     private static final Identifier VIEW_TEXTURE = Snapper.id("screenshots/view");
     private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Snapper.id("screenshots/view_highlighted");
 
-    public static final Identifier MENU_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_background.png");
-
     private final Screen parent;
 
     public final CompletableFuture<List<ScreenshotEntry>> loadFuture;
@@ -472,7 +470,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             RenderSystem.enableBlend();
             {
-                context.drawTexture(MENU_BACKGROUND_TEXTURE, x, y, 0, 0, entryWidth, entryHeight);
+                Identifier hoverBackground = Identifier.of("snapper", "textures/gui/grid_selection_background.png");
+                context.drawTexture(hoverBackground, x, y, 0, 0, entryWidth, entryHeight);
             }
             RenderSystem.disableBlend();
 
@@ -516,7 +515,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         public String truncateFileName(String fileName, int maxWidth, int truncateLength) {
             String truncatedName = fileName;
-            if (this.client.textRenderer.getWidth(truncatedName) > maxWidth) truncatedName = truncatedName.substring(0, Math.min(fileName.length(), truncateLength)) + "...";
+            if (this.client.textRenderer.getWidth(truncatedName) > maxWidth)
+                truncatedName = truncatedName.substring(0, Math.min(fileName.length(), truncateLength)) + "...";
             return truncatedName;
         }
 
@@ -528,7 +528,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             }
         }
 
-            @Override
+        @Override
         public void setFocused(boolean focused) {
             if (focused) {
                 setEntrySelected(this);
