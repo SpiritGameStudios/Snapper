@@ -47,6 +47,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     private static final Identifier VIEW_TEXTURE = Snapper.id("screenshots/view");
     private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Snapper.id("screenshots/view_highlighted");
 
+    public static final Identifier MENU_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_background.png");
+
     private final Screen parent;
 
     public final CompletableFuture<List<ScreenshotEntry>> loadFuture;
@@ -173,7 +175,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     @Override
     protected int getMaxPosition() {
-        int totalRows = (int) (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
+        int totalRows = (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
         return showGrid ? totalRows * itemHeight : super.getMaxPosition();
     }
 
@@ -470,8 +472,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             RenderSystem.enableBlend();
             {
-                Identifier hoverBackground = Identifier.of("snapper", "textures/gui/transparent_background.png");
-                context.drawTexture(hoverBackground, x, y, 0, 0, entryWidth, entryHeight);
+                context.drawTexture(MENU_BACKGROUND_TEXTURE, x, y, 0, 0, entryWidth, entryHeight);
             }
             RenderSystem.disableBlend();
 

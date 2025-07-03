@@ -11,10 +11,10 @@ import dev.spiritstudios.specter.api.config.Value;
 import java.nio.file.Path;
 
 public final class SnapperConfig extends Config<SnapperConfig> {
-
     public static final ConfigHolder<SnapperConfig, ?> HOLDER = ConfigHolder.builder(
             Snapper.id("snapper"), SnapperConfig.class
     ).build();
+
     public static final SnapperConfig INSTANCE = HOLDER.get();
 
     public final Value<Boolean> copyTakenScreenshot = booleanValue(false)

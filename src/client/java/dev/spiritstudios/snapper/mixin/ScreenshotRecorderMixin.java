@@ -1,5 +1,6 @@
 package dev.spiritstudios.snapper.mixin;
 
+import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.mixinsupport.ImageTransferable;
 import net.minecraft.client.texture.NativeImage;
@@ -42,8 +43,7 @@ public abstract class ScreenshotRecorderMixin {
     )
     private static void saveWrittenFileToClipboard(NativeImage nativeImage, File screenshotFile, Consumer<Text> messageReceiver, CallbackInfo ci) throws IOException {
         if (!screenshotFile.getAbsolutePath().contains("/panorama/") && SnapperConfig.INSTANCE.copyTakenScreenshot.get()) {
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(new ImageTransferable(ImageIO.read(screenshotFile)), null);
+            Snapper.getPlatformHelper().copyScreenshot(screenshotFile.toPath());
         }
     }
 
