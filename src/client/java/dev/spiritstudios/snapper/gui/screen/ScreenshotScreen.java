@@ -181,7 +181,7 @@ public class ScreenshotScreen extends Screen {
 
         viewModeButton.setPosition(width / 2 - 178, height - 56);
 
-        Path panoramaDir = Path.of(this.client.runDirectory.getPath(), "screenshots", "panorama");
+        Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
         boolean hasPanorama = SnapperUtil.panoramaPresent(panoramaDir);
 
         TextIconButtonWidget panoramaButton = addDrawableChild(TextIconButtonWidget.builder(

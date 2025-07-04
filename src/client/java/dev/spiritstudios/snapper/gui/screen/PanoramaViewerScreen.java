@@ -40,7 +40,7 @@ public class PanoramaViewerScreen extends Screen {
     private List<Path> getImagePaths() {
         Objects.requireNonNull(this.client);
 
-        Path panoramaDir = Path.of(this.client.runDirectory.getPath(), "screenshots", "panorama");
+        Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
         if (!SnapperUtil.panoramaPresent(panoramaDir)) return null;
 
         try (Stream<Path> stream = Files.list(panoramaDir)) {
