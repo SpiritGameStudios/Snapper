@@ -6,6 +6,7 @@ import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.mixin.accessor.EntryListWidgetAccessor;
+import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
 import dev.spiritstudios.snapper.util.SnapperUtil;
@@ -25,7 +26,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import org.apache.commons.io.file.FilesUncheck;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -336,7 +336,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     .orElse(null);
             this.path = iconPath;
             this.iconFileName = iconPath.getFileName().toString();
-            this.lastModified = FilesUncheck.getLastModifiedTime(iconPath);
+            this.lastModified = SafeFiles.getLastModifiedTime(iconPath).orElse(FileTime.fromMillis(0L));
             this.screenshots = screenshots;
         }
 
