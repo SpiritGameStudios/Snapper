@@ -48,12 +48,10 @@ public class PanoramaViewerScreen extends Screen {
                     .filter(path -> {
                         if (Files.isDirectory(path)) return false;
 
-                        return SafeFiles.probeContentType(path)
-                                .map(fileType -> Objects.equals(fileType, "image/png"))
-                                .orElse(false);
+                        return SafeFiles.isContentType(path, "image/png", ".png");
                     })
                     .toList();
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             Snapper.LOGGER.error("Failed to list the contents of directory", e);
             return null;
         }
