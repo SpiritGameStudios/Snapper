@@ -45,8 +45,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
-    private static final Identifier VIEW_TEXTURE = Snapper.id("screenshots/view");
-    private static final Identifier VIEW_HIGHLIGHTED_TEXTURE = Snapper.id("screenshots/view_highlighted");
+    private static final Identifier VIEW_SPRITE = Snapper.id("screenshots/view");
+    private static final Identifier VIEW_HIGHLIGHTED_SPRITE = Snapper.id("screenshots/view_highlighted");
+
+    private static final Identifier GRID_SELECTION_BACKGROUND_TEXTURE = Snapper.id("textures/gui/grid_selection_background.png");
 
     private final Screen parent;
 
@@ -302,6 +304,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     0xFFFFFF,
                     false
             );
+
             context.drawText(
                     this.client.textRenderer,
                     EMPTY_CUSTOM_LIST_TEXT,
@@ -374,8 +377,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             context.drawText(
                     this.client.textRenderer,
                     truncateFileName(fileName, entryWidth - 32 - 6, 29),
-                    x + 32 + 3,
-                    y + 1,
+                    x + 32 + 3, y + 1,
                     0xFFFFFF,
                     false
             );
@@ -383,41 +385,32 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             context.drawText(
                     this.client.textRenderer,
                     creationString,
-                    x + 35,
-                    y + 12,
+                    x + 35, y + 12,
                     Colors.GRAY,
                     false
             );
 
-
             if (this.icon != null) {
-                RenderSystem.enableBlend();
                 context.drawTexture(
                         RenderLayer::getGuiTextured,
                         this.icon.getTextureId(),
-                        x,
-                        y,
-                        (icon.getHeight()) / 3.0f + 32,
-                        0,
-                        entryHeight,
-                        entryHeight,
-                        icon.getHeight(),
-                        icon.getHeight(),
-                        icon.getWidth(),
-                        icon.getHeight()
+                        x, y,
+                        (icon.getHeight()) / 3.0f + 32, 0,
+                        entryHeight, entryHeight,
+                        icon.getHeight(), icon.getHeight(),
+                        icon.getWidth(), icon.getHeight()
                 );
-                RenderSystem.disableBlend();
             }
 
             if (this.client.options.getTouchscreen().getValue() || hovered) {
                 context.fill(x, y, x + 32, y + 32, 0xA0909090);
                 context.drawGuiTexture(
                         RenderLayer::getGuiTextured,
-                        mouseX - x < 32 && this.icon != null ? ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
-                        x,
-                        y,
-                        32,
-                        32
+                        mouseX - x < 32 && this.icon != null ?
+                                ScreenshotListWidget.VIEW_HIGHLIGHTED_SPRITE :
+                                ScreenshotListWidget.VIEW_SPRITE,
+                        x, y,
+                        32, 32
                 );
             }
         }
@@ -429,22 +422,15 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             clickthroughHovered = SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY);
 
             if (this.icon != null) {
-                RenderSystem.enableBlend();
                 context.drawTexture(
                         RenderLayer::getGuiTextured,
                         this.icon.getTextureId(),
-                        x,
-                        y,
-                        0,
-                        0,
-                        entryWidth,
-                        entryHeight,
-                        icon.getWidth(),
-                        icon.getHeight(),
-                        icon.getWidth(),
-                        icon.getHeight()
+                        x, y,
+                        0, 0,
+                        entryWidth, entryHeight,
+                        icon.getWidth(), icon.getHeight(),
+                        icon.getWidth(), icon.getHeight()
                 );
-                RenderSystem.disableBlend();
             }
 
             if (this.client.options.getTouchscreen().getValue() || (hovered && mouseX < x + entryWidth) || isSelectedEntry(index)) {
@@ -472,23 +458,26 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             if (creationTime != -1L)
                 creationString = DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
 
-			RenderSystem.enableBlend();
-			{
-				Identifier hoverBackground = Snapper.id("textures/gui/grid_selection_background.png");
-				context.drawTexture(RenderLayer::getGuiTextured, hoverBackground, x, y, 0, 0, entryWidth, entryHeight, entryWidth, entryHeight);
-            }
-            RenderSystem.disableBlend();
+            context.drawTexture(
+                    RenderLayer::getGuiTextured,
+                    GRID_SELECTION_BACKGROUND_TEXTURE,
+                    x, y,
+                    0, 0,
+                    entryWidth, entryHeight,
+                    16, 16
+            );
 
-                context.drawGuiTexture(
-						RenderLayer::getGuiTextured,
-                        clickthroughHovered &&
-                                this.icon != null ?
-                                ScreenshotListWidget.VIEW_HIGHLIGHTED_TEXTURE : ScreenshotListWidget.VIEW_TEXTURE,
-                        centreX - 16,
-                        centreY - 16,
-                        32,
-                        32
-                );
+
+            context.drawGuiTexture(
+                    RenderLayer::getGuiTextured,
+                    clickthroughHovered &&
+                            this.icon != null ?
+                            ScreenshotListWidget.VIEW_HIGHLIGHTED_SPRITE : ScreenshotListWidget.VIEW_SPRITE,
+                    centreX - 16,
+                    centreY - 16,
+                    32,
+                    32
+            );
 
             context.drawText(
                     this.client.textRenderer,
@@ -569,8 +558,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         public boolean click() {
             if (this.icon == null) return false;
-            this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-
+            playClickSound(this.client.getSoundManager());
             this.client.setScreen(new ScreenshotViewerScreen(this.icon, this.path, this.screenParent, this.screenshots));
             return true;
         }

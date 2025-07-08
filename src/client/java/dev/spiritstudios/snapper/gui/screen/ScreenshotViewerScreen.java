@@ -197,14 +197,10 @@ public class ScreenshotViewerScreen extends Screen {
         context.drawTexture(
                 RenderLayer::getGuiTextured,
                 this.icon.getTextureId(),
-                (this.width / 2) - (finalWidth / 2),
-                this.height - 68 - finalHeight,
-                0,
-                0,
-                finalWidth,
-                finalHeight,
-                finalWidth,
-                finalHeight
+                (this.width / 2) - (finalWidth / 2), this.height - 68 - finalHeight,
+                0, 0,
+                finalWidth, finalHeight,
+                finalWidth, finalHeight
         );
 
         if (screenshotIndex != -1 && screenshots != null) {
@@ -259,59 +255,46 @@ public class ScreenshotViewerScreen extends Screen {
     }
 
     private void drawMenuBackground(DrawContext context) {
-        RenderSystem.enableBlend();
-        Identifier texture = this.client.world == null ? MENU_DECOR_BACKGROUND_TEXTURE : INWORLD_MENU_DECOR_BACKGROUND_TEXTURE;
         context.drawTexture(
                 RenderLayer::getGuiTextured,
-                texture,
-                0,
-                48,
-                0,
-                0,
-                width,
-                height - 68 - 48,
-                32,
-                32
+                this.client.world == null ?
+                        MENU_DECOR_BACKGROUND_TEXTURE :
+                        INWORLD_MENU_DECOR_BACKGROUND_TEXTURE,
+                width, height - 68 - 48,
+                0, 0,
+                32, 32,
+                0, 48
         );
-        RenderSystem.disableBlend();
     }
 
     private void drawHeaderAndFooterSeparators(DrawContext context) {
-        RenderSystem.enableBlend();
-        Identifier headerTexture = this.client.world == null ? Screen.HEADER_SEPARATOR_TEXTURE : Screen.INWORLD_HEADER_SEPARATOR_TEXTURE;
-        Identifier footerTexture = this.client.world == null ? Screen.FOOTER_SEPARATOR_TEXTURE : Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE;
         context.drawTexture(
                 RenderLayer::getGuiTextured,
-                headerTexture,
-                0,
-                48 - 2,
-                0,
-                0,
-                width,
-                2,
-                32,
-                2
+                this.client.world == null ?
+                        Screen.HEADER_SEPARATOR_TEXTURE :
+                        Screen.INWORLD_HEADER_SEPARATOR_TEXTURE,
+                0, 48 - 2,
+                0, 0,
+                width, 2,
+                32, 2
         );
 
         context.drawTexture(
                 RenderLayer::getGuiTextured,
-                footerTexture,
-                0,
-                height - 68,
-                0,
-                0,
-                width,
-                2,
-                32,
-                2
+                this.client.world == null ?
+                        Screen.FOOTER_SEPARATOR_TEXTURE :
+                        Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE,
+                0, height - 68,
+                0, 0,
+                width, 2,
+                32, 2
         );
-
-        RenderSystem.disableBlend();
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (this.screenshotIndex == -1 || this.screenshots == null) return super.keyPressed(keyCode, scanCode, modifiers);
+        if (this.screenshotIndex == -1 || this.screenshots == null)
+            return super.keyPressed(keyCode, scanCode, modifiers);
 
         Path imagePath = switch (keyCode) {
             case GLFW_KEY_LEFT -> this.screenshotIndex >= 1 ?

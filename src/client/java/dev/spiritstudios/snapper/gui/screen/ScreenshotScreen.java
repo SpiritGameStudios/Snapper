@@ -230,26 +230,22 @@ public class ScreenshotScreen extends Screen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (super.keyPressed(keyCode, scanCode, modifiers)) return true;
+        if (client == null) return false;
 
-        long handle = MinecraftClient.getInstance().getWindow().getHandle();
         if (keyCode == GLFW.GLFW_KEY_F5) {
-            if (client == null) return false;
 
             client.setScreen(new ScreenshotScreen(this.parent));
             return true;
         }
 
-        if (
-                (InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_LEFT_CONTROL) || InputUtil.isKeyPressed(handle, GLFW.GLFW_KEY_RIGHT_CONTROL)) &&
-                        InputUtil.isKeyPressed(handle, InputUtil.GLFW_KEY_C) &&
-                        selectedScreenshot != null
-        ) {
+        if (selectedScreenshot == null) return false;
+
+        if ((modifiers & GLFW.GLFW_MOD_CONTROL) != 0 && keyCode == InputUtil.GLFW_KEY_C) {
             Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.path);
             return true;
         }
 
-        if (keyCode == GLFW.GLFW_KEY_ENTER && selectedScreenshot != null) {
-            if (client == null) return false;
+        if (keyCode == GLFW.GLFW_KEY_ENTER) {
             client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.path, this));
         }
 
