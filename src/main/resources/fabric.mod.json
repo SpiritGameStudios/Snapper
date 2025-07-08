@@ -31,7 +31,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=${fabric_loader_version}",
-		"minecraft": "~${minecraft_version}",
+		"minecraft": "${minecraft_version}",
 		"fabric-api": "*",
 		"java": ">=21",
 		"specter-config": "*"

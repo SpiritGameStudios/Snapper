@@ -32,12 +32,11 @@ public class DirectoryConfigUtil {
 
                 return DataResult.success(path);
             },
-            Path::toString
+            path -> escapePath(path.toString())
     );
 
     public static Optional<Path> openFolderSelect(String title) {
         String selectedPath = TinyFileDialogs.tinyfd_selectFolderDialog(title, SystemProperties.getUserHome());
-
         if (Strings.isNullOrEmpty(selectedPath)) {
             return Optional.empty();
         }
@@ -50,4 +49,8 @@ public class DirectoryConfigUtil {
 
         return new FolderSelectWidget(0, 0, 10, 10, value, "%s.placeholder".formatted(configValue.translationKey(id)));
     };
+
+    public static String escapePath(String path) {
+        return path.replace("\\", "\\\\");
+    }
 }

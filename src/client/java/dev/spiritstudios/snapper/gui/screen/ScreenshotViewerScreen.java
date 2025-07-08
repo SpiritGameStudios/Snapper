@@ -45,7 +45,7 @@ public class ScreenshotViewerScreen extends Screen {
     private final Path screenshot;
     private final @Nullable List<Path> screenshots;
     private final int screenshotIndex;
-    private Path iconPath;
+    private final Path iconPath;
 
     public ScreenshotViewerScreen(ScreenshotImage icon, Path screenshot, Screen parent) {
         this(icon, screenshot, parent, null);
@@ -92,13 +92,6 @@ public class ScreenshotViewerScreen extends Screen {
 
         int firstRowButtonWidth = 74;
 
-        // OPEN IMAGE EXTERNALLY
-
-        ButtonWidget openButton = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("button.snapper.open"),
-                button -> Util.getOperatingSystem().open(this.iconPath)
-        ).width(100).build());
-
         // OPEN FOLDER
 
         ButtonWidget folderButton = addDrawableChild(ButtonWidget.builder(
@@ -108,6 +101,13 @@ public class ScreenshotViewerScreen extends Screen {
                         .width(100)
                         .build()
         );
+
+        // OPEN IMAGE EXTERNALLY
+
+        ButtonWidget openButton = addDrawableChild(ButtonWidget.builder(
+                Text.translatable("button.snapper.open"),
+                button -> Util.getOperatingSystem().open(this.iconPath)
+        ).width(100).build());
 
         // EXIT PAGE
 
@@ -174,8 +174,8 @@ public class ScreenshotViewerScreen extends Screen {
                 AxisGridWidget.DisplayAxis.HORIZONTAL)
         );
 
-        secondRowWidget.add(openButton);
         secondRowWidget.add(folderButton);
+        secondRowWidget.add(openButton);
         secondRowWidget.add(doneButton);
 
         verticalButtonLayout.refreshPositions();

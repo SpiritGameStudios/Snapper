@@ -1,5 +1,5 @@
 [versions]
-fabric_loom = "1.10-SNAPSHOT"
+fabric_loom = "1.11-SNAPSHOT"
 minotaur = "2.+"
 
 minecraft = "1.21.4"

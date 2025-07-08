@@ -4,6 +4,7 @@ import com.google.gson.JsonParser;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.serialization.JsonOps;
+import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.session.Session;
@@ -58,6 +59,10 @@ public class AxolotlClientApi implements Closeable {
                 .thenApply(response -> {
                     if (response.statusCode() != 200) return null;
                     return response.body();
+                })
+                .exceptionally(e -> {
+                    Snapper.LOGGER.error("Failed to upload image", e);
+                    return null;
                 });
     }
 
@@ -72,7 +77,7 @@ public class AxolotlClientApi implements Closeable {
         try {
             sessionService.joinServer(session.getUuidOrNull(), session.getAccessToken(), serverId);
         } catch (AuthenticationException e) {
-            throw new RuntimeException(e);
+            return CompletableFuture.failedFuture(e);
         }
 
         return this.get("authenticate", Map.of("username", session.getUsername(), "server_id", serverId))

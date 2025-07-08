@@ -1,8 +1,12 @@
 package dev.spiritstudios.snapper.util;
 
+import dev.spiritstudios.snapper.Snapper;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.Optional;
 
 public final class SafeFiles {
@@ -15,9 +19,23 @@ public final class SafeFiles {
         }
     }
 
-    public static Optional<String> probeContentType(Path path) {
+    public static boolean isContentType(Path path, String matchType, String extension) {
+        if (!Files.exists(path)) return false;
         try {
-            return Optional.of(Files.probeContentType(path));
+            @Nullable String foundType = Files.probeContentType(path);
+            if (foundType != null) {
+                return foundType.equals(matchType);
+            }
+        } catch (IOException | NullPointerException e) {
+            Snapper.LOGGER.error("Failed to get MIME type of file name {}; attempting extension match", path.getFileName());
+            return false;
+        }
+        return path.getFileName().toString().endsWith(extension);
+    }
+
+    public static Optional<FileTime> getLastModifiedTime(Path path) {
+        try {
+            return Optional.of(Files.getLastModifiedTime(path));
         } catch (IOException e) {
             return Optional.empty();
         }

@@ -4,7 +4,6 @@ import ca.weblite.objc.Client;
 import ca.weblite.objc.Proxy;
 import dev.spiritstudios.snapper.Snapper;
 
-import java.io.File;
 import java.nio.file.Path;
 
 public class MacActions implements PlatformHelper {

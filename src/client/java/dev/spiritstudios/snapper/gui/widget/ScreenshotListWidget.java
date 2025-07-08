@@ -6,6 +6,7 @@ import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.mixin.accessor.EntryListWidgetAccessor;
+import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
 import dev.spiritstudios.snapper.util.SnapperUtil;
@@ -26,7 +27,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import org.apache.commons.io.file.FilesUncheck;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -180,7 +180,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     public void toggleGrid() {
         this.showGrid = !this.showGrid;
-        ((EntryListWidgetAccessor) (Object) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
+        ((EntryListWidgetAccessor) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
         for (var entry : this.children()) if (entry instanceof ScreenshotEntry sc) sc.setShowGrid(this.showGrid);
 
         SnapperConfig.INSTANCE.viewMode.set(this.showGrid ? ScreenshotViewerScreen.ViewMode.GRID : ScreenshotViewerScreen.ViewMode.LIST);
@@ -196,7 +196,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         if (relX < 0 || relX > rowWidth || relY < 0 || relY > getBottom()) return null;
 
-        int rowIndex = (relY + (int) this.getScrollAmount()) / this.itemHeight;
+        int rowIndex = (relY + (int) this.getScrollY()) / this.itemHeight;
         int colIndex = MathHelper.floor(((float) relX / (float) rowWidth) * (float) getColumnCount());
         int entryIndex = rowIndex * getColumnCount() + colIndex;
 
@@ -337,7 +337,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     .orElse(null);
             this.path = iconPath;
             this.iconFileName = iconPath.getFileName().toString();
-            this.lastModified = FilesUncheck.getLastModifiedTime(iconPath);
+            this.lastModified = SafeFiles.getLastModifiedTime(iconPath).orElse(FileTime.fromMillis(0L));
             this.screenshots = screenshots;
         }
 
@@ -373,7 +373,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             context.drawText(
                     this.client.textRenderer,
-                    fileName,
+                    truncateFileName(fileName, entryWidth - 32 - 6, 29),
                     x + 32 + 3,
                     y + 1,
                     0xFFFFFF,
@@ -472,9 +472,11 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             if (creationTime != -1L)
                 creationString = DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
 
-            RenderSystem.enableBlend();
-            Identifier hoverBackground = Snapper.id("textures/gui/grid_selection_background.png");
-            context.drawTexture(RenderLayer::getGuiTextured, hoverBackground, x, y, 0, 0, entryWidth, entryHeight);
+			RenderSystem.enableBlend();
+			{
+				Identifier hoverBackground = Snapper.id("textures/gui/grid_selection_background.png");
+				context.drawTexture(RenderLayer::getGuiTextured, hoverBackground, x, y, 0, 0, entryWidth, entryHeight, entryWidth, entryHeight);
+            }
             RenderSystem.disableBlend();
 
                 context.drawGuiTexture(
@@ -516,6 +518,13 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             );
         }
 
+        public String truncateFileName(String fileName, int maxWidth, int truncateLength) {
+            String truncatedName = fileName;
+            if (this.client.textRenderer.getWidth(truncatedName) > maxWidth)
+                truncatedName = truncatedName.substring(0, Math.min(fileName.length(), truncateLength)) + "...";
+            return truncatedName;
+        }
+
         @Override
         public void drawBorder(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             if (isSelectedEntry(index)) {
@@ -524,7 +533,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             }
         }
 
-            @Override
+        @Override
         public void setFocused(boolean focused) {
             if (focused) {
                 setEntrySelected(this);

@@ -29,15 +29,22 @@ With Snapper, you can:
   No. Please do not ask us for a forge port.
 
 * Do you plan to / Could you add `X`? <br/>
-  If you want to suggest something, join the [discord](https://discord.gg/TTmx7d2axf).
+  If you want to suggest something, join the [Discord](https://discord.gg/TTmx7d2axf) or make a [GitHub issue](https://github.com/SpiritGameStudios/Snapper/issues).
 
 * Can you port/backport to `X` version? <br/>
   Probably not. Multi-version projects are hard :<
 
+* My screenshots aren't copying and my game is logging `Failed to get clipboard`. <br />
+  The official Minecraft launcher doesn't have all of the necessary tools provided by a standard Java runtime. This may cause issues with copying for some users on Windows & Linux. Other launchers are not affected.
+
+* Question not here? We're happy to help you on our [Discord server](https://discord.gg/TTmx7d2axf).
+
 ## ➕ Details
 
-Special thanks to our original beta testers:
+Special thanks to our quality assurance team:
 - [Blurryface](https://blurry.gay)
 - [ThinkSeal](https://github.com/thinkseal)
+
+---
 
 Snapper's image uploading is powered by the wonderful (and [open-source](https://github.com/axolotlclient)) [AxolotlClient](https://modrinth.com/mod/axolotlclient) and governed by their [terms of use](https://axolotlclient.com/terms). Agreement is opt-in and you may revoke it at any time.

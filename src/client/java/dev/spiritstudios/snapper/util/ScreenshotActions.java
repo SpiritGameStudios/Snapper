@@ -8,24 +8,22 @@ import net.minecraft.client.gui.screen.ProgressScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import org.apache.commons.io.file.FilesUncheck;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.nio.file.attribute.FileTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class ScreenshotActions {
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void deleteScreenshot(Path path, Screen screen) {
         if (!Files.exists(path)) return;
 
@@ -61,27 +59,31 @@ public class ScreenshotActions {
         }
     }
 
-    public static java.util.List<Path> getScreenshots(MinecraftClient client) {
+    public static List<Path> getScreenshots(MinecraftClient client) {
         Path customScreenshotDirectory = SnapperConfig.INSTANCE.customScreenshotFolder.get().resolve("screenshots");
         Path defaultScreenshotDirectory = Path.of(client.runDirectory.getPath(), "screenshots");
         Path screenshotDir = SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() ? customScreenshotDirectory : defaultScreenshotDirectory;
 
-        return FilesUncheck.list(screenshotDir)
-                .filter(file -> {
-                    if (Files.isDirectory(file)) return false;
-                    String fileType;
+        try (Stream<Path> stream = Files.list(screenshotDir)){
+            return stream.filter(file -> {
+                        if (Files.isDirectory(file)) return false;
+                        String fileType;
 
-                    try {
-                        fileType = Files.probeContentType(file);
-                    } catch (IOException e) {
-                        Snapper.LOGGER.error("Couldn't load screenshot list", e);
-                        return false;
-                    }
+                        try {
+                            fileType = Files.probeContentType(file);
+                        } catch (IOException e) {
+                            Snapper.LOGGER.error("Couldn't load screenshot list", e);
+                            return false;
+                        }
 
-                    return Objects.equals(fileType, "image/png");
-                })
-                .sorted(Comparator.<Path>comparingLong(path -> FilesUncheck.getLastModifiedTime(path).toMillis()).reversed())
-                .toList();
+                        return Objects.equals(fileType, "image/png");
+                    })
+                    .sorted(Comparator.<Path>comparingLong(path -> SafeFiles.getLastModifiedTime(path)
+                            .map(FileTime::toMillis).orElse(0L)).reversed())
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     record TransferableImage(Image image) implements Transferable {

@@ -1,7 +1,7 @@
 package dev.spiritstudios.snapper.mixin;
 
+import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.mixinsupport.ImageTransferable;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.text.Text;
@@ -11,9 +11,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,8 +39,7 @@ public abstract class ScreenshotRecorderMixin {
     )
     private static void saveWrittenFileToClipboard(NativeImage nativeImage, File screenshotFile, Consumer<Text> messageReceiver, CallbackInfo ci) throws IOException {
         if (!screenshotFile.getAbsolutePath().contains("/panorama/") && SnapperConfig.INSTANCE.copyTakenScreenshot.get()) {
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(new ImageTransferable(ImageIO.read(screenshotFile)), null);
+            Snapper.getPlatformHelper().copyScreenshot(screenshotFile.toPath());
         }
     }
 

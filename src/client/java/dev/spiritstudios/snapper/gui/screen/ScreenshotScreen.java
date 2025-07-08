@@ -20,10 +20,14 @@ import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.nio.file.Path;
+
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
 public class ScreenshotScreen extends Screen {
     private static final Identifier PANORAMA_BUTTON_ICON = Identifier.of(MODID, "screenshots/panorama");
+    private static final Identifier PANORAMA_BUTTON_DISABLED_ICON = Identifier.of(MODID, "screenshots/panorama_disabled");
+
     private static final Identifier SETTINGS_ICON = Identifier.of(MODID, "screenshots/settings");
     private static Identifier VIEW_MODE_ICON;
     private final Screen parent;
@@ -61,7 +65,7 @@ public class ScreenshotScreen extends Screen {
                 this
         ));
 
-        int secondRowButtonWidth = 74;
+        int secondRowButtonWidth = 100;
 
         ButtonWidget folderButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.folder"),
@@ -77,24 +81,12 @@ public class ScreenshotScreen extends Screen {
                 }
         ).width(secondRowButtonWidth).build());
 
-        this.viewButton = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("button.snapper.view"),
-                button -> {
-                    if (selectedScreenshot != null)
-                        this.client.setScreen(new ScreenshotViewerScreen(
-                                selectedScreenshot.icon,
-                                selectedScreenshot.path,
-                                selectedScreenshot.screenParent
-                        ));
-                }
-        ).width(secondRowButtonWidth).build());
-
         ButtonWidget doneButton = addDrawableChild(ButtonWidget.builder(
                 ScreenTexts.DONE,
                 button -> this.close()
         ).width(secondRowButtonWidth).build());
 
-        int firstRowButtonWidth = 74;
+        int firstRowButtonWidth = 58;
 
         this.deleteButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.delete"),
@@ -117,6 +109,18 @@ public class ScreenshotScreen extends Screen {
                 button -> {
                     if (selectedScreenshot != null)
                         Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.path);
+                }
+        ).width(firstRowButtonWidth).build());
+
+        this.viewButton = addDrawableChild(ButtonWidget.builder(
+                Text.translatable("button.snapper.view"),
+                button -> {
+                    if (selectedScreenshot != null)
+                        this.client.setScreen(new ScreenshotViewerScreen(
+                                selectedScreenshot.icon,
+                                selectedScreenshot.path,
+                                selectedScreenshot.screenParent
+                        ));
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -143,6 +147,7 @@ public class ScreenshotScreen extends Screen {
         firstRowWidget.add(this.deleteButton);
         firstRowWidget.add(this.renameButton);
         firstRowWidget.add(this.copyButton);
+        firstRowWidget.add(this.viewButton);
         firstRowWidget.add(this.uploadButton);
 
         AxisGridWidget secondRowWidget = verticalButtonLayout.add(new AxisGridWidget(
@@ -153,7 +158,6 @@ public class ScreenshotScreen extends Screen {
 
         secondRowWidget.add(folderButton);
         secondRowWidget.add(this.openButton);
-        secondRowWidget.add(this.viewButton);
         secondRowWidget.add(doneButton);
 
         verticalButtonLayout.refreshPositions();
@@ -177,16 +181,24 @@ public class ScreenshotScreen extends Screen {
 
         viewModeButton.setPosition(width / 2 - 178, height - 56);
 
+        Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
+        boolean hasPanorama = SnapperUtil.panoramaPresent(panoramaDir);
+
         TextIconButtonWidget panoramaButton = addDrawableChild(TextIconButtonWidget.builder(
                 Text.translatable("button.snapper.screenshots"),
                 button -> this.client.setScreen(new PanoramaViewerScreen(Text.translatable("menu.snapper.panorama").getString(), this)),
                 true
-        ).width(20).texture(PANORAMA_BUTTON_ICON, 15, 15).build());
+        ).width(20).texture(hasPanorama ? PANORAMA_BUTTON_ICON : PANORAMA_BUTTON_DISABLED_ICON, 15, 15).build());
 
+        panoramaButton.active = hasPanorama;
         panoramaButton.setPosition(width / 2 + 158, height - 32);
-        panoramaButton.setTooltip(Tooltip.of(Text.translatable("button.snapper.panorama.tooltip")));
 
-        this.imageSelected(null);
+        panoramaButton.setTooltip(Tooltip.of(Text.translatable(hasPanorama ?
+                "button.snapper.panorama.tooltip" :
+                "text.snapper.panorama_encourage")));
+
+
+        this.imageSelected(selectedScreenshot);
     }
 
     public void imageSelected(@Nullable ScreenshotListWidget.ScreenshotEntry screenshot) {
