@@ -1,6 +1,5 @@
 package dev.spiritstudios.snapper.gui.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
@@ -19,8 +18,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.input.KeyCodes;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
@@ -177,7 +174,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     @Override
     public int getMaxScrollY() {
         int totalRows = (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
-        return showGrid ? totalRows * itemHeight : super.getMaxScrollY();
+        return showGrid ? totalRows * itemHeight - this.height + 4 : super.getMaxScrollY();
     }
 
     public void toggleGrid() {

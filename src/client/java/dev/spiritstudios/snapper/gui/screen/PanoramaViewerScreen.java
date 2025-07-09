@@ -99,8 +99,6 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-
         PANORAMA_RENDERER_CUBE.render(context, this.width, this.height, 1.0F, delta);
 
         context.drawCenteredTextWithShadow(
@@ -110,6 +108,8 @@ public class PanoramaViewerScreen extends Screen {
                 20,
                 0xFFFFFF
         );
+
+        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
