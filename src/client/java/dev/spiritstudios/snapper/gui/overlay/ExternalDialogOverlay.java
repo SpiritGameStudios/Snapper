@@ -23,13 +23,12 @@ public class ExternalDialogOverlay extends Overlay {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         if (this.client.currentScreen != null) {
             this.client.currentScreen.render(context, mouseX, mouseY, delta);
-            context.draw();
         }
 
         this.client.gameRenderer.renderBlur();
 
         context.drawTexture(
-                RenderLayer::getGuiTextured,
+                RenderLayer::getGuiTexturedOverlay,
                 this.client.world == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE,
                 0, 0,
                 0, 0,
