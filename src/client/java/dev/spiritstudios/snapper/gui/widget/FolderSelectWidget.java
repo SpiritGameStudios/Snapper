@@ -6,6 +6,7 @@ import dev.spiritstudios.specter.api.config.Value;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ParentElement;
+import net.minecraft.client.gui.screen.Overlay;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
@@ -66,15 +67,11 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
                 Text.translatable("config.snapper.snapper.customScreenshotFolder.select"),
                 button -> {
                     ExternalDialogOverlay overlay = new ExternalDialogOverlay();
-                    CompletableFuture<Boolean> assureRender = CompletableFuture.supplyAsync(() -> {
-                        client.setOverlay(overlay);
-                        LOGGER.debug("Opening folder select dialog & overlay"); // THIS SOMEHOW FIXES A BUG; DON'T QUESTION IT
-                        return true;
-                    });
-                    assureRender.thenAccept(e -> {
-                        Optional<Path> folderValue = DirectoryConfigUtil.openFolderSelect(Text.translatable("prompt.snapper.folder_select").getString().replaceAll("[^a-zA-Z0-9 .,]", ""));
-                        valueFromSelectDialog(folderValue.orElse(null));
-                        overlay.close();
+                    client.setOverlay(overlay);
+
+                    DirectoryConfigUtil.openFolderSelect(Text.translatable("prompt.snapper.folder_select").getString().replaceAll("[^a-zA-Z0-9 .,]", "")).thenAccept(path -> {
+                        valueFromSelectDialog(path.orElse(null));
+                        client.submit(overlay::close).join();
                     });
                 },
                 true
