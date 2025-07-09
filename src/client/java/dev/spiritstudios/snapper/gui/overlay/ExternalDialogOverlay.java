@@ -22,7 +22,8 @@ public class ExternalDialogOverlay extends Overlay {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         if (this.client.currentScreen != null) {
-            this.client.currentScreen.render(context, 0, 0, delta);
+            this.client.currentScreen.render(context, mouseX, mouseY, delta);
+            context.draw();
         }
 
         this.client.gameRenderer.renderBlur();
@@ -31,7 +32,7 @@ public class ExternalDialogOverlay extends Overlay {
         context.drawTexture(
                 RenderLayer::getGuiTextured,
                 this.client.world == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE,
-                0, 0, 0,
+                0, 0,
                 0, 0,
                 context.getScaledWindowWidth(), context.getScaledWindowHeight(),
                 32, 32
@@ -46,6 +47,7 @@ public class ExternalDialogOverlay extends Overlay {
 
         if (InputUtil.isKeyPressed(client.getWindow().getHandle(), InputUtil.GLFW_KEY_ESCAPE)) close();
     }
+
 
     public void close() {
         this.client.setOverlay(null);
