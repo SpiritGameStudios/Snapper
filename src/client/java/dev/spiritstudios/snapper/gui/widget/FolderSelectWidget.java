@@ -176,4 +176,22 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
     public void forEachChild(Consumer<ClickableWidget> consumer) {
         this.children().forEach(consumer);
     }
+
+    @Override
+    protected int getContentsHeightWithPadding() {
+        return 20;
+    }
+
+    @Override
+    protected double getDeltaYPerScroll() {
+        return 20/2f;
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        this.active = true;
+        var hovered = super.isMouseOver(mouseX, mouseY);
+        this.active = false;
+        return hovered;
+    }
 }
