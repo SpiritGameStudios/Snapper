@@ -30,7 +30,7 @@ public class ExternalDialogOverlay extends Overlay {
         this.client.getFramebuffer().beginWrite(false);
 
         context.drawTexture(
-                RenderLayer::getGuiTextured,
+                RenderLayer::getGuiTexturedOverlay,
                 this.client.world == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE,
                 0, 0,
                 0, 0,
