@@ -174,7 +174,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     @Override
     public int getMaxScrollY() {
         int totalRows = (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
-        return showGrid ? totalRows * itemHeight - this.height + 4 : super.getMaxScrollY();
+        return showGrid ? Math.max(0, totalRows * itemHeight - this.height + 4) : super.getMaxScrollY();
     }
 
     public void toggleGrid() {
