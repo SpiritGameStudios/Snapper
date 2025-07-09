@@ -27,7 +27,6 @@ public class ExternalDialogOverlay extends Overlay {
         }
 
         this.client.gameRenderer.renderBlur();
-        this.client.getFramebuffer().beginWrite(false);
 
         context.drawTexture(
                 RenderLayer::getGuiTextured,

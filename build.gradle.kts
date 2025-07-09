@@ -31,7 +31,6 @@ loom {
 repositories {
 	mavenCentral()
 	maven("https://maven.spiritstudios.dev/releases/")
-	maven("https://maven.bawnorton.com/releases")
 	maven("https://moehreag.duckdns.org/maven/releases") {
 		content {
 			includeGroup("io.github.axolotlclient.AxolotlClient")
@@ -51,10 +50,6 @@ dependencies {
 	modImplementation(libs.bundles.specter)
 
 	implementation(libs.objc.bridge)
-
-	include("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.3.3")
-	implementation("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.3.3")
-	annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.3.3")
 }
 
 tasks.processResources {

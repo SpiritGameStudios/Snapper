@@ -4,6 +4,7 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
 import dev.spiritstudios.snapper.util.SnapperUtil;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.CubeMapRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.RotatingCubeMapRenderer;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -30,10 +32,31 @@ public class PanoramaViewerScreen extends Screen {
     private final String title;
     private final Screen parent;
 
+    private final List<ScreenshotImage> images = new ArrayList<>();
+
     protected PanoramaViewerScreen(String title, Screen parent) {
         super(Text.translatable("menu.snapper.viewer_menu"));
         this.title = title;
         this.parent = parent;
+        this.client = MinecraftClient.getInstance();
+        assert this.client != null;
+
+        List<Path> panorama = this.getImagePaths();
+        if (panorama == null) {
+            Snapper.LOGGER.error("No panorama found");
+            close();
+            return;
+        }
+
+        for (Path path : panorama) {
+            ScreenshotImage.createPanoramaFace(this.client.getTextureManager(), path)
+                    .ifPresent(screenshotImage -> {
+                        images.add(screenshotImage);
+                        screenshotImage
+                                .load()
+                                .thenAccept(ignored -> screenshotImage.enableFiltering());
+                    });
+        }
     }
 
     @Nullable
@@ -61,6 +84,10 @@ public class PanoramaViewerScreen extends Screen {
     public void close() {
         Objects.requireNonNull(this.client);
 
+        for (ScreenshotImage image : images) {
+            image.close();
+        }
+
         client.setScreen(this.parent);
     }
 
@@ -83,18 +110,6 @@ public class PanoramaViewerScreen extends Screen {
                 ScreenTexts.DONE,
                 button -> this.close()
         ).dimensions(width / 2 + 4, height - 32, 150, 20).build());
-
-        List<Path> panorama = this.getImagePaths();
-        if (panorama == null) {
-            Snapper.LOGGER.error("No panorama found");
-            close();
-            return;
-        }
-
-        for (Path path : panorama) {
-            ScreenshotImage.createPanoramaFace(this.client.getTextureManager(), path)
-                    .ifPresent(ScreenshotImage::enableFiltering);
-        }
     }
 
     @Override

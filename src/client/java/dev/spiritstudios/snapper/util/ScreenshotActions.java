@@ -59,12 +59,8 @@ public class ScreenshotActions {
         }
     }
 
-    public static List<Path> getScreenshots(MinecraftClient client) {
-        Path customScreenshotDirectory = SnapperConfig.INSTANCE.customScreenshotFolder.get().resolve("screenshots");
-        Path defaultScreenshotDirectory = Path.of(client.runDirectory.getPath(), "screenshots");
-        Path screenshotDir = SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() ? customScreenshotDirectory : defaultScreenshotDirectory;
-
-        try (Stream<Path> stream = Files.list(screenshotDir)){
+    public static List<Path> getScreenshots() {
+        try (Stream<Path> stream = Files.list(SnapperUtil.getConfiguredScreenshotDirectory())) {
             return stream.filter(file -> {
                         if (Files.isDirectory(file)) return false;
                         String fileType;

@@ -6,12 +6,15 @@ import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
-import dev.spiritstudios.specter.api.config.RootConfigScreen;
-import net.minecraft.client.MinecraftClient;
+import dev.spiritstudios.specter.api.config.client.RootConfigScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.AxisGridWidget;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
+import net.minecraft.client.gui.widget.SimplePositioningWidget;
+import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -77,7 +80,7 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.open"),
                 button -> {
                     if (selectedScreenshot != null)
-                        Util.getOperatingSystem().open(selectedScreenshot.path);
+                        Util.getOperatingSystem().open(selectedScreenshot.icon.getPath());
                 }
         ).width(secondRowButtonWidth).build());
 
@@ -92,7 +95,7 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.delete"),
                 button -> {
                     if (selectedScreenshot != null)
-                        ScreenshotActions.deleteScreenshot(selectedScreenshot.path, this);
+                        ScreenshotActions.deleteScreenshot(selectedScreenshot.icon.getPath(), this);
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -100,7 +103,7 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.rename"),
                 button -> {
                     if (this.selectedScreenshot != null)
-                        client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.path, this));
+                        client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.icon.getPath(), this));
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -108,7 +111,7 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.copy"),
                 button -> {
                     if (selectedScreenshot != null)
-                        Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.path);
+                        Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.icon.getPath());
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -118,7 +121,7 @@ public class ScreenshotScreen extends Screen {
                     if (selectedScreenshot != null)
                         this.client.setScreen(new ScreenshotViewerScreen(
                                 selectedScreenshot.icon,
-                                selectedScreenshot.path,
+                                selectedScreenshot.icon.getPath(),
                                 selectedScreenshot.screenParent
                         ));
                 }
@@ -128,7 +131,7 @@ public class ScreenshotScreen extends Screen {
             if (selectedScreenshot == null) return;
 
             button.active = false;
-            ScreenshotUploading.upload(selectedScreenshot.path)
+            ScreenshotUploading.upload(selectedScreenshot.icon.getPath())
                     .thenRun(() -> button.active = true);
         }).width(firstRowButtonWidth).build());
 
@@ -241,12 +244,12 @@ public class ScreenshotScreen extends Screen {
         if (selectedScreenshot == null) return false;
 
         if ((modifiers & GLFW.GLFW_MOD_CONTROL) != 0 && keyCode == InputUtil.GLFW_KEY_C) {
-            Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.path);
+            Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.icon.getPath());
             return true;
         }
 
         if (keyCode == GLFW.GLFW_KEY_ENTER) {
-            client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.path, this));
+            client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.icon.getPath(), this));
         }
 
         return false;
