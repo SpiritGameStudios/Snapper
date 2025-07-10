@@ -6,6 +6,7 @@ import dev.spiritstudios.specter.api.config.Value;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ParentElement;
+import net.minecraft.client.gui.screen.Overlay;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
