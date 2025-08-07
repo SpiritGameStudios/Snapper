@@ -2,11 +2,9 @@
 
 Screenshots, made simple
 
-<img alt="Available for Fabric" src="https://raw.githubusercontent.com/intergrav/devins-badges/v3/assets/compact/supported/fabric_vector.svg">
-
-<img alt="Won't support Forge" src="https://raw.githubusercontent.com/intergrav/devins-badges/v3/assets/compact/unsupported/forge_vector.svg">
-
 <img alt="Made by Spirit Studios" src="https://raw.githubusercontent.com/SpiritGameStudios/.github/main/assets/brand/badge/compact.svg">
+
+![Minimal Powered by OneConfig](https://polyfrost.org/media/branding/badges/badge_3.svg)
 
 <img alt="As seen on ModFest 1.21" height="40" src="https://badger-api-staging.worldwidepixel.ca/compact?gradientStart=4B2018&gradientEnd=220D09&lineOne=As+seen+on&lineTwo=ModFest+1.21&colourOne=FFFFFF&colourTwo=de634c&iconUrl=https://raw.githubusercontent.com/ModFest/art/refs/heads/v2/icon/svg/1.21/transparent.svg">
 
@@ -25,14 +23,9 @@ With Snapper, you can:
 - ~~Not having to install a mod from an EXE~~
 
 ## ❓ FAQ
-* Forge? <br/>
-  No. Please do not ask us for a forge port.
 
 * Do you plan to / Could you add `X`? <br/>
   If you want to suggest something, join the [Discord](https://discord.gg/TTmx7d2axf) or make a [GitHub issue](https://github.com/SpiritGameStudios/Snapper/issues).
-
-* Can you port/backport to `X` version? <br/>
-  Probably not. Multi-version projects are hard :<
 
 * My screenshots aren't copying and my game is logging `Failed to get clipboard`. <br />
   The official Minecraft launcher doesn't have all of the necessary tools provided by a standard Java runtime. This may cause issues with copying for some users on Windows & Linux. Other launchers are not affected.
