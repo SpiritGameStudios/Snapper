@@ -188,6 +188,13 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         return showGrid ? Math.max(0, totalRows * itemHeight - this.height + 4) : super.getMaxScrollY();
     }
 
+    @Override
+    protected int getContentsHeightWithPadding() {
+        if (!this.showGrid) return super.getContentsHeightWithPadding();
+        int totalRows = (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
+        return totalRows * this.itemHeight + this.headerHeight + 4;
+    }
+
     public void toggleGrid() {
         this.showGrid = !this.showGrid;
         ((EntryListWidgetAccessor) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
@@ -396,6 +403,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             );
 
             if (icon.loaded()) {
+                //noinspection SuspiciousNameCombination
                 context.drawTexture(
                         RenderLayer::getGuiTextured,
                         this.icon.getTextureId(),
@@ -485,7 +493,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             context.drawText(
                     this.client.textRenderer,
-                    fileName,
+                    truncateFileName(fileName, entryWidth, 24),
                     x + 5,
                     y + 6,
                     0xFFFFFF,
