@@ -36,7 +36,7 @@ public class ScreenshotViewerScreen extends Screen {
     private static final Identifier MENU_DECOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_list_background.png");
     private static final Identifier INWORLD_MENU_DECOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/inworld_menu_list_background.png");
     private final MinecraftClient client = MinecraftClient.getInstance();
-    private final ScreenshotImage icon;
+    private final ScreenshotImage image;
     private final String title;
     private final int imageWidth;
     private final int imageHeight;
@@ -64,7 +64,7 @@ public class ScreenshotViewerScreen extends Screen {
             this.client.setScreen(parent);
         }
 
-        this.icon = icon;
+        this.image = icon;
         this.title = iconPath.getFileName().toString();
 
         this.imageWidth = image != null ? image.getWidth() : 0;
@@ -197,7 +197,7 @@ public class ScreenshotViewerScreen extends Screen {
 
         context.drawTexture(
                 RenderLayer::getGuiTextured,
-                this.icon.getTextureId(),
+                this.image.getTextureId(),
                 (this.width / 2) - (finalWidth / 2), this.height - 68 - finalHeight,
                 0, 0,
                 finalWidth, finalHeight,
@@ -261,10 +261,14 @@ public class ScreenshotViewerScreen extends Screen {
                 this.client.world == null ?
                         MENU_DECOR_BACKGROUND_TEXTURE :
                         INWORLD_MENU_DECOR_BACKGROUND_TEXTURE,
-                width, height - 68 - 48,
-                0, 0,
-                32, 32,
-                0, 48
+                0,
+                48,
+                0,
+                0,
+                width,
+                height - 68 - 48,
+                32,
+                32
         );
     }
 
