@@ -71,7 +71,6 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         this.loadFuture.thenAccept(entries -> {
             this.clearEntries();
-            entries.sort(Comparator.comparingLong(ScreenshotEntry::lastModified).reversed());
             entries.forEach(this::addEntry);
 
             if (entries.isEmpty()) {
