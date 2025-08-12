@@ -71,6 +71,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         this.loadFuture.thenAccept(entries -> {
             this.clearEntries();
+            entries.sort(Comparator.comparingLong(ScreenshotEntry::lastModified).reversed());
             entries.forEach(this::addEntry);
 
             if (entries.isEmpty()) {
@@ -316,7 +317,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     EMPTY_LIST_TEXT,
                     (this.client.currentScreen.width - this.client.textRenderer.getWidth(EMPTY_LIST_TEXT)) / 2,
                     y + entryHeight / 2,
-                    0xFFFFFFFF,
+                    0xFFFFFF,
                     false
             );
 
@@ -325,7 +326,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     EMPTY_CUSTOM_LIST_TEXT,
                     (this.client.currentScreen.width - this.client.textRenderer.getWidth(EMPTY_CUSTOM_LIST_TEXT)) / 2,
                     y + entryHeight / 2 + 10,
-                    0xFFFFFFFF,
+                    0xFFFFFF,
                     false
             );
         }
