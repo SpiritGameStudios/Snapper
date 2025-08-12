@@ -4,7 +4,7 @@ import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
-import dev.spiritstudios.specter.api.core.util.ClientKeybindEvents;
+import dev.spiritstudios.specter.api.core.client.event.ClientKeybindEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
@@ -61,7 +61,7 @@ public final class SnapperKeybindings {
     }
 
     private static void openRecentScreenshot(MinecraftClient client) {
-        List<Path> screenshots = ScreenshotActions.getScreenshots(client);
+        List<Path> screenshots = ScreenshotActions.getScreenshots();
         if (screenshots.isEmpty()) {
             if (client.player != null)
                 client.player.sendMessage(Text.translatable("text.snapper.screenshot_not_exists"), true);
@@ -71,11 +71,14 @@ public final class SnapperKeybindings {
         Path latestPath = screenshots.getFirst();
         ScreenshotImage.createScreenshot(client.getTextureManager(), latestPath)
                 .ifPresentOrElse(
-                        image -> client.setScreen(new ScreenshotViewerScreen(
-                                image,
-                                latestPath,
-                                client.currentScreen
-                        )),
+                        image -> {
+                            client.setScreen(new ScreenshotViewerScreen(
+                                    image,
+                                    latestPath,
+                                    client.currentScreen
+                            ));
+                            image.load();
+                        },
                         () -> {
                             if (client.player != null)
                                 client.player.sendMessage(Text.translatable("text.snapper.screenshot_open_failure"), true);

@@ -1,5 +1,6 @@
 package dev.spiritstudios.snapper.util;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
@@ -11,13 +12,16 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class ScreenshotImage implements AutoCloseable {
     private static final Identifier UNKNOWN_SERVER_ID = Identifier.ofVanilla("textures/misc/unknown_server.png");
 
     private final TextureManager textureManager;
     private final Identifier id;
-    private final NativeImageBackedTexture texture;
+    private final Path path;
+    private final NativeImage image;
+    private NativeImageBackedTexture texture;
 
     private boolean closed;
 
@@ -28,11 +32,18 @@ public class ScreenshotImage implements AutoCloseable {
         if (!Files.isRegularFile(path))
             throw new IllegalArgumentException("Passed path for invalid file to new ScreenshotImage()");
 
-        try (InputStream stream = Files.newInputStream(path)) {
-            this.texture = new NativeImageBackedTexture(NativeImage.read(stream));
-        }
+        this.path = path;
 
-        this.textureManager.registerTexture(this.id, this.texture);
+        try (InputStream stream = Files.newInputStream(path)) {
+            this.image = NativeImage.read(stream);
+        }
+    }
+
+    public CompletableFuture<Void> load() {
+        return MinecraftClient.getInstance().submit(() -> {
+            this.texture = new NativeImageBackedTexture(this.id::toString, this.image);
+            this.textureManager.registerTexture(this.id, this.texture);
+        });
     }
 
     public static Optional<ScreenshotImage> createScreenshot(TextureManager textureManager, Path path) {
@@ -90,6 +101,14 @@ public class ScreenshotImage implements AutoCloseable {
 
     public Identifier getTextureId() {
         return this.texture != null ? this.id : UNKNOWN_SERVER_ID;
+    }
+
+    public boolean loaded() {
+        return texture != null;
+    }
+
+    public Path getPath() {
+        return path;
     }
 
     public void close() {

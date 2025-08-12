@@ -35,11 +35,11 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
     private static final Identifier VIEW_SPRITE = Snapper.id("screenshots/view");
@@ -102,11 +102,23 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     public CompletableFuture<List<ScreenshotEntry>> load(MinecraftClient client) {
         return CompletableFuture.supplyAsync(() -> {
-            List<Path> screenshots = ScreenshotActions.getScreenshots(client);
-            return screenshots.parallelStream()
-                    .map(file -> new ScreenshotEntry(file, client, parent, screenshots))
-                    .collect(Collectors.toList());
-        });
+                    List<Path> screenshots = ScreenshotActions.getScreenshots();
+
+                    return screenshots.parallelStream()
+                            .flatMap(path -> ScreenshotImage.createScreenshot(client.getTextureManager(), path).stream())
+                            .peek(screenshotImage -> screenshotImage.load()
+                                    .exceptionally(throwable -> {
+                                        Snapper.LOGGER.error("An error occurred while loading the screenshot list", throwable);
+                                        return null;
+                                    }))
+                            .map(image -> new ScreenshotEntry(image, client, parent, screenshots))
+                            .sorted(Comparator.comparingLong(ScreenshotEntry::lastModified).reversed())
+                            .toList();
+                })
+                .exceptionally(throwable -> {
+                    Snapper.LOGGER.error("An error occurred while loading the screenshot list", throwable);
+                    return Collections.emptyList();
+                });
     }
 
     private void setEntrySelected(@Nullable ScreenshotEntry entry) {
@@ -175,6 +187,13 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     public int getMaxScrollY() {
         int totalRows = (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
         return showGrid ? Math.max(0, totalRows * itemHeight - this.height + 4) : super.getMaxScrollY();
+    }
+
+    @Override
+    protected int getContentsHeightWithPadding() {
+        if (!this.showGrid) return super.getContentsHeightWithPadding();
+        int totalRows = (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
+        return totalRows * this.itemHeight + this.headerHeight + 4;
     }
 
     public void toggleGrid() {
@@ -322,22 +341,19 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         private final MinecraftClient client;
         public final ScreenshotImage icon;
         public final String iconFileName;
-        public Path path;
         public final Screen screenParent;
         private long time;
         private boolean showGrid;
         private final List<Path> screenshots;
         private boolean clickthroughHovered = false;
 
-        public ScreenshotEntry(Path iconPath, MinecraftClient client, Screen parent, List<Path> screenshots) {
+        public ScreenshotEntry(ScreenshotImage icon, MinecraftClient client, Screen parent, List<Path> screenshots) {
             this.showGrid = ScreenshotListWidget.this.showGrid;
             this.client = client;
             this.screenParent = parent;
-            this.icon = ScreenshotImage.createScreenshot(this.client.getTextureManager(), iconPath)
-                    .orElse(null);
-            this.path = iconPath;
-            this.iconFileName = iconPath.getFileName().toString();
-            this.lastModified = SafeFiles.getLastModifiedTime(iconPath).orElse(FileTime.fromMillis(0L));
+            this.icon = icon;
+            this.iconFileName = icon.getPath().getFileName().toString();
+            this.lastModified = SafeFiles.getLastModifiedTime(icon.getPath()).orElse(FileTime.fromMillis(0L));
             this.screenshots = screenshots;
         }
 
@@ -360,7 +376,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             long creationTime = 0;
             try {
-                creationTime = Files.readAttributes(path, BasicFileAttributes.class).creationTime().toMillis();
+                creationTime = Files.readAttributes(icon.getPath(), BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException e) {
                 client.setScreen(new ScreenshotScreen(screenParent));
             }
@@ -387,7 +403,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     false
             );
 
-            if (this.icon != null) {
+            if (icon.loaded()) {
+                //noinspection SuspiciousNameCombination
                 context.drawTexture(
                         RenderLayer::getGuiTextured,
                         this.icon.getTextureId(),
@@ -403,7 +420,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 context.fill(x, y, x + 32, y + 32, 0xA0909090);
                 context.drawGuiTexture(
                         RenderLayer::getGuiTextured,
-                        mouseX - x < 32 && this.icon != null ?
+                        mouseX - x < 32 && this.icon.loaded() ?
                                 ScreenshotListWidget.VIEW_HIGHLIGHTED_SPRITE :
                                 ScreenshotListWidget.VIEW_SPRITE,
                         x, y,
@@ -418,7 +435,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             clickthroughHovered = SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY);
 
-            if (this.icon != null) {
+            if (this.icon.loaded()) {
                 context.drawTexture(
                         RenderLayer::getGuiTextured,
                         this.icon.getTextureId(),
@@ -447,7 +464,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             String creationString = "undefined";
             long creationTime = 0;
             try {
-                creationTime = Files.readAttributes(path, BasicFileAttributes.class).creationTime().toMillis();
+                creationTime = Files.readAttributes(icon.getPath(), BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException e) {
                 client.setScreen(new ScreenshotScreen(screenParent));
             }
@@ -467,8 +484,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             context.drawGuiTexture(
                     RenderLayer::getGuiTextured,
-                    clickthroughHovered &&
-                            this.icon != null ?
+                    clickthroughHovered && icon.loaded() ?
                             ScreenshotListWidget.VIEW_HIGHLIGHTED_SPRITE : ScreenshotListWidget.VIEW_SPRITE,
                     centreX - 16,
                     centreY - 16,
@@ -478,7 +494,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             context.drawText(
                     this.client.textRenderer,
-                    fileName,
+                    truncateFileName(fileName, entryWidth, 24),
                     x + 5,
                     y + 6,
                     0xFFFFFF,
@@ -556,7 +572,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         public boolean click() {
             if (this.icon == null) return false;
             playClickSound(this.client.getSoundManager());
-            this.client.setScreen(new ScreenshotViewerScreen(this.icon, this.path, this.screenParent, this.screenshots));
+            this.client.setScreen(new ScreenshotViewerScreen(this.icon, icon.getPath(), this.screenParent, this.screenshots));
             return true;
         }
 
