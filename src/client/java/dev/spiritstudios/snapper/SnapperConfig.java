@@ -29,7 +29,7 @@ public final class SnapperConfig extends Config<SnapperConfig> {
             .comment("Whether to show Snapper button in game menu.")
             .build();
 
-    public final Value<ScreenshotViewerScreen.ViewMode> viewMode = enumValue(ScreenshotViewerScreen.ViewMode.LIST, ScreenshotViewerScreen.ViewMode.class)
+    public final Value<ScreenshotViewerScreen.ViewMode> viewMode = enumValue(ScreenshotViewerScreen.ViewMode.GRID, ScreenshotViewerScreen.ViewMode.class)
             .comment("Whether to show screenshot menu with grid or list.")
             .build();
 

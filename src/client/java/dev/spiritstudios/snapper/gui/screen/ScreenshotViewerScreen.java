@@ -1,6 +1,5 @@
 package dev.spiritstudios.snapper.gui.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotImage;
@@ -75,6 +74,8 @@ public class ScreenshotViewerScreen extends Screen {
         this.screenshots = screenshots;
 
         this.screenshotIndex = this.screenshots != null ? this.screenshots.indexOf(this.screenshot) : -1;
+
+        icon.load();
     }
 
     public enum ViewMode {
@@ -307,7 +308,6 @@ public class ScreenshotViewerScreen extends Screen {
         };
 
         if (imagePath == null) return super.keyPressed(keyCode, scanCode, modifiers);
-
         ScreenshotImage.createScreenshot(client.getTextureManager(), imagePath)
                 .ifPresent(image -> client.setScreen(new ScreenshotViewerScreen(
                         image, imagePath,
