@@ -71,11 +71,14 @@ public final class SnapperKeybindings {
         Path latestPath = screenshots.getFirst();
         ScreenshotImage.createScreenshot(client.getTextureManager(), latestPath)
                 .ifPresentOrElse(
-                        image -> client.setScreen(new ScreenshotViewerScreen(
-                                image,
-                                latestPath,
-                                client.currentScreen
-                        )),
+                        image -> {
+                            client.setScreen(new ScreenshotViewerScreen(
+                                    image,
+                                    latestPath,
+                                    client.currentScreen
+                            ));
+                            image.load();
+                        },
                         () -> {
                             if (client.player != null)
                                 client.player.sendMessage(Text.translatable("text.snapper.screenshot_open_failure"), true);

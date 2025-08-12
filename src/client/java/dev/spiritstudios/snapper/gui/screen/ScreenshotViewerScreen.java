@@ -74,8 +74,6 @@ public class ScreenshotViewerScreen extends Screen {
         this.screenshots = screenshots;
 
         this.screenshotIndex = this.screenshots != null ? this.screenshots.indexOf(this.screenshot) : -1;
-
-        icon.load();
     }
 
     public enum ViewMode {
@@ -313,11 +311,14 @@ public class ScreenshotViewerScreen extends Screen {
 
         if (imagePath == null) return super.keyPressed(keyCode, scanCode, modifiers);
         ScreenshotImage.createScreenshot(client.getTextureManager(), imagePath)
-                .ifPresent(image -> client.setScreen(new ScreenshotViewerScreen(
-                        image, imagePath,
-                        this.parent,
-                        this.screenshots
-                )));
+                .ifPresent(image -> {
+                    client.setScreen(new ScreenshotViewerScreen(
+                            image, imagePath,
+                            this.parent,
+                            this.screenshots
+                    ));
+                    image.load();
+                });
 
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
