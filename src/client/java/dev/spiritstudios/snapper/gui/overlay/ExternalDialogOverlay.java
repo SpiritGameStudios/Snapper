@@ -46,7 +46,6 @@ public class ExternalDialogOverlay extends Overlay {
         if (InputUtil.isKeyPressed(client.getWindow().getHandle(), InputUtil.GLFW_KEY_ESCAPE)) close();
     }
 
-
     public void close() {
         this.client.setOverlay(null);
     }

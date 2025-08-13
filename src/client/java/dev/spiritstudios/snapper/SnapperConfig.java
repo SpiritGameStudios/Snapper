@@ -1,6 +1,6 @@
 package dev.spiritstudios.snapper;
 
-import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
@@ -29,7 +29,7 @@ public final class SnapperConfig extends Config<SnapperConfig> {
             .comment("Whether to show Snapper button in game menu.")
             .build();
 
-    public final Value<ScreenshotViewerScreen.ViewMode> viewMode = enumValue(ScreenshotViewerScreen.ViewMode.GRID, ScreenshotViewerScreen.ViewMode.class)
+    public final Value<ScreenshotScreen.ViewMode> viewMode = enumValue(ScreenshotScreen.ViewMode.GRID, ScreenshotScreen.ViewMode.class)
             .comment("Whether to show screenshot menu with grid or list.")
             .build();
 
@@ -41,7 +41,7 @@ public final class SnapperConfig extends Config<SnapperConfig> {
             .comment("Whether to use a custom screenshot folder instead of Minecraft's default")
             .build();
 
-    public final Value<Path> customScreenshotFolder = value(Path.of(SnapperUtil.getOSUnifiedFolder().toString()), DirectoryConfigUtil.PATH_CODEC)
+    public final Value<Path> customScreenshotFolder = value(SnapperUtil.UNIFIED_FOLDER, DirectoryConfigUtil.PATH_CODEC)
             .comment("What folder to use if custom screenshot folders are enabled.")
             .build();
 }

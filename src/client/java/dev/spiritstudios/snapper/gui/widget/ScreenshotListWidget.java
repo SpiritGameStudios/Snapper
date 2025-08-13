@@ -7,7 +7,7 @@ import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.mixin.accessor.EntryListWidgetAccessor;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
-import dev.spiritstudios.snapper.util.ScreenshotImage;
+import dev.spiritstudios.snapper.util.DynamicTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.specter.api.core.exception.UnreachableException;
 import net.minecraft.client.MinecraftClient;
@@ -51,6 +51,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     public final CompletableFuture<List<ScreenshotEntry>> loadFuture;
 
+	public static final int GRID_ENTRY_WIDTH = 144;
+
     private final int gridItemHeight = 81;
     private final int listItemHeight = 36;
     private boolean showGrid = false;
@@ -78,7 +80,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             }
         });
 
-        this.showGrid = SnapperConfig.INSTANCE.viewMode.get().equals(ScreenshotViewerScreen.ViewMode.GRID);
+        this.showGrid = SnapperConfig.INSTANCE.viewMode.get().equals(ScreenshotScreen.ViewMode.GRID);
 
         ((EntryListWidgetAccessor) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
     }
@@ -104,7 +106,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     List<Path> screenshots = ScreenshotActions.getScreenshots();
 
                     return screenshots.parallelStream()
-                            .flatMap(path -> ScreenshotImage.createScreenshot(client.getTextureManager(), path).stream())
+                            .flatMap(path -> DynamicTexture.createScreenshot(client.getTextureManager(), path).stream())
                             .peek(screenshotImage -> screenshotImage.load()
                                     .exceptionally(throwable -> {
                                         Snapper.LOGGER.error("An error occurred while loading the screenshot list", throwable);
@@ -122,8 +124,9 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     private void setEntrySelected(@Nullable ScreenshotEntry entry) {
         super.setSelected(entry);
-        if (this.parent instanceof ScreenshotScreen screenshotScreen)
-            screenshotScreen.imageSelected(entry);
+        if (this.parent instanceof ScreenshotScreen screenshotScreen) {
+			screenshotScreen.imageSelected(entry);
+		}
     }
 
     private int getColumnCount() {
@@ -143,7 +146,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     @Override
     public int getRowWidth() {
-        return showGrid ? 144 * getColumnCount() + 4 * (getColumnCount() - 1) : 220;
+        return showGrid ? GRID_ENTRY_WIDTH * getColumnCount() + 4 * (getColumnCount() - 1) : 220;
     }
 
     @Override
@@ -152,10 +155,9 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             int rowLeft = this.getRowLeft();
             int rowWidth = this.getRowWidth();
             int entryHeight = this.itemHeight - 4;
-            int gridItemWidth = 144;
-            int entryWidth = showGrid ? gridItemWidth : rowWidth;
+            int entryWidth = GRID_ENTRY_WIDTH;
             int entryCount = this.getEntryCount();
-            int spacing = showGrid ? (rowWidth - (getColumnCount() * entryWidth)) / (getColumnCount() - 1) : 0;
+            int spacing = (rowWidth - (getColumnCount() * entryWidth)) / (getColumnCount() - 1);
 
             for (int index = 0; index < entryCount; index++) {
                 int rowTop = this.getRowTop(index);
@@ -200,7 +202,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         ((EntryListWidgetAccessor) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
         for (var entry : this.children()) if (entry instanceof ScreenshotEntry sc) sc.setShowGrid(this.showGrid);
 
-        SnapperConfig.INSTANCE.viewMode.set(this.showGrid ? ScreenshotViewerScreen.ViewMode.GRID : ScreenshotViewerScreen.ViewMode.LIST);
+        SnapperConfig.INSTANCE.viewMode.set(this.showGrid ? ScreenshotScreen.ViewMode.GRID : ScreenshotScreen.ViewMode.LIST);
     }
 
     @Override
@@ -338,7 +340,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         public final FileTime lastModified;
         private final MinecraftClient client;
-        public final ScreenshotImage icon;
+        public final DynamicTexture icon;
         public final String iconFileName;
         public final Screen screenParent;
         private long time;
@@ -346,7 +348,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         private final List<Path> screenshots;
         private boolean clickthroughHovered = false;
 
-        public ScreenshotEntry(ScreenshotImage icon, MinecraftClient client, Screen parent, List<Path> screenshots) {
+        public ScreenshotEntry(DynamicTexture icon, MinecraftClient client, Screen parent, List<Path> screenshots) {
             this.showGrid = ScreenshotListWidget.this.showGrid;
             this.client = client;
             this.screenParent = parent;

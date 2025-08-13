@@ -1,5 +1,6 @@
 package dev.spiritstudios.snapper.util;
 
+import dev.spiritstudios.snapper.Snapper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -14,23 +15,19 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-public class ScreenshotImage implements AutoCloseable {
-    private static final Identifier UNKNOWN_SERVER_ID = Identifier.ofVanilla("textures/misc/unknown_server.png");
+public class DynamicTexture implements AutoCloseable {
+    private static final Identifier UNKNOWN_SERVER = Identifier.ofVanilla("textures/misc/unknown_server.png");
 
     private final TextureManager textureManager;
     private final Identifier id;
     private final Path path;
+
     private final NativeImage image;
     private NativeImageBackedTexture texture;
 
-    private boolean closed;
-
-    private ScreenshotImage(TextureManager textureManager, Identifier id, Path path) throws IOException {
+    private DynamicTexture(TextureManager textureManager, Identifier id, Path path) throws IOException {
         this.textureManager = textureManager;
         this.id = id;
-
-        if (!Files.isRegularFile(path))
-            throw new IllegalArgumentException("Passed path for invalid file to new ScreenshotImage()");
 
         this.path = path;
 
@@ -46,13 +43,13 @@ public class ScreenshotImage implements AutoCloseable {
         });
     }
 
-    public static Optional<ScreenshotImage> createScreenshot(TextureManager textureManager, Path path) {
+    public static Optional<DynamicTexture> createScreenshot(TextureManager textureManager, Path path) {
         try {
-            return Optional.of(new ScreenshotImage(
+            return Optional.of(new DynamicTexture(
                     textureManager,
-                    Identifier.ofVanilla(
-                            "screenshots/" + Util.replaceInvalidChars(path.getFileName().toString(), Identifier::isPathCharacterValid) + "/icon"
-                    ),
+					Snapper.id(
+							"screenshots/" + Util.replaceInvalidChars(path.getFileName().toString(), Identifier::isPathCharacterValid) + "/icon"
+					),
                     path
             ));
         } catch (IOException e) {
@@ -60,11 +57,11 @@ public class ScreenshotImage implements AutoCloseable {
         }
     }
 
-    public static Optional<ScreenshotImage> createPanoramaFace(TextureManager textureManager, Path path) {
+    public static Optional<DynamicTexture> createPanoramaFace(TextureManager textureManager, Path path) {
         try {
-            return Optional.of(new ScreenshotImage(
+            return Optional.of(new DynamicTexture(
                     textureManager,
-                    Identifier.ofVanilla(
+					Snapper.id(
                             "screenshots/panorama/" + Util.replaceInvalidChars(path.getFileName().toString(), Identifier::isPathCharacterValid)
                     ),
                     path
@@ -78,29 +75,24 @@ public class ScreenshotImage implements AutoCloseable {
      * Must be called on render thread
      */
     public void enableFiltering() {
-        this.assertOpen();
-        this.texture.setFilter(true, false);
+        this.texture.setFilter(true, true);
     }
 
     public void destroy() {
-        this.assertOpen();
-
         this.textureManager.destroyTexture(this.id);
         this.texture.close();
     }
 
     public int getWidth() {
-        this.assertOpen();
         return this.texture != null && this.texture.getImage() != null ? this.texture.getImage().getWidth() : 64;
     }
 
     public int getHeight() {
-        this.assertOpen();
         return this.texture != null && this.texture.getImage() != null ? this.texture.getImage().getHeight() : 64;
     }
 
     public Identifier getTextureId() {
-        return this.texture != null ? this.id : UNKNOWN_SERVER_ID;
+        return this.texture != null ? this.id : UNKNOWN_SERVER;
     }
 
     public boolean loaded() {
@@ -113,10 +105,5 @@ public class ScreenshotImage implements AutoCloseable {
 
     public void close() {
         this.destroy();
-        this.closed = true;
-    }
-
-    private void assertOpen() {
-        if (this.closed) throw new IllegalStateException("Icon already closed");
     }
 }

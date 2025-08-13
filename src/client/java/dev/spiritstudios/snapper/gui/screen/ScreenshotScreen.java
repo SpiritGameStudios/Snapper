@@ -25,16 +25,20 @@ import org.lwjgl.glfw.GLFW;
 
 import java.nio.file.Path;
 
-import static dev.spiritstudios.snapper.Snapper.MODID;
-
 public class ScreenshotScreen extends Screen {
-    private static final Identifier PANORAMA_BUTTON_ICON = Identifier.of(MODID, "screenshots/panorama");
-    private static final Identifier PANORAMA_BUTTON_DISABLED_ICON = Identifier.of(MODID, "screenshots/panorama_disabled");
+    private static final Identifier PANORAMA_BUTTON_ICON = Snapper.id("screenshots/panorama");
+    private static final Identifier PANORAMA_BUTTON_DISABLED_ICON = Snapper.id("screenshots/panorama_disabled");
 
-    private static final Identifier SETTINGS_ICON = Identifier.of(MODID, "screenshots/settings");
-    private static Identifier VIEW_MODE_ICON;
+    private static final Identifier SETTINGS_ICON = Snapper.id("screenshots/settings");
+
+	private static final Identifier VIEW_MODE_ICON_LIST = Snapper.id("screenshots/show_list");
+
+	private static final Identifier VIEW_MODE_ICON_GRID = Snapper.id("screenshots/show_grid");
+
     private final Screen parent;
-    ScreenshotListWidget screenshotList;
+	private final boolean isOffline;
+
+	private ScreenshotListWidget screenshotList;
     private ButtonWidget deleteButton;
     private ButtonWidget renameButton;
     private ButtonWidget viewButton;
@@ -42,17 +46,15 @@ public class ScreenshotScreen extends Screen {
     private ButtonWidget openButton;
     private ButtonWidget uploadButton;
     private TextIconButtonWidget viewModeButton;
-    private ScreenshotListWidget.@Nullable ScreenshotEntry selectedScreenshot = null;
+    private @Nullable ScreenshotListWidget.ScreenshotEntry selectedScreenshot = null;
     private boolean showGrid;
-    private final boolean isOffline;
 
     public ScreenshotScreen(Screen parent) {
         super(Text.translatable("menu.snapper.screenshot_menu"));
         this.parent = parent;
 
-        this.showGrid = SnapperConfig.INSTANCE.viewMode.get().equals(ScreenshotViewerScreen.ViewMode.GRID);
+        this.showGrid = SnapperConfig.INSTANCE.viewMode.get().equals(ViewMode.GRID);
         this.isOffline = SnapperUtil.isOfflineAccount();
-        VIEW_MODE_ICON = showGrid ? Identifier.of(MODID, "screenshots/show_list") : Identifier.of(MODID, "screenshots/show_grid");
     }
 
     @Override
@@ -79,8 +81,9 @@ public class ScreenshotScreen extends Screen {
         this.openButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.open"),
                 button -> {
-                    if (selectedScreenshot != null)
-                        Util.getOperatingSystem().open(selectedScreenshot.icon.getPath());
+                    if (selectedScreenshot != null) {
+						Util.getOperatingSystem().open(selectedScreenshot.icon.getPath());
+					}
                 }
         ).width(secondRowButtonWidth).build());
 
@@ -94,36 +97,40 @@ public class ScreenshotScreen extends Screen {
         this.deleteButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.delete"),
                 button -> {
-                    if (selectedScreenshot != null)
-                        ScreenshotActions.deleteScreenshot(selectedScreenshot.icon.getPath(), this);
+                    if (selectedScreenshot != null) {
+						ScreenshotActions.deleteScreenshot(selectedScreenshot.icon.getPath(), this);
+					}
                 }
         ).width(firstRowButtonWidth).build());
 
         this.renameButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.rename"),
                 button -> {
-                    if (this.selectedScreenshot != null)
-                        client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.icon.getPath(), this));
+                    if (this.selectedScreenshot != null) {
+						client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.icon.getPath(), this));
+					}
                 }
         ).width(firstRowButtonWidth).build());
 
         this.copyButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.copy"),
                 button -> {
-                    if (selectedScreenshot != null)
-                        Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.icon.getPath());
+                    if (selectedScreenshot != null) {
+						Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.icon.getPath());
+					}
                 }
         ).width(firstRowButtonWidth).build());
 
         this.viewButton = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.view"),
                 button -> {
-                    if (selectedScreenshot != null)
-                        this.client.setScreen(new ScreenshotViewerScreen(
-                                selectedScreenshot.icon,
-                                selectedScreenshot.icon.getPath(),
-                                selectedScreenshot.screenParent
-                        ));
+                    if (selectedScreenshot != null) {
+						this.client.setScreen(new ScreenshotViewerScreen(
+								selectedScreenshot.icon,
+								selectedScreenshot.icon.getPath(),
+								selectedScreenshot.screenParent
+						));
+					}
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -139,7 +146,8 @@ public class ScreenshotScreen extends Screen {
             this.uploadButton.setTooltip(Tooltip.of(Text.translatable("button.snapper.upload.tooltip")));
         }
 
-        DirectionalLayoutWidget verticalButtonLayout = DirectionalLayoutWidget.vertical().spacing(4);
+        DirectionalLayoutWidget verticalButtonLayout = DirectionalLayoutWidget.vertical()
+				.spacing(4);
 
         AxisGridWidget firstRowWidget = verticalButtonLayout.add(new AxisGridWidget(
                 308,
@@ -180,7 +188,7 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("config.snapper.snapper.viewMode"),
                 button -> this.toggleGrid(),
                 true
-        ).width(20).texture(VIEW_MODE_ICON, 15, 15).build());
+        ).width(20).texture(showGrid ? VIEW_MODE_ICON_LIST : VIEW_MODE_ICON_GRID, 15, 15).build());
 
         viewModeButton.setPosition(width / 2 - 178, height - 56);
 
@@ -219,14 +227,13 @@ public class ScreenshotScreen extends Screen {
         screenshotList.toggleGrid();
         screenshotList.refreshScroll();
         this.showGrid = !this.showGrid;
-        VIEW_MODE_ICON = showGrid ? Identifier.of(MODID, "screenshots/show_list") : Identifier.of(MODID, "screenshots/show_grid");
 
         remove(this.viewModeButton);
         this.viewModeButton = addDrawableChild(TextIconButtonWidget.builder(
                 Text.translatable("config.snapper.snapper.viewMode"),
                 button -> this.toggleGrid(),
                 true
-        ).width(20).texture(VIEW_MODE_ICON, 15, 15).build());
+        ).width(20).texture(showGrid ? VIEW_MODE_ICON_LIST : VIEW_MODE_ICON_GRID, 15, 15).build());
         viewModeButton.setPosition(width / 2 - 178, height - 56);
     }
 
@@ -236,7 +243,6 @@ public class ScreenshotScreen extends Screen {
         if (client == null) return false;
 
         if (keyCode == GLFW.GLFW_KEY_F5) {
-
             client.setScreen(new ScreenshotScreen(this.parent));
             return true;
         }
@@ -250,7 +256,8 @@ public class ScreenshotScreen extends Screen {
 
         if (keyCode == GLFW.GLFW_KEY_ENTER) {
             client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.icon.getPath(), this));
-        }
+			return true;
+		}
 
         return false;
     }
@@ -266,4 +273,9 @@ public class ScreenshotScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xffffff);
     }
+
+	public enum ViewMode {
+		LIST,
+		GRID
+	}
 }
