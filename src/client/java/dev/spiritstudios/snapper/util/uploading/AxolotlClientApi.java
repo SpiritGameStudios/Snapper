@@ -11,6 +11,7 @@ import net.minecraft.client.session.Session;
 import net.minecraft.util.Util;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class AxolotlClientApi implements Closeable {
             .build();
 
     private Instant authTime = Instant.EPOCH;
-    private AxolotlAuthentication auth;
+    private @Nullable AxolotlAuthentication auth;
 
     public CompletableFuture<String> uploadImage(Path image) {
         byte[] bytes;

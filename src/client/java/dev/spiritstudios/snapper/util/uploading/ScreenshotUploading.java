@@ -20,10 +20,12 @@ public class ScreenshotUploading {
 
 	private static final AxolotlClientApi API = new AxolotlClientApi();
 
+	public static final SystemToast.Type SCREENSHOT_UPLOAD_TOAST = new SystemToast.Type();
+
 	public static void toast(String title, String description, Object... args) {
 		MinecraftClient.getInstance().getToastManager().add(
 				SystemToast.create(MinecraftClient.getInstance(),
-						SystemToast.Type.WORLD_BACKUP,
+						SCREENSHOT_UPLOAD_TOAST,
 						Text.translatable(title, args),
 						Text.translatable(description, args)));
 	}
