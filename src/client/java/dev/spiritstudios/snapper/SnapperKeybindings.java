@@ -1,70 +1,81 @@
 package dev.spiritstudios.snapper;
 
+import dev.deftu.omnicore.client.OmniChat;
+import dev.deftu.omnicore.client.OmniScreen;
+import dev.deftu.omnicore.client.keybindings.ManagedKeyBinding;
+import dev.deftu.omnicore.client.keybindings.OmniKeyBinding;
+import dev.deftu.omnicore.common.OmniLoader;
+import dev.deftu.textile.minecraft.MCTextHolder;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.DynamicTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
-import dev.spiritstudios.specter.api.core.client.event.ClientKeybindEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
+import org.polyfrost.oneconfig.api.event.v1.EventManager;
+import org.polyfrost.oneconfig.api.event.v1.events.KeyInputEvent;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 public final class SnapperKeybindings {
-    public static final KeyBinding PANORAMA_KEY = new KeyBinding(
+    public static final ManagedKeyBinding PANORAMA_KEY = OmniKeyBinding.create(
             "key.snapper.panorama",
-            GLFW.GLFW_KEY_F8,
-            "key.categories.snapper"
+            "key.categories.snapper",
+            GLFW.GLFW_KEY_F8
     );
 
-    public static final KeyBinding RECENT_SCREENSHOT_KEY = new KeyBinding(
+    public static final ManagedKeyBinding RECENT_SCREENSHOT_KEY = OmniKeyBinding.create(
             "key.snapper.recent",
-            GLFW.GLFW_KEY_O,
-            "key.categories.snapper"
+            "key.categories.snapper",
+            GLFW.GLFW_KEY_O
     );
 
-    public static final KeyBinding SCREENSHOT_MENU_KEY = new KeyBinding(
+    public static final ManagedKeyBinding SCREENSHOT_MENU_KEY = OmniKeyBinding.create(
             "key.snapper.screenshot_menu",
-            GLFW.GLFW_KEY_V,
-            "key.categories.snapper"
+            "key.categories.snapper",
+            GLFW.GLFW_KEY_V
     );
 
     public static void init() {
-        KeyBindingHelper.registerKeyBinding(PANORAMA_KEY);
-        KeyBindingHelper.registerKeyBinding(RECENT_SCREENSHOT_KEY);
-        KeyBindingHelper.registerKeyBinding(SCREENSHOT_MENU_KEY);
-
-        ClientKeybindEvents.pressed(SCREENSHOT_MENU_KEY).register(client ->
-                client.setScreen(new ScreenshotScreen(client.currentScreen)));
-
-        ClientKeybindEvents.pressed(PANORAMA_KEY).register(SnapperKeybindings::takePanorama);
-        ClientKeybindEvents.pressed(RECENT_SCREENSHOT_KEY).register(SnapperKeybindings::openRecentScreenshot);
+        SCREENSHOT_MENU_KEY.register();
+        PANORAMA_KEY.register();
+        RECENT_SCREENSHOT_KEY.register();
+        EventManager.register(KeyInputEvent.class, (event) -> { //todo replace with omnicore keybind methods once that gets pushed to oneconfig
+            if (SCREENSHOT_MENU_KEY.consume()) {
+                OmniScreen.setCurrentScreen(new ScreenshotScreen(OmniScreen.getCurrentScreen()));
+            }
+            if (PANORAMA_KEY.consume()) {
+                takePanorama(MinecraftClient.getInstance());
+            }
+            if (RECENT_SCREENSHOT_KEY.consume()) {
+                openRecentScreenshot(MinecraftClient.getInstance());
+            }
+        });
     }
 
     private static void takePanorama(MinecraftClient client) {
         if (client.player == null) return;
 
-        if (Snapper.IS_IRIS_INSTALLED) {
-            client.player.sendMessage(Text.translatable("text.snapper.panorama_failure_iris"), true);
+        if (Snapper.IS_IRIS_INSTALLED.orElseGet(() -> { Snapper.IS_IRIS_INSTALLED = Optional.of(OmniLoader.isModLoaded("iris")); return Snapper.IS_IRIS_INSTALLED.get(); })) { // TODO migrate all usages of "displayClientMessage" to use action bar/overlay
+            OmniChat.displayClientMessage(MCTextHolder.convertFromVanilla(Text.translatable("text.snapper.panorama_failure_iris")));
             return;
         }
 
         client.takePanorama(client.runDirectory, 1024, 1024);
-        client.player.sendMessage(Text.translatable(
+        OmniChat.displayClientMessage(MCTextHolder.convertFromVanilla(Text.translatable(
                 "text.snapper.panorama_success",
-                SCREENSHOT_MENU_KEY.getBoundKeyLocalizedText()
-        ), true);
+                SCREENSHOT_MENU_KEY.getVanillaKeyBinding().getBoundKeyLocalizedText()
+        )));
     }
 
     private static void openRecentScreenshot(MinecraftClient client) {
         List<Path> screenshots = ScreenshotActions.getScreenshots();
         if (screenshots.isEmpty()) {
             if (client.player != null)
-                client.player.sendMessage(Text.translatable("text.snapper.screenshot_not_exists"), true);
+                OmniChat.displayClientMessage(MCTextHolder.convertFromVanilla(Text.translatable("text.snapper.screenshot_not_exists")));
             return;
         }
 

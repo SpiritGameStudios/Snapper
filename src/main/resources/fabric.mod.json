@@ -19,10 +19,9 @@
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"dev.spiritstudios.snapper.Snapper"
+			"dev.spiritstudios.snapper.SnapperEntrypoint"
 		]
 	},
-	"accessWidener": "snapper.accesswidener",
 	"mixins": [
 		"mixins.snapper.json"
 	],

@@ -40,7 +40,7 @@ public abstract class ScreenshotRecorderMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Text;literal(Ljava/lang/String;)Lnet/minecraft/text/MutableText;", shift = At.Shift.AFTER)
     )
     private static void saveWrittenFileToClipboard(NativeImage nativeImage, File screenshotFile, Consumer<Text> messageReceiver, CallbackInfo ci) {
-        if (!screenshotFile.getAbsolutePath().contains("/panorama/") && SnapperConfig.INSTANCE.copyTakenScreenshot.get()) {
+        if (!screenshotFile.getAbsolutePath().contains("/panorama/") && SnapperConfig.copyTakenScreenshot) {
             Snapper.getPlatformHelper().copyScreenshot(screenshotFile.toPath());
         }
     }
@@ -48,8 +48,8 @@ public abstract class ScreenshotRecorderMixin {
     @WrapMethod(method = "saveScreenshot(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;Ljava/util/function/Consumer;)V")
     private static void getConfiguredGameDirectory(File gameDirectory, @Nullable String fileName, Framebuffer framebuffer, Consumer<Text> messageReceiver, Operation<Void> original) {
         original.call(
-                SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() && Files.exists(SnapperConfig.INSTANCE.customScreenshotFolder.get()) ?
-                        SnapperConfig.INSTANCE.customScreenshotFolder.get().toFile() :
+                SnapperConfig.useCustomScreenshotFolder && Files.exists(SnapperConfig.customScreenshotFolder) ?
+                        SnapperConfig.customScreenshotFolder.toFile() :
                         gameDirectory,
                 fileName,
                 framebuffer,

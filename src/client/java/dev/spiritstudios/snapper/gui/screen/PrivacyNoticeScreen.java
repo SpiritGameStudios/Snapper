@@ -92,15 +92,15 @@ public class PrivacyNoticeScreen extends Screen {
 
         addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.accept"), buttonWidget -> {
             client.setScreen(parent);
-            SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.ACCEPTED);
-            SnapperConfig.HOLDER.save();
+            SnapperConfig.termsAccepted = AxolotlClientApi.TermsAcceptance.ACCEPTED;
+            SnapperConfig.INSTANCE.save();
             accepted.accept(true);
         }).dimensions(width / 2 - (buttonWidth / 2), y, buttonWidth, 20).build());
 
         addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.deny"), buttonWidget -> {
             client.setScreen(parent);
-            SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.DENIED);
-            SnapperConfig.HOLDER.save();
+            SnapperConfig.termsAccepted = AxolotlClientApi.TermsAcceptance.DENIED;
+            SnapperConfig.INSTANCE.save();
             accepted.accept(false);
         }).dimensions(width / 2 - (buttonWidth / 2) + buttonWidth + 5, y, buttonWidth, 20).build());
     }

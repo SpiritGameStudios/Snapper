@@ -23,11 +23,11 @@ public abstract class KeyboardMixin {
     @Overwrite
     private void method_1464(Text text) {
         this.client.inGameHud.setOverlayMessage(Text.translatable(
-                SnapperConfig.INSTANCE.copyTakenScreenshot.get() ?
+                SnapperConfig.copyTakenScreenshot ?
                         "text.snapper.screenshot_instructions_copy" :
                         "text.snapper.screenshot_instructions",
                 text,
-                SnapperKeybindings.RECENT_SCREENSHOT_KEY.getBoundKeyLocalizedText()
+                SnapperKeybindings.RECENT_SCREENSHOT_KEY.getVanillaKeyBinding().getBoundKeyLocalizedText()
         ), false);
     }
 }

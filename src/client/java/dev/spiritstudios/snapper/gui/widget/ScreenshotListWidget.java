@@ -5,11 +5,7 @@ import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.mixin.accessor.EntryListWidgetAccessor;
-import dev.spiritstudios.snapper.util.SafeFiles;
-import dev.spiritstudios.snapper.util.ScreenshotActions;
-import dev.spiritstudios.snapper.util.DynamicTexture;
-import dev.spiritstudios.snapper.util.SnapperUtil;
-import dev.spiritstudios.specter.api.core.exception.UnreachableException;
+import dev.spiritstudios.snapper.util.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.navigation.NavigationDirection;
@@ -23,7 +19,6 @@ import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -41,7 +36,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
-public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
+public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> implements GridListAbstraction {
     private static final Identifier VIEW_SPRITE = Snapper.id("screenshots/view");
     private static final Identifier VIEW_HIGHLIGHTED_SPRITE = Snapper.id("screenshots/view_highlighted");
 
@@ -80,7 +75,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             }
         });
 
-        this.showGrid = SnapperConfig.INSTANCE.viewMode.get().equals(ScreenshotScreen.ViewMode.GRID);
+        this.showGrid = SnapperConfig.viewMode.equals(ScreenshotScreen.ViewMode.GRID);
 
         ((EntryListWidgetAccessor) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
     }
@@ -129,7 +124,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 		}
     }
 
-    private int getColumnCount() {
+    @Override
+    public int getColumnCount() {
         if (client.currentScreen != null) {
             int width = client.currentScreen.width;
 
@@ -202,24 +198,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         ((EntryListWidgetAccessor) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
         for (var entry : this.children()) if (entry instanceof ScreenshotEntry sc) sc.setShowGrid(this.showGrid);
 
-        SnapperConfig.INSTANCE.viewMode.set(this.showGrid ? ScreenshotScreen.ViewMode.GRID : ScreenshotScreen.ViewMode.LIST);
+        SnapperConfig.viewMode = (this.showGrid ? ScreenshotScreen.ViewMode.GRID : ScreenshotScreen.ViewMode.LIST);
     }
 
     @Override
-    protected @Nullable Entry getEntryAtPosition(double x, double y) {
-        if (!showGrid) return super.getEntryAtPosition(x, y);
-
-        int rowWidth = this.getRowWidth();
-        int relX = MathHelper.floor(x - this.getRowLeft());
-        int relY = MathHelper.floor(y - (double) this.getY()) - this.headerHeight;
-
-        if (relX < 0 || relX > rowWidth || relY < 0 || relY > getBottom()) return null;
-
-        int rowIndex = (relY + (int) this.getScrollY()) / this.itemHeight;
-        int colIndex = MathHelper.floor(((float) relX / (float) rowWidth) * (float) getColumnCount());
-        int entryIndex = rowIndex * getColumnCount() + colIndex;
-
-        return entryIndex >= 0 && entryIndex < getEntryCount() ? getEntry(entryIndex) : null;
+    public boolean showGrid() {
+        return showGrid;
     }
 
     public abstract static class Entry extends AlwaysSelectedEntryListWidget.Entry<Entry> implements AutoCloseable {

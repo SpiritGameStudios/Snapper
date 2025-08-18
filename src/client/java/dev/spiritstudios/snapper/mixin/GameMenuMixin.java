@@ -28,7 +28,7 @@ public abstract class GameMenuMixin extends Screen {
             at = @At("TAIL")
     )
     protected void initWidgets(CallbackInfo ci) {
-        if (SnapperConfig.INSTANCE.showSnapperGameMenu.get()) {
+        if (SnapperConfig.showSnapperGameMenu) {
             this.addDrawableChild(
                     TextIconButtonWidget.builder(
                             Text.translatable("button.snapper.screenshots"),

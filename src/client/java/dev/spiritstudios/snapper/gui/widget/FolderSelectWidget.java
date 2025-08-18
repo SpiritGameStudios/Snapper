@@ -2,11 +2,9 @@ package dev.spiritstudios.snapper.gui.widget;
 
 import dev.spiritstudios.snapper.gui.overlay.ExternalDialogOverlay;
 import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
-import dev.spiritstudios.specter.api.config.Value;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ParentElement;
-import net.minecraft.client.gui.screen.Overlay;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
@@ -15,19 +13,16 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
+import org.polyfrost.oneconfig.api.config.v1.Property;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import static dev.spiritstudios.snapper.Snapper.LOGGER;
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
 public class FolderSelectWidget extends ContainerWidget implements ParentElement {
-    private final Value<Path> value;
     private static final Identifier FOLDER_ICON = Identifier.of(MODID, "screenshots/folder");
     private static final Identifier RESET_ICON = Identifier.of(MODID, "screenshots/reset");
 
@@ -35,6 +30,8 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
     private final TextIconButtonWidget folderSelectButton;
     private final TextIconButtonWidget resetFolderButton;
     private final MinecraftClient client = MinecraftClient.getInstance();
+
+    private final Property<Path> value;
 
     /*
         Because of the visual bar at the top of config screens, this offset needs to exist for the mouse to notice the elements.
@@ -44,7 +41,7 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
     */
     private static final int WEIRD_FIX_OFFSET = 40;
 
-    public FolderSelectWidget(int x, int y, int width, int height, Value<Path> value, String placeholderKey) {
+    public FolderSelectWidget(int x, int y, int width, int height, Property<Path> value, String placeholderKey) {
         super(x, y, width, height, ScreenTexts.EMPTY);
         this.value = value;
         this.active = false;
@@ -81,7 +78,7 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
         this.resetFolderButton = TextIconButtonWidget.builder(
                 Text.translatable("config.snapper.snapper.customScreenshotFolder.reset"),
                 button -> {
-                    value.reset();
+                    //value.reset(); //todo
                     textField.setText(value.get().toString());
                 },
                 true

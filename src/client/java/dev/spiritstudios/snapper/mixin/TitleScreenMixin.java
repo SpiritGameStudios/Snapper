@@ -30,7 +30,7 @@ public abstract class TitleScreenMixin extends Screen {
             at = @At("HEAD")
     )
     protected void init(CallbackInfo ci) {
-        if (SnapperConfig.INSTANCE.showSnapperTitleScreen.get()) {
+        if (SnapperConfig.showSnapperTitleScreen) {
 			Objects.requireNonNull(client);
 
 			int y = this.height / 4 + 48;

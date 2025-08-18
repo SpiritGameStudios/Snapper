@@ -4,6 +4,7 @@
   "compatibilityLevel": "${java_version}",
   "client": [
     "CameraMixin",
+    "EntryListWidgetMixin",
     "GameMenuMixin",
     "KeyboardMixin",
     "MinecraftClientMixin",

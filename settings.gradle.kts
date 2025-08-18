@@ -49,6 +49,7 @@ rootProject.buildFileName = "root.gradle.kts"
 // The format is: version-modloader (f.ex: 1.8.9-forge, 1.17.1-fabric, etc)
 // **REMEMBER TO ALSO UPDATE THE `root.gradle.kts` FILE WITH THE NEW VERSION(S).
 listOf(
+	"1.21.5-neoforge",
 	"1.21.5-fabric"
 ).forEach { version ->
 	include(":$version")

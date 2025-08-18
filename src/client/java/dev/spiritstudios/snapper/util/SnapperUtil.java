@@ -22,8 +22,8 @@ public final class SnapperUtil {
 	}
 
 	public static Path getConfiguredScreenshotDirectory() {
-		if (SnapperConfig.INSTANCE.useCustomScreenshotFolder.get()) {
-			Path customPath = SnapperConfig.INSTANCE.customScreenshotFolder.get().resolve("screenshots");
+		if (SnapperConfig.useCustomScreenshotFolder) {
+			Path customPath = SnapperConfig.customScreenshotFolder.resolve("screenshots");
 
 			if (!SafeFiles.createDirectories(customPath)) {
 				Snapper.LOGGER.error("Failed to create directories of configured custom screenshot folder");

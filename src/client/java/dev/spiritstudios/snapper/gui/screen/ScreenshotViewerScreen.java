@@ -1,11 +1,11 @@
 package dev.spiritstudios.snapper.gui.screen;
 
+import dev.deftu.omnicore.common.OmniLoader;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.DynamicTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -209,7 +209,7 @@ public class ScreenshotViewerScreen extends Screen {
             );
         }
 
-        if (FabricLoader.getInstance().isDevelopmentEnvironment()) renderDebugInfo(context);
+        if (OmniLoader.isDevelopment()) renderDebugInfo(context);
     }
 
     private void renderDebugInfo(DrawContext context) {

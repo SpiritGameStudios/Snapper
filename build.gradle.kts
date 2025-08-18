@@ -53,7 +53,7 @@ toolkitLoomHelper {
 val mod_id = property("mod.id").toString()
 
 loom {
-	if (mcData.version >= MinecraftVersions.VERSION_1_19) {
+	if (mcData.version >= MinecraftVersions.VERSION_1_19 && mcData.isFabric) {
 		splitEnvironmentSourceSets()
 
 		mods.create(mod_id) {
@@ -61,18 +61,17 @@ loom {
 			sourceSet(sourceSets["client"])
 		}
 	}
-
-	accessWidenerPath = rootProject.file("src/main/resources/snapper.accesswidener")
 }
 
-if (mcData.version < MinecraftVersions.VERSION_1_19) {
+if (mcData.version < MinecraftVersions.VERSION_1_19 || mcData.isForgeLike) {
 	sourceSets {
 		main {
+			val thisProject = if (mcData.version == MinecraftVersions.VERSION_1_21_5 && mcData.isFabric) rootProject else project
 			java {
-				srcDirs(rootProject.file("src/client/java"), rootProject.file("src/main/java"))
+				srcDirs(thisProject.file("src/client/java"), thisProject.file("src/main/java"))
 			}
 			resources {
-				srcDirs(rootProject.file("src/client/resources"), rootProject.file("src/main/resources"))
+				srcDirs(thisProject.file("src/client/resources"), thisProject.file("src/main/resources"))
 			}
 		}
 	}
@@ -129,26 +128,14 @@ dependencies {
 
 	//TODO remove the above once https://github.com/Deftu/Gradle-Toolkit/pull/24 is merged
 
-
-	// Add (Legacy) Fabric API as dependencies (these are both optional but are particularly useful).
-	if (mcData.isFabric) {
-		if (mcData.isLegacyFabric) {
-			// 1.8.9 - 1.13
-			modImplementation("net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${mcData.dependencies.legacyFabric.legacyFabricApiVersion}")
-		} else {
-			// 1.16.5+
-			modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
-		}
-	}
-	include(libs.bundles.specter)
-	modImplementation(libs.bundles.specter)
-
 	implementation(libs.objc.bridge)
 }
 
 tasks {
 	fatJar {
-		from(sourceSets.getByName("main").output, sourceSets.getByName("client").output)
+		sourceSets.findByName("client")?.let { clientSourceSet ->
+			from(sourceSets.getByName("main").output, clientSourceSet.output)
+		}
 	}
 	downgradeJar {
 		inputFile = this@tasks.named<ShadowJar>("fatJar").get().archiveFile
@@ -163,6 +150,14 @@ tasks {
 
 java {
 	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+tasks.withType<JavaCompile> {
+	options.encoding = "UTF-8"
+	options.release = 21
 }
 
 tasks.jar { from("LICENSE") { rename { "${it}_${base.archivesName.get()}" } } }

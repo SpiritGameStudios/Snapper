@@ -6,7 +6,6 @@ import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
-import dev.spiritstudios.specter.api.config.client.RootConfigScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -53,7 +52,7 @@ public class ScreenshotScreen extends Screen {
         super(Text.translatable("menu.snapper.screenshot_menu"));
         this.parent = parent;
 
-        this.showGrid = SnapperConfig.INSTANCE.viewMode.get().equals(ViewMode.GRID);
+        this.showGrid = SnapperConfig.viewMode.equals(ViewMode.GRID);
         this.isOffline = SnapperUtil.isOfflineAccount();
     }
 
@@ -177,7 +176,7 @@ public class ScreenshotScreen extends Screen {
         TextIconButtonWidget settingsButton = addDrawableChild(TextIconButtonWidget.builder(
                 Text.translatable("config.snapper.snapper.title"),
                 button -> this.client.setScreen(
-                        new RootConfigScreen(SnapperConfig.HOLDER, new ScreenshotScreen(this.parent))),
+                        new ConfigScreen(SnapperConfig.INSTANCE, new ScreenshotScreen(this.parent))),
                 true
         ).width(20).texture(SETTINGS_ICON, 15, 15).build());
 
@@ -264,7 +263,7 @@ public class ScreenshotScreen extends Screen {
 
     @Override
     public void close() {
-        SnapperConfig.HOLDER.save();
+        SnapperConfig.INSTANCE.save();
         super.close();
     }
 
