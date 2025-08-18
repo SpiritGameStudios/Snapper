@@ -1,5 +1,6 @@
 package dev.spiritstudios.snapper.mixin;
 
+import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
@@ -13,8 +14,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static dev.spiritstudios.snapper.Snapper.MODID;
-
 @Mixin(GameMenuScreen.class)
 public abstract class GameMenuMixin extends Screen {
     protected GameMenuMixin(Text title) {
@@ -22,14 +21,14 @@ public abstract class GameMenuMixin extends Screen {
     }
 
     @Unique
-    private static final Identifier SNAPPER_BUTTON_ICON = Identifier.of(MODID, "screenshots/screenshot");
+    private static final Identifier SNAPPER_BUTTON_ICON = Snapper.id("screenshots/screenshot");
 
     @Inject(
             method = "initWidgets",
             at = @At("TAIL")
     )
     protected void initWidgets(CallbackInfo ci) {
-        if (SnapperConfig.INSTANCE.showSnapperGameMenu.get()) {
+        if (SnapperConfig.showSnapperGameMenu) {
             this.addDrawableChild(
                     TextIconButtonWidget.builder(
                             Text.translatable("button.snapper.screenshots"),

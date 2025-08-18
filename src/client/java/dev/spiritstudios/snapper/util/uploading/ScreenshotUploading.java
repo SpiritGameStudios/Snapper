@@ -2,9 +2,9 @@ package dev.spiritstudios.snapper.util.uploading;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.SnapperConstants;
 import dev.spiritstudios.snapper.gui.screen.PrivacyNoticeScreen;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
@@ -14,16 +14,16 @@ import java.util.concurrent.CompletableFuture;
 
 public class ScreenshotUploading {
 	public static final String SNAPPER_WEB_URL = "https://snapper.spiritstudios.dev/img/%s";
-	public static final String SNAPPER_VERSION = FabricLoader.getInstance().getModContainer("snapper")
-			.orElseThrow()
-			.getMetadata().getVersion().getFriendlyString();
+	public static final String SNAPPER_VERSION = SnapperConstants.VERSION;
 
 	private static final AxolotlClientApi API = new AxolotlClientApi();
+
+	public static final SystemToast.Type SCREENSHOT_UPLOAD_TOAST = new SystemToast.Type();
 
 	public static void toast(String title, String description, Object... args) {
 		MinecraftClient.getInstance().getToastManager().add(
 				SystemToast.create(MinecraftClient.getInstance(),
-						SystemToast.Type.WORLD_BACKUP,
+						SCREENSHOT_UPLOAD_TOAST,
 						Text.translatable(title, args),
 						Text.translatable(description, args)));
 	}
@@ -34,7 +34,7 @@ public class ScreenshotUploading {
 			return CompletableFuture.failedFuture(new IllegalStateException("Minecraft is currently running in offline mode."));
 		}
 
-		if (SnapperConfig.INSTANCE.termsAccepted.get() == AxolotlClientApi.TermsAcceptance.UNSET) {
+		if (SnapperConfig.termsAccepted == AxolotlClientApi.TermsAcceptance.UNSET) {
             MinecraftClient client = MinecraftClient.getInstance();
             CompletableFuture<Void> success = new CompletableFuture<>();
 
@@ -45,7 +45,7 @@ public class ScreenshotUploading {
 			return success;
 		}
 
-		if (SnapperConfig.INSTANCE.termsAccepted.get() != AxolotlClientApi.TermsAcceptance.ACCEPTED) {
+		if (SnapperConfig.termsAccepted != AxolotlClientApi.TermsAcceptance.ACCEPTED) {
 			toast("toast.snapper.upload.failure", "toast.snapper.upload.axolotlclient.api_disabled");
 			return CompletableFuture.failedFuture(new IllegalStateException("AxolotlClient API is disabled."));
 		}

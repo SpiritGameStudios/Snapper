@@ -1,12 +1,11 @@
 package dev.spiritstudios.snapper.gui.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import dev.deftu.omnicore.common.OmniLoader;
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.util.DynamicTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
-import dev.spiritstudios.snapper.util.ScreenshotImage;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -30,14 +29,16 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class ScreenshotViewerScreen extends Screen {
     private static final Identifier MENU_DECOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_list_background.png");
     private static final Identifier INWORLD_MENU_DECOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/inworld_menu_list_background.png");
+
     private final MinecraftClient client = MinecraftClient.getInstance();
-    private final ScreenshotImage icon;
+    private final DynamicTexture image;
     private final String title;
     private final int imageWidth;
     private final int imageHeight;
@@ -47,11 +48,11 @@ public class ScreenshotViewerScreen extends Screen {
     private final int screenshotIndex;
     private final Path iconPath;
 
-    public ScreenshotViewerScreen(ScreenshotImage icon, Path screenshot, Screen parent) {
+    public ScreenshotViewerScreen(DynamicTexture icon, Path screenshot, Screen parent) {
         this(icon, screenshot, parent, null);
     }
 
-    public ScreenshotViewerScreen(ScreenshotImage icon, Path iconPath, Screen parent, @Nullable List<Path> screenshots) {
+    public ScreenshotViewerScreen(DynamicTexture icon, Path iconPath, Screen parent, @Nullable List<Path> screenshots) {
         super(Text.translatable("menu.snapper.viewer_menu"));
         this.parent = parent;
         this.iconPath = iconPath;
@@ -65,7 +66,7 @@ public class ScreenshotViewerScreen extends Screen {
             this.client.setScreen(parent);
         }
 
-        this.icon = icon;
+        this.image = icon;
         this.title = iconPath.getFileName().toString();
 
         this.imageWidth = image != null ? image.getWidth() : 0;
@@ -77,12 +78,7 @@ public class ScreenshotViewerScreen extends Screen {
         this.screenshotIndex = this.screenshots != null ? this.screenshots.indexOf(this.screenshot) : -1;
     }
 
-    public enum ViewMode {
-        LIST,
-        GRID
-    }
-
-    @Override
+	@Override
     public void close() {
         this.client.setScreen(this.parent);
     }
@@ -196,7 +192,7 @@ public class ScreenshotViewerScreen extends Screen {
 
         context.drawTexture(
                 RenderLayer::getGuiTextured,
-                this.icon.getTextureId(),
+                this.image.getTextureId(),
                 (this.width / 2) - (finalWidth / 2), this.height - 68 - finalHeight,
                 0, 0,
                 finalWidth, finalHeight,
@@ -213,7 +209,7 @@ public class ScreenshotViewerScreen extends Screen {
             );
         }
 
-        if (FabricLoader.getInstance().isDevelopmentEnvironment()) renderDebugInfo(context);
+        if (OmniLoader.isDevelopment()) renderDebugInfo(context);
     }
 
     private void renderDebugInfo(DrawContext context) {
@@ -260,10 +256,14 @@ public class ScreenshotViewerScreen extends Screen {
                 this.client.world == null ?
                         MENU_DECOR_BACKGROUND_TEXTURE :
                         INWORLD_MENU_DECOR_BACKGROUND_TEXTURE,
-                width, height - 68 - 48,
-                0, 0,
-                32, 32,
-                0, 48
+                0,
+                48,
+                0,
+                0,
+                width,
+                height - 68 - 48,
+                32,
+                32
         );
     }
 
@@ -307,13 +307,17 @@ public class ScreenshotViewerScreen extends Screen {
         };
 
         if (imagePath == null) return super.keyPressed(keyCode, scanCode, modifiers);
-
-        ScreenshotImage.createScreenshot(client.getTextureManager(), imagePath)
-                .ifPresent(image -> client.setScreen(new ScreenshotViewerScreen(
-                        image, imagePath,
-                        this.parent,
-                        this.screenshots
-                )));
+		CompletableFuture.supplyAsync(() -> DynamicTexture.createScreenshot(client.getTextureManager(), imagePath), Util.getIoWorkerExecutor())
+				.thenAccept(texture -> {
+					texture.ifPresent(dynamicTexture -> client.submit(() -> {
+						client.setScreen(new ScreenshotViewerScreen(
+								dynamicTexture, imagePath,
+								this.parent,
+								this.screenshots
+						));
+						dynamicTexture.load();
+					}));
+				});
 
         return super.keyPressed(keyCode, scanCode, modifiers);
     }

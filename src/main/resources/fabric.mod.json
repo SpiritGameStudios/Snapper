@@ -19,22 +19,17 @@
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"dev.spiritstudios.snapper.Snapper"
-		],
-		"mixinsquared-adjuster": [
-			"dev.spiritstudios.snapper.REMOVETHISAFTER1point21point5"
+			"dev.spiritstudios.snapper.SnapperEntrypoint"
 		]
 	},
-	"accessWidener": "snapper.accesswidener",
 	"mixins": [
-		"snapper.mixins.json"
+		"mixins.snapper.json"
 	],
 	"depends": {
-		"fabricloader": ">=${fabric_loader_version}",
-		"minecraft": "${minecraft_version}",
+		"fabricloader": ">=0.15.11",
+		"minecraft": "${mc_version}",
 		"fabric-api": "*",
-		"java": ">=21",
-		"specter-config": "*"
+		"java": ">=${java_version}"
 	},
 	"custom": {
 		"modmenu": {

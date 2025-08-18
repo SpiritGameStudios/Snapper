@@ -23,11 +23,9 @@ public class ExternalDialogOverlay extends Overlay {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         if (this.client.currentScreen != null) {
             this.client.currentScreen.render(context, mouseX, mouseY, delta);
-            context.draw();
         }
 
         this.client.gameRenderer.renderBlur();
-        this.client.getFramebuffer().beginWrite(false);
 
         context.drawTexture(
                 RenderLayer::getGuiTexturedOverlay,
@@ -47,7 +45,6 @@ public class ExternalDialogOverlay extends Overlay {
 
         if (InputUtil.isKeyPressed(client.getWindow().getHandle(), InputUtil.GLFW_KEY_ESCAPE)) close();
     }
-
 
     public void close() {
         this.client.setOverlay(null);
