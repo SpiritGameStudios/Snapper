@@ -1,8 +1,8 @@
 package dev.spiritstudios.snapper;
 
-import dev.spiritstudios.snapper.util.MacActions;
+import dev.spiritstudios.snapper.util.actions.MacPlatformActions;
 import dev.spiritstudios.snapper.util.PlatformHelper;
-import dev.spiritstudios.snapper.util.WindowsActions;
+import dev.spiritstudios.snapper.util.actions.GeneralPlatformActions;
 import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import dev.spiritstudios.specter.api.config.client.ConfigScreenWidgets;
@@ -10,8 +10,8 @@ import dev.spiritstudios.specter.api.config.client.ModMenuHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,10 +38,6 @@ public final class Snapper implements ClientModInitializer {
     }
 
     public static PlatformHelper getPlatformHelper() {
-        return switch (Util.getOperatingSystem()) {
-            case WINDOWS -> new WindowsActions();
-            case OSX -> new MacActions();
-            default -> new WindowsActions();
-        };
+        return MinecraftClient.IS_SYSTEM_MAC ? new MacPlatformActions() : new GeneralPlatformActions();
     }
 }

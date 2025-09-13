@@ -8,7 +8,6 @@ import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -45,14 +44,15 @@ public abstract class ScreenshotRecorderMixin {
         }
     }
 
-    @WrapMethod(method = "saveScreenshot(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;Ljava/util/function/Consumer;)V")
-    private static void getConfiguredGameDirectory(File gameDirectory, @Nullable String fileName, Framebuffer framebuffer, Consumer<Text> messageReceiver, Operation<Void> original) {
+    @WrapMethod(method = "saveScreenshot(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;ILjava/util/function/Consumer;)V")
+    private static void getConfiguredGameDirectory(File gameDirectory, String fileName, Framebuffer framebuffer, int downscaleFactor, Consumer<Text> messageReceiver, Operation<Void> original) {
         original.call(
                 SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() && Files.exists(SnapperConfig.INSTANCE.customScreenshotFolder.get()) ?
                         SnapperConfig.INSTANCE.customScreenshotFolder.get().toFile() :
                         gameDirectory,
                 fileName,
                 framebuffer,
+                downscaleFactor,
                 messageReceiver
         );
     }

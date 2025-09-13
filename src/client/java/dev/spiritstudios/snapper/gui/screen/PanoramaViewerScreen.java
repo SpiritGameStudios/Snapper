@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -109,14 +110,14 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        ROTATING_PANORAMA_RENDERER.render(context, this.width, this.height, 1.0F, delta);
+        ROTATING_PANORAMA_RENDERER.render(context, this.width, this.height, true);
 
         context.drawCenteredTextWithShadow(
                 this.textRenderer,
                 this.title,
                 this.width / 2,
                 20,
-                0xFFFFFF
+                Colors.WHITE
         );
 
         super.render(context, mouseX, mouseY, delta);

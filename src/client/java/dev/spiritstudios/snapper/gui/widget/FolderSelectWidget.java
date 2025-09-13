@@ -6,12 +6,12 @@ import dev.spiritstudios.specter.api.config.Value;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ParentElement;
-import net.minecraft.client.gui.screen.Overlay;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -19,11 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import static dev.spiritstudios.snapper.Snapper.LOGGER;
 import static dev.spiritstudios.snapper.Snapper.MODID;
 
 public class FolderSelectWidget extends ContainerWidget implements ParentElement {
@@ -143,16 +140,16 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
 
         // Special thanks to Falkreon for this workaround
         this.children().forEach(child -> {
-            context.getMatrices().push();
+            context.getMatrices().pushMatrix();
             {
-                context.getMatrices().translate(this.getX(), this.getY() - WEIRD_FIX_OFFSET, 0);
+                context.getMatrices().translate(this.getX(), this.getY() - WEIRD_FIX_OFFSET);
                 child.render(
                         context,
                         mouseX - this.getX(), mouseY - this.getY() + WEIRD_FIX_OFFSET,
                         delta
                 );
             }
-            context.getMatrices().pop();
+            context.getMatrices().popMatrix();
 
             if (child instanceof TextFieldWidget textFieldWidget) {
                 if (!Files.exists(Path.of(textFieldWidget.getText()))) {
@@ -160,7 +157,7 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
                     return;
                 }
 
-                textFieldWidget.setEditableColor(0xFFFFFF);
+                textFieldWidget.setEditableColor(Colors.WHITE);
             }
         });
     }
@@ -181,7 +178,7 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
 
     @Override
     protected double getDeltaYPerScroll() {
-        return 20/2f;
+        return 20 / 2f;
     }
 
     @Override

@@ -1,12 +1,13 @@
-package dev.spiritstudios.snapper.util;
+package dev.spiritstudios.snapper.util.actions;
 
 import ca.weblite.objc.Client;
 import ca.weblite.objc.Proxy;
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.util.PlatformHelper;
 
 import java.nio.file.Path;
 
-public class MacActions implements PlatformHelper {
+public class MacPlatformActions implements PlatformHelper {
 
     /* Screenshot copy logic (ScreenshotActions, ScreenshotActionsMac) heavily inspired by
     ScreenshotViewer by LGatodu47. (https://github.com/LGatodu47/ScreenshotViewer).

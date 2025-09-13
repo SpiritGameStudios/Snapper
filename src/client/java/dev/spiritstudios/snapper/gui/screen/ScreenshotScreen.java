@@ -18,6 +18,7 @@ import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
@@ -31,14 +32,14 @@ public class ScreenshotScreen extends Screen {
 
     private static final Identifier SETTINGS_ICON = Snapper.id("screenshots/settings");
 
-	private static final Identifier VIEW_MODE_ICON_LIST = Snapper.id("screenshots/show_list");
+    private static final Identifier VIEW_MODE_ICON_LIST = Snapper.id("screenshots/show_list");
 
-	private static final Identifier VIEW_MODE_ICON_GRID = Snapper.id("screenshots/show_grid");
+    private static final Identifier VIEW_MODE_ICON_GRID = Snapper.id("screenshots/show_grid");
 
     private final Screen parent;
-	private final boolean isOffline;
+    private final boolean isOffline;
 
-	private ScreenshotListWidget screenshotList;
+    private ScreenshotListWidget screenshotList;
     private ButtonWidget deleteButton;
     private ButtonWidget renameButton;
     private ButtonWidget viewButton;
@@ -82,8 +83,8 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.open"),
                 button -> {
                     if (selectedScreenshot != null) {
-						Util.getOperatingSystem().open(selectedScreenshot.icon.getPath());
-					}
+                        Util.getOperatingSystem().open(selectedScreenshot.icon.getPath());
+                    }
                 }
         ).width(secondRowButtonWidth).build());
 
@@ -98,8 +99,8 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.delete"),
                 button -> {
                     if (selectedScreenshot != null) {
-						ScreenshotActions.deleteScreenshot(selectedScreenshot.icon.getPath(), this);
-					}
+                        ScreenshotActions.deleteScreenshot(selectedScreenshot.icon.getPath(), this);
+                    }
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -107,8 +108,8 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.rename"),
                 button -> {
                     if (this.selectedScreenshot != null) {
-						client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.icon.getPath(), this));
-					}
+                        client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.icon.getPath(), this));
+                    }
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -116,8 +117,8 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.copy"),
                 button -> {
                     if (selectedScreenshot != null) {
-						Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.icon.getPath());
-					}
+                        Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.icon.getPath());
+                    }
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -125,12 +126,12 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.view"),
                 button -> {
                     if (selectedScreenshot != null) {
-						this.client.setScreen(new ScreenshotViewerScreen(
-								selectedScreenshot.icon,
-								selectedScreenshot.icon.getPath(),
-								selectedScreenshot.screenParent
-						));
-					}
+                        this.client.setScreen(new ScreenshotViewerScreen(
+                                selectedScreenshot.icon,
+                                selectedScreenshot.icon.getPath(),
+                                selectedScreenshot.screenParent
+                        ));
+                    }
                 }
         ).width(firstRowButtonWidth).build());
 
@@ -147,7 +148,7 @@ public class ScreenshotScreen extends Screen {
         }
 
         DirectionalLayoutWidget verticalButtonLayout = DirectionalLayoutWidget.vertical()
-				.spacing(4);
+                .spacing(4);
 
         AxisGridWidget firstRowWidget = verticalButtonLayout.add(new AxisGridWidget(
                 308,
@@ -256,8 +257,8 @@ public class ScreenshotScreen extends Screen {
 
         if (keyCode == GLFW.GLFW_KEY_ENTER) {
             client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.icon.getPath(), this));
-			return true;
-		}
+            return true;
+        }
 
         return false;
     }
@@ -271,11 +272,11 @@ public class ScreenshotScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xffffff);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, Colors.WHITE);
     }
 
-	public enum ViewMode {
-		LIST,
-		GRID
-	}
+    public enum ViewMode {
+        LIST,
+        GRID
+    }
 }

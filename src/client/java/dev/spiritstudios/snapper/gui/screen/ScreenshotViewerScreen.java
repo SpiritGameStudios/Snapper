@@ -7,6 +7,7 @@ import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -14,9 +15,9 @@ import net.minecraft.client.gui.widget.AxisGridWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
 import net.minecraft.client.gui.widget.SimplePositioningWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
@@ -78,7 +79,7 @@ public class ScreenshotViewerScreen extends Screen {
         this.screenshotIndex = this.screenshots != null ? this.screenshots.indexOf(this.screenshot) : -1;
     }
 
-	@Override
+    @Override
     public void close() {
         this.client.setScreen(this.parent);
     }
@@ -184,14 +185,14 @@ public class ScreenshotViewerScreen extends Screen {
 
         this.drawMenuBackground(context);
         this.drawHeaderAndFooterSeparators(context);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, Colors.WHITE);
 
         int finalHeight = this.height - 48 - 68;
         float scaleFactor = (float) finalHeight / imageHeight;
         int finalWidth = (int) (imageWidth * scaleFactor);
 
         context.drawTexture(
-                RenderLayer::getGuiTextured,
+                RenderPipelines.GUI_TEXTURED,
                 this.image.getTextureId(),
                 (this.width / 2) - (finalWidth / 2), this.height - 68 - finalHeight,
                 0, 0,
@@ -205,7 +206,7 @@ public class ScreenshotViewerScreen extends Screen {
                     "Screenshot %d/%d".formatted(screenshotIndex + 1, screenshots.size()),
                     this.width / 2,
                     30,
-                    0xFFFFFF
+                    Colors.WHITE
             );
         }
 
@@ -213,7 +214,7 @@ public class ScreenshotViewerScreen extends Screen {
     }
 
     private void renderDebugInfo(DrawContext context) {
-        context.getMatrices().push();
+        context.getMatrices().pushMatrix();
         int finalHeight = this.height - 48 - 48;
         float scaleFactor = (float) finalHeight / imageHeight;
         int finalWidth = (int) (imageWidth * scaleFactor);
@@ -223,7 +224,7 @@ public class ScreenshotViewerScreen extends Screen {
                 "Image Size: %dx%d".formatted(imageWidth, imageHeight),
                 this.width / 2,
                 40,
-                0xFFFFFF
+                Colors.WHITE
         );
 
         context.drawCenteredTextWithShadow(
@@ -231,14 +232,14 @@ public class ScreenshotViewerScreen extends Screen {
                 "Screen Size: %dx%d".formatted(this.width, this.height),
                 this.width / 2,
                 50,
-                0xFFFFFF
+                Colors.WHITE
         );
 
         context.drawCenteredTextWithShadow(this.textRenderer,
                 "Scale Factor: %s".formatted(scaleFactor),
                 this.width / 2,
                 60,
-                0xFFFFFF
+                Colors.WHITE
         );
 
         context.drawCenteredTextWithShadow(
@@ -246,13 +247,13 @@ public class ScreenshotViewerScreen extends Screen {
                 "Scaled Size: %dx%d".formatted(finalWidth, finalHeight),
                 this.width / 2,
                 70,
-                0xFFFFFF
+                Colors.WHITE
         );
     }
 
     private void drawMenuBackground(DrawContext context) {
         context.drawTexture(
-                RenderLayer::getGuiTextured,
+                RenderPipelines.GUI_TEXTURED,
                 this.client.world == null ?
                         MENU_DECOR_BACKGROUND_TEXTURE :
                         INWORLD_MENU_DECOR_BACKGROUND_TEXTURE,
@@ -269,7 +270,7 @@ public class ScreenshotViewerScreen extends Screen {
 
     private void drawHeaderAndFooterSeparators(DrawContext context) {
         context.drawTexture(
-                RenderLayer::getGuiTextured,
+                RenderPipelines.GUI_TEXTURED,
                 this.client.world == null ?
                         Screen.HEADER_SEPARATOR_TEXTURE :
                         Screen.INWORLD_HEADER_SEPARATOR_TEXTURE,
@@ -280,7 +281,7 @@ public class ScreenshotViewerScreen extends Screen {
         );
 
         context.drawTexture(
-                RenderLayer::getGuiTextured,
+                RenderPipelines.GUI_TEXTURED,
                 this.client.world == null ?
                         Screen.FOOTER_SEPARATOR_TEXTURE :
                         Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE,
@@ -307,17 +308,15 @@ public class ScreenshotViewerScreen extends Screen {
         };
 
         if (imagePath == null) return super.keyPressed(keyCode, scanCode, modifiers);
-		CompletableFuture.supplyAsync(() -> DynamicTexture.createScreenshot(client.getTextureManager(), imagePath), Util.getIoWorkerExecutor())
-				.thenAccept(texture -> {
-					texture.ifPresent(dynamicTexture -> client.submit(() -> {
-						client.setScreen(new ScreenshotViewerScreen(
-								dynamicTexture, imagePath,
-								this.parent,
-								this.screenshots
-						));
-						dynamicTexture.load();
-					}));
-				});
+        CompletableFuture.supplyAsync(() -> DynamicTexture.createScreenshot(client.getTextureManager(), imagePath), Util.getIoWorkerExecutor())
+                .thenAccept(texture -> texture.ifPresent(dynamicTexture -> client.submit(() -> {
+                    client.setScreen(new ScreenshotViewerScreen(
+                            dynamicTexture, imagePath,
+                            this.parent,
+                            this.screenshots
+                    ));
+                    dynamicTexture.load();
+                })));
 
         return super.keyPressed(keyCode, scanCode, modifiers);
     }

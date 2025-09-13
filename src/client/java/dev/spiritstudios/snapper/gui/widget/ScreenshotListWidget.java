@@ -11,13 +11,13 @@ import dev.spiritstudios.snapper.util.DynamicTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.specter.api.core.exception.UnreachableException;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.navigation.NavigationDirection;
 import net.minecraft.client.gui.screen.LoadingDisplay;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
 import net.minecraft.client.input.KeyCodes;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
@@ -51,7 +51,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
     public final CompletableFuture<List<ScreenshotEntry>> loadFuture;
 
-	public static final int GRID_ENTRY_WIDTH = 144;
+    public static final int GRID_ENTRY_WIDTH = 144;
 
     private final int gridItemHeight = 81;
     private final int listItemHeight = 36;
@@ -125,8 +125,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     private void setEntrySelected(@Nullable ScreenshotEntry entry) {
         super.setSelected(entry);
         if (this.parent instanceof ScreenshotScreen screenshotScreen) {
-			screenshotScreen.imageSelected(entry);
-		}
+            screenshotScreen.imageSelected(entry);
+        }
     }
 
     private int getColumnCount() {
@@ -278,7 +278,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     LOADING_LIST_TEXT,
                     (this.client.currentScreen.width - this.client.textRenderer.getWidth(LOADING_LIST_TEXT)) / 2,
                     y + (entryHeight - 9) / 2,
-                    0xFFFFFF,
+                    Colors.WHITE,
                     false
             );
 
@@ -318,7 +318,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     EMPTY_LIST_TEXT,
                     (this.client.currentScreen.width - this.client.textRenderer.getWidth(EMPTY_LIST_TEXT)) / 2,
                     y + entryHeight / 2,
-                    0xFFFFFF,
+                    Colors.WHITE,
                     false
             );
 
@@ -327,7 +327,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     EMPTY_CUSTOM_LIST_TEXT,
                     (this.client.currentScreen.width - this.client.textRenderer.getWidth(EMPTY_CUSTOM_LIST_TEXT)) / 2,
                     y + entryHeight / 2 + 10,
-                    0xFFFFFF,
+                    Colors.WHITE,
                     false
             );
         }
@@ -392,7 +392,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     this.client.textRenderer,
                     truncateFileName(fileName, entryWidth - 32 - 6, 29),
                     x + 32 + 3, y + 1,
-                    0xFFFFFF,
+                    Colors.WHITE,
                     false
             );
 
@@ -407,7 +407,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             if (icon.loaded()) {
                 //noinspection SuspiciousNameCombination
                 context.drawTexture(
-                        RenderLayer::getGuiTextured,
+                        RenderPipelines.GUI_TEXTURED,
                         this.icon.getTextureId(),
                         x, y,
                         (icon.getHeight()) / 3.0f + 32, 0,
@@ -420,7 +420,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             if (this.client.options.getTouchscreen().getValue() || hovered) {
                 context.fill(x, y, x + 32, y + 32, 0xA0909090);
                 context.drawGuiTexture(
-                        RenderLayer::getGuiTextured,
+                        RenderPipelines.GUI_TEXTURED,
                         mouseX - x < 32 && this.icon.loaded() ?
                                 ScreenshotListWidget.VIEW_HIGHLIGHTED_SPRITE :
                                 ScreenshotListWidget.VIEW_SPRITE,
@@ -438,7 +438,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             if (this.icon.loaded()) {
                 context.drawTexture(
-                        RenderLayer::getGuiTextured,
+                        RenderPipelines.GUI_TEXTURED,
                         this.icon.getTextureId(),
                         x, y,
                         0, 0,
@@ -474,7 +474,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 creationString = DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
 
             context.drawTexture(
-                    RenderLayer::getGuiTextured,
+                    RenderPipelines.GUI_TEXTURED,
                     GRID_SELECTION_BACKGROUND_TEXTURE,
                     x, y,
                     0, 0,
@@ -484,7 +484,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
 
             context.drawGuiTexture(
-                    RenderLayer::getGuiTextured,
+                    RenderPipelines.GUI_TEXTURED,
                     clickthroughHovered && icon.loaded() ?
                             ScreenshotListWidget.VIEW_HIGHLIGHTED_SPRITE : ScreenshotListWidget.VIEW_SPRITE,
                     centreX - 16,
@@ -498,7 +498,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     truncateFileName(fileName, entryWidth, 24),
                     x + 5,
                     y + 6,
-                    0xFFFFFF,
+                    Colors.WHITE,
                     true
             );
 

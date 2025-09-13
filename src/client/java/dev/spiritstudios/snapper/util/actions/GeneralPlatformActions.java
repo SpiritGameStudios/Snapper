@@ -1,6 +1,7 @@
-package dev.spiritstudios.snapper.util;
+package dev.spiritstudios.snapper.util.actions;
 
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.util.PlatformHelper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -16,7 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class WindowsActions implements PlatformHelper {
+public class GeneralPlatformActions implements PlatformHelper {
     @Override
     public void copyScreenshot(Path path) {
         if (!Files.exists(path)) {

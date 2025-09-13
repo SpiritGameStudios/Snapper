@@ -53,7 +53,7 @@ public final class SnapperKeybindings {
             return;
         }
 
-        client.takePanorama(client.runDirectory, 1024, 1024);
+        client.takePanorama(client.runDirectory);
         client.player.sendMessage(Text.translatable(
                 "text.snapper.panorama_success",
                 SCREENSHOT_MENU_KEY.getBoundKeyLocalizedText()

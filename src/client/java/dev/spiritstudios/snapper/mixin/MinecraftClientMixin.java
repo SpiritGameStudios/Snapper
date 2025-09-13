@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
+import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.mixin.accessor.CameraAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
@@ -12,12 +13,13 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
@@ -41,11 +43,11 @@ public abstract class MinecraftClientMixin {
             method = "takePanorama",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/util/ScreenshotRecorder;saveScreenshot(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;Ljava/util/function/Consumer;)V")
+                    target = "Lnet/minecraft/client/util/ScreenshotRecorder;saveScreenshot(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;ILjava/util/function/Consumer;)V")
     )
-    private void saveScreenshot(File gameDirectory, @Nullable String fileName, Framebuffer framebuffer, Consumer<Text> messageReceiver, Operation<Void> original) {
+    private void saveScreenshot(File gameDirectory, String fileName, Framebuffer framebuffer, int downscaleFactor, Consumer<Text> messageReceiver, Operation<Void> original) {
         fileName = "panorama/" + fileName;
-        original.call(gameDirectory, fileName, framebuffer, messageReceiver);
+        original.call(gameDirectory, fileName, framebuffer, downscaleFactor, messageReceiver);
     }
 
     @Inject(
@@ -73,6 +75,14 @@ public abstract class MinecraftClientMixin {
         if (!this.options.getPerspective().isFirstPerson())
             ((CameraAccessor) this.gameRenderer.getCamera()).invokeSetRotation(yaw.get(), value);
         else op.call(player, value);
+    }
+
+    @ModifyConstant(
+            method = "takePanorama",
+            constant = @Constant(intValue = 4096)
+    )
+    private int configurablePanoramaSize(int original) {
+        return SnapperConfig.INSTANCE.panoramaDimensions.get().size();
     }
 
 }
