@@ -30,6 +30,10 @@ public class PanoramaViewerScreen extends Screen {
 
     protected static final RotatingCubeMapRenderer ROTATING_PANORAMA_RENDERER = new RotatingCubeMapRenderer(PANORAMA_RENDERER);
 
+	static {
+		ROTATING_PANORAMA_RENDERER.registerTextures(MinecraftClient.getInstance().getTextureManager());
+	}
+
     private final String title;
     private final Screen parent;
 
