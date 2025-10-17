@@ -1,7 +1,7 @@
 package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.util.DynamicTexture;
+import dev.spiritstudios.snapper.util.DynamicCubemapTexture;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.MinecraftClient;
@@ -13,60 +13,37 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class PanoramaViewerScreen extends Screen {
-    protected static final CubeMapRenderer PANORAMA_RENDERER = new CubeMapRenderer(Snapper.id("screenshots/panorama/panorama"));
+    protected static final Identifier ID = Snapper.id("screenshots/panorama");
+    protected static final CubeMapRenderer PANORAMA_RENDERER = new CubeMapRenderer(ID);
 
-    protected static final RotatingCubeMapRenderer ROTATING_PANORAMA_RENDERER = new RotatingCubeMapRenderer(PANORAMA_RENDERER);
-
-	static {
-		ROTATING_PANORAMA_RENDERER.registerTextures(MinecraftClient.getInstance().getTextureManager());
-	}
+    private final RotatingCubeMapRenderer rotatingPanoramaRenderer = new RotatingCubeMapRenderer(PANORAMA_RENDERER);
+    private final DynamicCubemapTexture texture;
 
     private final String title;
     private final Screen parent;
-
-    private final List<DynamicTexture> images = new ArrayList<>();
 
     protected PanoramaViewerScreen(String title, Screen parent) {
         super(Text.translatable("menu.snapper.viewer_menu"));
         this.title = title;
         this.parent = parent;
         this.client = MinecraftClient.getInstance();
-        assert this.client != null;
-
-        List<Path> facePaths = this.getImagePaths();
-
-        if (facePaths == null) {
-            Snapper.LOGGER.error("No panorama found");
-            close();
-            return;
-        }
-
-        for (Path path : facePaths) {
-            DynamicTexture.createPanoramaFace(this.client.getTextureManager(), path)
-                    .ifPresent(screenshotImage -> {
-                        images.add(screenshotImage);
-                        screenshotImage
-                                .load()
-                                .thenAccept(ignored -> screenshotImage.enableFiltering());
-                    });
-        }
+        assert client != null;
+        this.texture = this.getTexture();
     }
 
-
-    private @Nullable @Unmodifiable List<Path> getImagePaths() {
+    @Nullable
+    private DynamicCubemapTexture getTexture() {
         Objects.requireNonNull(this.client);
 
         Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
@@ -74,12 +51,11 @@ public class PanoramaViewerScreen extends Screen {
 
         try (Stream<Path> stream = Files.list(panoramaDir)) {
             return stream
-                    .filter(path -> {
+                    .allMatch(path -> {
                         if (Files.isDirectory(path)) return false;
 
                         return SafeFiles.isContentType(path, "image/png", ".png");
-                    })
-                    .toList();
+                    }) ? DynamicCubemapTexture.createPanorama(ID, panoramaDir).orElse(null) : null;
         } catch (IOException | NullPointerException e) {
             Snapper.LOGGER.error("Failed to list the contents of directory", e);
             return null;
@@ -90,8 +66,9 @@ public class PanoramaViewerScreen extends Screen {
     public void close() {
         Objects.requireNonNull(this.client);
 
-        for (DynamicTexture image : images) {
-            image.close();
+        if (texture != null) {
+            client.getTextureManager().destroyTexture(ID);
+            texture.close();
         }
 
         client.setScreen(this.parent);
@@ -100,6 +77,13 @@ public class PanoramaViewerScreen extends Screen {
     @Override
     protected void init() {
         assert client != null;
+
+        if (this.texture == null) {
+            Snapper.LOGGER.error("No panorama found");
+            close();
+            return;
+        }
+        client.getTextureManager().registerTexture(ID, texture);
 
         Path panoramaPath = Path.of(client.runDirectory.getPath(), "screenshots", "panorama");
         addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.folder"), button -> {
@@ -114,7 +98,7 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        ROTATING_PANORAMA_RENDERER.render(context, this.width, this.height, true);
+        rotatingPanoramaRenderer.render(context, this.width, this.height, true);
 
         context.drawCenteredTextWithShadow(
                 this.textRenderer,

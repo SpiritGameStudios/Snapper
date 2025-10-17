@@ -57,20 +57,6 @@ public class DynamicTexture implements AutoCloseable {
         }
     }
 
-    public static Optional<DynamicTexture> createPanoramaFace(TextureManager textureManager, Path path) {
-        try {
-            return Optional.of(new DynamicTexture(
-                    textureManager,
-					Snapper.id(
-                            "screenshots/panorama/" + Util.replaceInvalidChars(path.getFileName().toString(), Identifier::isPathCharacterValid)
-                    ),
-                    path
-            ));
-        } catch (IOException e) {
-            return Optional.empty();
-        }
-    }
-
     /*
      * Must be called on render thread
      */
