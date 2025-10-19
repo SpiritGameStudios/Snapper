@@ -11,6 +11,7 @@ import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
@@ -42,6 +43,16 @@ public abstract class ScreenshotRecorderMixin {
         if (!screenshotFile.getAbsolutePath().contains("/panorama/") && SnapperConfig.INSTANCE.copyTakenScreenshot.get()) {
             Snapper.getPlatformHelper().copyScreenshot(screenshotFile.toPath());
         }
+    }
+
+    /**
+     * @author WorldWidePixel
+     * @reason Okay, I know this is weird but it's so we can use our own wrapper text for the toast.
+     */
+    @ModifyArg(method = "method_22691",
+    at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Text;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/text/MutableText;", ordinal = 0))
+    private static String changeSuccessTranslation(String existing) {
+        return "toast.snapper.created.screenshot.success";
     }
 
     @WrapMethod(method = "saveScreenshot(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;ILjava/util/function/Consumer;)V")

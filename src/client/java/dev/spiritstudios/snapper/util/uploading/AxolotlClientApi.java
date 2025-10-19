@@ -6,8 +6,11 @@ import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.serialization.JsonOps;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.gui.toast.SnapperToast;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.session.Session;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -53,7 +56,9 @@ public class AxolotlClientApi implements Closeable {
             return CompletableFuture.failedFuture(e);
         }
 
-        ScreenshotUploading.toast("toast.snapper.upload.in_progress", "toast.snapper.upload.in_progress.description");
+        SnapperUtil.toast(SnapperToast.Type.UPLOAD,
+                Text.translatable("toast.snapper.upload.in_progress"),
+                Text.translatable("toast.snapper.upload.in_progress.description"));
 
         return authenticate()
                 .thenCompose(ignored -> post("image/" + image.getFileName().toString(), bytes))

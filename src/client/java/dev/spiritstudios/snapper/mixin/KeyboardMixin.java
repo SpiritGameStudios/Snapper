@@ -2,6 +2,8 @@ package dev.spiritstudios.snapper.mixin;
 
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.SnapperKeybindings;
+import dev.spiritstudios.snapper.gui.toast.SnapperToast;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
@@ -17,17 +19,21 @@ public abstract class KeyboardMixin {
     private MinecraftClient client;
 
     /**
-     * @author CallMeEcho
-     * @reason Change message logic to show an overlay instead of chat message
+     * @author CallMeEcho & WorldWidePixel
+     * @reason Change message logic to show a toast instead of chat message
      */
     @Overwrite
     private void method_1464(Text text) {
-        this.client.inGameHud.setOverlayMessage(Text.translatable(
-                SnapperConfig.INSTANCE.copyTakenScreenshot.get() ?
-                        "text.snapper.screenshot_instructions_copy" :
-                        "text.snapper.screenshot_instructions",
-                text,
-                SnapperKeybindings.RECENT_SCREENSHOT_KEY.getBoundKeyLocalizedText()
-        ), false);
+        // Lovely tree of decisions to decide what instructions make sense. <3 Lynn
+        String inGameDeterminedDescription = client.currentScreen == null ? "toast.snapper.created.screenshot.description"
+                : "toast.snapper.created.screenshot.description_in_menu";
+        String copyDeterminedDescription = SnapperConfig.INSTANCE.copyTakenScreenshot.get() ?
+                "toast.snapper.created.screenshot.description_copy" : inGameDeterminedDescription;
+
+        SnapperUtil.toast(
+                SnapperToast.Type.SCREENSHOT,
+                Text.translatable("toast.snapper.created.screenshot"),
+                Text.translatable(copyDeterminedDescription, text, SnapperKeybindings.RECENT_SCREENSHOT_KEY.getBoundKeyLocalizedText())
+        );
     }
 }
