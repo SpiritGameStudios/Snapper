@@ -32,7 +32,7 @@ public abstract class KeyboardMixin {
 
         SnapperUtil.toast(
                 SnapperToast.Type.SCREENSHOT,
-                Text.translatable("toast.snapper.created.screenshot"),
+                Text.translatable("toast.snapper.screenshot.created"),
                 Text.translatable(copyDeterminedDescription, text, SnapperKeybindings.RECENT_SCREENSHOT_KEY.getBoundKeyLocalizedText())
         );
     }

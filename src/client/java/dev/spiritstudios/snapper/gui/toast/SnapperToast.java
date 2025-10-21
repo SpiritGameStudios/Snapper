@@ -16,8 +16,10 @@ import java.util.List;
 
 public class SnapperToast implements Toast {
     private static final Identifier TEXTURE = Snapper.id("toast/snapper");
-    private static final Identifier IMAGE_ICON = Snapper.id("icon/image");
+    private static final Identifier SCREENSHOT_ICON = Snapper.id("icon/image");
+    private static final Identifier PANORAMA_ICON = Snapper.id("icon/panorama");
     private static final Identifier UPLOAD_ICON = Snapper.id("icon/upload");
+    private static final Identifier DENY_ICON = Snapper.id("icon/nuh_uh");
     private static final int VISIBILITY_DURATION = 5000;
     private static final int WIDTH = 256;
     private static final int LINE_HEIGHT = 12;
@@ -35,7 +37,7 @@ public class SnapperToast implements Toast {
         this.title = title;
         MinecraftClient client = MinecraftClient.getInstance();
         TextRenderer textRenderer = client.textRenderer;
-        this.lines = textRenderer.wrapLines(description, WIDTH - PADDING * 3 - 15);
+        this.lines = textRenderer.wrapLines(description, WIDTH - PADDING * 3 - 16);
     }
 
     @Override
@@ -55,7 +57,7 @@ public class SnapperToast implements Toast {
     @Override
     public void draw(DrawContext context, TextRenderer textRenderer, long startTime) {
         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, 0, 0, this.getWidth(), this.getHeight());
-        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, getCurrentTexture(), PADDING, PADDING, 15, 15);
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, getCurrentTexture(), PADDING, PADDING, 16, 16);
 
         context.drawText(textRenderer, title, PADDING * 2 + 14, this.lines.isEmpty() ? 12 : 7, Colors.YELLOW, false);
 
@@ -78,15 +80,18 @@ public class SnapperToast implements Toast {
                 return UPLOAD_ICON;
             }
             case PANORAMA -> {
-                return IMAGE_ICON; // Future proofing. Deal with it.
+                return PANORAMA_ICON;
+            }
+            case DENY -> {
+                return DENY_ICON;
             }
             default -> {
-                return IMAGE_ICON;
+                return SCREENSHOT_ICON;
             }
         }
     }
 
     public enum Type {
-        SCREENSHOT, PANORAMA, UPLOAD
+        SCREENSHOT, PANORAMA, UPLOAD, DENY
     }
 }

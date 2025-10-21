@@ -346,7 +346,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         private long time;
         private boolean showGrid;
         private final List<Path> screenshots;
-        private boolean clickthroughHovered = false;
+        private boolean clickThroughHovered = false;
 
         public ScreenshotEntry(DynamicTexture icon, MinecraftClient client, Screen parent, List<Path> screenshots) {
             this.showGrid = ScreenshotListWidget.this.showGrid;
@@ -434,7 +434,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             int centreX = x + entryWidth / 2;
             int centreY = y + entryHeight / 2;
 
-            clickthroughHovered = SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY);
+            clickThroughHovered = SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY);
 
             if (this.icon.loaded()) {
                 context.drawTexture(
@@ -485,7 +485,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
             context.drawGuiTexture(
                     RenderPipelines.GUI_TEXTURED,
-                    clickthroughHovered && icon.loaded() ?
+                    clickThroughHovered && icon.loaded() ?
                             ScreenshotListWidget.VIEW_HIGHLIGHTED_SPRITE : ScreenshotListWidget.VIEW_SPRITE,
                     centreX - 16,
                     centreY - 16,
@@ -560,7 +560,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     ) ||
                             (
                                     this.showGrid &&
-                                            clickthroughHovered
+                                            clickThroughHovered
                             );
             if (!clickThrough && Util.getMeasuringTimeMs() - this.time >= 250L) {
                 this.time = Util.getMeasuringTimeMs();

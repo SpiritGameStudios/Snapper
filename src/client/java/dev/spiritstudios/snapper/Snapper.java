@@ -1,15 +1,14 @@
 package dev.spiritstudios.snapper;
 
-import dev.spiritstudios.snapper.util.actions.MacPlatformActions;
 import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.actions.GeneralPlatformActions;
+import dev.spiritstudios.snapper.util.actions.MacPlatformActions;
 import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import dev.spiritstudios.specter.api.config.client.ConfigScreenWidgets;
 import dev.spiritstudios.specter.api.config.client.ModMenuHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -20,8 +19,6 @@ import java.nio.file.Path;
 public final class Snapper implements ClientModInitializer {
     public static final String MODID = "snapper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
-
-    public static final boolean IS_IRIS_INSTALLED = FabricLoader.getInstance().isModLoaded("iris");
 
     @Override
     public void onInitializeClient() {

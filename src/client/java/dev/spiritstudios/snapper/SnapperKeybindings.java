@@ -2,8 +2,10 @@ package dev.spiritstudios.snapper;
 
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
+import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.util.DynamicTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.specter.api.core.client.event.ClientKeybindEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
@@ -47,17 +49,16 @@ public final class SnapperKeybindings {
 
     private static void takePanorama(MinecraftClient client) {
         if (client.player == null) return;
-
-        if (Snapper.IS_IRIS_INSTALLED) {
-            client.player.sendMessage(Text.translatable("text.snapper.panorama_failure_iris"), true);
-            return;
-        }
-
         client.takePanorama(client.runDirectory);
-        client.player.sendMessage(Text.translatable(
-                "text.snapper.panorama_success",
-                SCREENSHOT_MENU_KEY.getBoundKeyLocalizedText()
-        ), true);
+
+        SnapperUtil.toast(
+                SnapperToast.Type.PANORAMA,
+                Text.translatable("toast.snapper.panorama.created"),
+                Text.translatable(
+                        "toast.snapper.panorama.created.description",
+                        SCREENSHOT_MENU_KEY.getBoundKeyLocalizedText()
+                )
+        );
     }
 
     private static void openRecentScreenshot(MinecraftClient client) {
