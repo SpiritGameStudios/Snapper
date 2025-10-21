@@ -43,7 +43,7 @@ public class ScreenshotUploading {
 
         if (SnapperConfig.INSTANCE.termsAccepted.get() != AxolotlClientApi.TermsAcceptance.ACCEPTED) {
             SnapperUtil.toast(
-                    SnapperToast.Type.DENY,
+                    SnapperToast.Type.UPLOAD,
                     Text.translatable("toast.snapper.upload.failure"),
                     Text.translatable("toast.snapper.upload.axolotlclient.api_disabled")
             );

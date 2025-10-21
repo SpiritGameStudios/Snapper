@@ -64,8 +64,11 @@ public final class SnapperKeybindings {
     private static void openRecentScreenshot(MinecraftClient client) {
         List<Path> screenshots = ScreenshotActions.getScreenshots();
         if (screenshots.isEmpty()) {
-            if (client.player != null)
-                client.player.sendMessage(Text.translatable("text.snapper.screenshot_not_exists"), true);
+            SnapperUtil.toast(
+                    SnapperToast.Type.SCREENSHOT,
+                    Text.translatable("toast.snapper.screenshot.recent.failure"),
+                    Text.translatable("toast.snapper.screenshot.recent.failure.not_exist")
+            );
             return;
         }
 
@@ -80,10 +83,11 @@ public final class SnapperKeybindings {
                             ));
                             image.load();
                         },
-                        () -> {
-                            if (client.player != null)
-                                client.player.sendMessage(Text.translatable("text.snapper.screenshot_open_failure"), true);
-                        }
+                        () -> SnapperUtil.toast(
+                                SnapperToast.Type.DENY,
+                                Text.translatable("toast.snapper.screenshot.recent.failure"),
+                                Text.translatable("toast.snapper.screenshot.recent.failure.generic")
+                        )
                 );
 
     }
