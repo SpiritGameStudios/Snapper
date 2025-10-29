@@ -37,7 +37,8 @@ public class DirectoryConfigUtil {
     );
 
     public static CompletableFuture<Optional<Path>> openFolderSelect(String title) {
-        return CompletableFuture.supplyAsync(() -> TinyFileDialogs.tinyfd_selectFolderDialog(title, SystemProperties.getUserHome()))
+		// replaceAll is to prevent an ACE exploit in TinyFD
+        return CompletableFuture.supplyAsync(() -> TinyFileDialogs.tinyfd_selectFolderDialog(title.replaceAll("[^a-zA-Z0-9 .,]", ""), SystemProperties.getUserHome()))
                 .thenApply(selectedPath -> {
                     if (Strings.isNullOrEmpty(selectedPath)) {
                         return Optional.empty();

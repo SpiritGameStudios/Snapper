@@ -75,20 +75,12 @@ public class SnapperToast implements Toast {
     }
 
     private Identifier getCurrentTexture() {
-        switch (type) {
-            case UPLOAD -> {
-                return UPLOAD_ICON;
-            }
-            case PANORAMA -> {
-                return PANORAMA_ICON;
-            }
-            case DENY -> {
-                return DENY_ICON;
-            }
-            default -> {
-                return SCREENSHOT_ICON;
-            }
-        }
+        return switch (type) {
+            case UPLOAD -> UPLOAD_ICON;
+            case PANORAMA -> PANORAMA_ICON;
+            case DENY -> DENY_ICON;
+            default -> SCREENSHOT_ICON;
+        };
     }
 
     public enum Type {

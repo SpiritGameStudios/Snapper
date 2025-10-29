@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 public class PanoramaViewerScreen extends Screen {
@@ -44,7 +43,7 @@ public class PanoramaViewerScreen extends Screen {
 
     @Nullable
     private DynamicCubemapTexture getTexture() {
-        Objects.requireNonNull(this.client);
+		assert client != null;
 
         Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
         if (!SnapperUtil.panoramaPresent(panoramaDir)) return null;
@@ -64,7 +63,7 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     public void close() {
-        Objects.requireNonNull(this.client);
+		assert client != null;
 
         if (texture != null) {
             client.getTextureManager().destroyTexture(ID);
