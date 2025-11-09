@@ -39,6 +39,9 @@ public class PanoramaViewerScreen extends Screen {
         this.client = MinecraftClient.getInstance();
         assert client != null;
         this.texture = this.getTexture();
+        if (texture != null) {
+            client.getTextureManager().registerTexture(ID, texture);
+        }
     }
 
     @Nullable
@@ -75,6 +78,7 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     protected void init() {
+        // This is called whenever the window is resized.
         assert client != null;
 
         if (this.texture == null) {
@@ -82,7 +86,6 @@ public class PanoramaViewerScreen extends Screen {
             close();
             return;
         }
-        client.getTextureManager().registerTexture(ID, texture);
 
         Path panoramaPath = Path.of(client.runDirectory.getPath(), "screenshots", "panorama");
         addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.folder"), button -> {
