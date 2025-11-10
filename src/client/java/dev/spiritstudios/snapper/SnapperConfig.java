@@ -37,7 +37,7 @@ public final class SnapperConfig extends Config<SnapperConfig> {
             .comment("Whether the terms of AxolotlClient have been accepted.")
             .build();
 
-    public final Value<SnapperUtil.PanoramaSize> panoramaDimensions = enumValue(SnapperUtil.PanoramaSize.ONE_THOUSAND_TWENTY_FOUR, SnapperUtil.PanoramaSize.class)
+    public final Value<SnapperUtil.PanoramaSize> panoramaDimensions = enumValue(SnapperUtil.PanoramaSize.TWO_THOUSAND_FORTY_EIGHT, SnapperUtil.PanoramaSize.class)
             .comment("Dimensions of individual panorama images when saved.")
             .build();
 
