@@ -12,7 +12,7 @@ import net.minecraft.text.Text;
 
 import java.nio.file.Path;
 
-public class RenameScreenshotScreen extends Screen {
+public class ScreenshotRenameScreen extends Screen {
     private final Path screenshot;
     private final TextFieldWidget renameInput;
     private final Text RENAME_INPUT_TEXT = Text.translatable("text.snapper.rename_input");
@@ -20,7 +20,7 @@ public class RenameScreenshotScreen extends Screen {
     private final TextRenderer textRenderer = client.textRenderer;
     private final Screen parent;
 
-    protected RenameScreenshotScreen(Path screenshot, Screen parent) {
+    protected ScreenshotRenameScreen(Path screenshot, Screen parent) {
         super(Text.translatable("text.snapper.rename"));
         this.screenshot = screenshot;
         this.renameInput = new TextFieldWidget(textRenderer, 200, 20, RENAME_INPUT_TEXT);

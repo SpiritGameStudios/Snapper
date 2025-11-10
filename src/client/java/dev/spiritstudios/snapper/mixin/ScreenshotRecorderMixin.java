@@ -52,7 +52,7 @@ public abstract class ScreenshotRecorderMixin {
     @ModifyArg(method = "method_22691",
     at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Text;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/text/MutableText;", ordinal = 0))
     private static String changeSuccessTranslation(String existing) {
-        return "toast.snapper.created.screenshot.success";
+        return "toast.snapper.screenshot.created.success";
     }
 
     @WrapMethod(method = "saveScreenshot(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;ILjava/util/function/Consumer;)V")

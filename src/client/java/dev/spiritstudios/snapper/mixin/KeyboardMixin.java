@@ -25,10 +25,10 @@ public abstract class KeyboardMixin {
     @Overwrite
     private void method_1464(Text text) {
         // Lovely tree of decisions to decide what instructions make sense. <3 Lynn
-        String inGameDeterminedDescription = client.currentScreen == null ? "toast.snapper.created.screenshot.description"
-                : "toast.snapper.created.screenshot.description_in_menu";
+        String inGameDeterminedDescription = client.currentScreen == null ? "toast.snapper.screenshot.created.description"
+                : "toast.snapper.screenshot.created.description_in_menu";
         String copyDeterminedDescription = SnapperConfig.INSTANCE.copyTakenScreenshot.get() ?
-                "toast.snapper.created.screenshot.description_copy" : inGameDeterminedDescription;
+                "toast.snapper.screenshot.created.description_copy" : inGameDeterminedDescription;
 
         SnapperUtil.toast(
                 SnapperToast.Type.SCREENSHOT,

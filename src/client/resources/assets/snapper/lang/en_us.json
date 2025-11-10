@@ -29,8 +29,6 @@
   "text.snapper.rename_input": "Enter new name here",
   "text.snapper.rename_invalid": "New name for screenshot invalid",
   "text.snapper.rename_invalid_png": "Name must end with '.png'",
-  "panorama.snapper.failure": "Couldn't save panorama: %s",
-  "panorama.snapper.success": "Saved screenshot as %s",
   "config.snapper.snapper.title": "Snapper Settings",
   "config.snapper.snapper.copyTakenScreenshot": "Auto-Clipboard",
   "config.snapper.snapper.copyTakenScreenshot.tooltip": "Copy screenshot to clipboard when taken",

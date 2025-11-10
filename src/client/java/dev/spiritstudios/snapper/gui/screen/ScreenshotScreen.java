@@ -108,7 +108,7 @@ public class ScreenshotScreen extends Screen {
                 Text.translatable("button.snapper.rename"),
                 button -> {
                     if (this.selectedScreenshot != null) {
-                        client.setScreen(new RenameScreenshotScreen(this.selectedScreenshot.icon.getPath(), this));
+                        client.setScreen(new ScreenshotRenameScreen(this.selectedScreenshot.icon.getPath(), this));
                     }
                 }
         ).width(firstRowButtonWidth).build());
