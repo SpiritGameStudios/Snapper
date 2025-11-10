@@ -82,7 +82,7 @@ public abstract class MinecraftClientMixin {
             constant = @Constant(intValue = 4096)
     )
     private int configurablePanoramaSize(int original) {
-        return SnapperConfig.INSTANCE.panoramaDimensions.get().size();
+        return SnapperConfig.INSTANCE.panoramaDimensions.get().size() * 4;
     }
 
 }
