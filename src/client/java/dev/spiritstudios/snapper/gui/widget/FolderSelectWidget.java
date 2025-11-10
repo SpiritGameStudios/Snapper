@@ -1,14 +1,19 @@
 package dev.spiritstudios.snapper.gui.widget;
 
+import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.overlay.ExternalDialogOverlay;
 import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
 import dev.spiritstudios.specter.api.config.Value;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.ParentElement;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.ContainerWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -17,175 +22,192 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static dev.spiritstudios.snapper.Snapper.MODID;
-
 public class FolderSelectWidget extends ContainerWidget implements ParentElement {
-    private final Value<Path> value;
-    private static final Identifier FOLDER_ICON = Identifier.of(MODID, "screenshots/folder");
-    private static final Identifier RESET_ICON = Identifier.of(MODID, "screenshots/reset");
+	private static final Identifier FOLDER_ICON = Snapper.id("screenshots/folder");
+	private static final Identifier RESET_ICON = Snapper.id("screenshots/reset");
 
-    private final TextFieldWidget textField;
-    private final TextIconButtonWidget folderSelectButton;
-    private final TextIconButtonWidget resetFolderButton;
-    private final MinecraftClient client = MinecraftClient.getInstance();
+	private static final int BUTTON_WIDTH = 25; // Includes padding
 
-    /*
-        Because of the visual bar at the top of config screens, this offset needs to exist for the mouse to notice the elements.
-        There is probably a proper way to do this, but I cannot be bothered.
-        Spectre Config upgrades should make this unnecessary.
-        - WWP
-    */
-    private static final int WEIRD_FIX_OFFSET = 40;
+	private final Value<Path> value;
 
-    public FolderSelectWidget(int x, int y, int width, int height, Value<Path> value, String placeholderKey) {
-        super(x, y, width, height, ScreenTexts.EMPTY);
-        this.value = value;
-        this.active = false;
+	private final TextFieldWidget textInput;
+	private final TextIconButtonWidget fileDialogButton;
+	private final TextIconButtonWidget resetButton;
 
-        this.textField = new TextFieldWidget(
-                MinecraftClient.getInstance().textRenderer,
-                25 + 25, 0,
-                120 - 25 - 25,
-                20,
-                Text.of(value.get().toString())
-        );
+	public FolderSelectWidget(int x, int y, int width, int height, Value<Path> value, String placeholderKey) {
+		super(x, y, width, height, ScreenTexts.EMPTY);
+		this.value = value;
+		this.active = false;
 
-        this.textField.setPlaceholder(Text.translatableWithFallback(placeholderKey, "").formatted(Formatting.DARK_GRAY));
-        this.textField.setMaxLength(Integer.MAX_VALUE);
-        this.textField.setText(value.get().toString());
-        this.textField.setChangedListener(content -> value.set(Path.of(content)));
-        this.textField.setTooltip(Tooltip.of(Text.translatable("config.snapper.snapper.customScreenshotFolder.input")));
+		MinecraftClient client = MinecraftClient.getInstance();
 
-        this.folderSelectButton = TextIconButtonWidget.builder(
-                Text.translatable("config.snapper.snapper.customScreenshotFolder.select"),
-                button -> {
-                    ExternalDialogOverlay overlay = new ExternalDialogOverlay();
-                    client.setOverlay(overlay);
+		this.textInput = new TextFieldWidget(
+				client.textRenderer,
+				BUTTON_WIDTH * 2, 0,
+				width - (BUTTON_WIDTH * 2),
+				20,
+				Text.of(value.get().toString())
+		);
 
-                    DirectoryConfigUtil.openFolderSelect(Text.translatable("prompt.snapper.folder_select").getString().replaceAll("[^a-zA-Z0-9 .,]", "")).thenAccept(path -> {
-                        valueFromSelectDialog(path.orElse(null));
-                        client.submit(overlay::close).join();
-                    });
-                },
-                true
-        ).width(20).texture(FOLDER_ICON, 15, 15).build();
-        this.folderSelectButton.setTooltip(Tooltip.of(Text.translatable("config.snapper.snapper.customScreenshotFolder.select")));
+		this.textInput.setPlaceholder(Text.translatableWithFallback(placeholderKey, "").formatted(Formatting.DARK_GRAY));
+		this.textInput.setMaxLength(4096); // Unix maximum path length, shorter on windows (I think it may have been 240)
+		this.textInput.setText(value.get().toString());
+		this.textInput.setChangedListener(content -> {
+			Path path;
 
-        this.resetFolderButton = TextIconButtonWidget.builder(
-                Text.translatable("config.snapper.snapper.customScreenshotFolder.reset"),
-                button -> {
-                    value.reset();
-                    textField.setText(value.get().toString());
-                },
-                true
-        ).width(20).texture(RESET_ICON, 15, 15).build();
-        this.resetFolderButton.setTooltip(Tooltip.of(Text.translatable("config.snapper.snapper.customScreenshotFolder.reset")));
-        resetFolderButton.setX(25);
-    }
+			try {
+				path = Path.of(content);
+			} catch (InvalidPathException ignored) {
+				path = null;
+			}
 
-    @Override
-    public List<? extends ClickableWidget> children() {
-        List<ClickableWidget> children = List.of(
-                this.folderSelectButton, this.resetFolderButton, this.textField
-        );
+			if (path == null || !Files.exists(path) || !Files.isDirectory(path)) {
+				this.textInput.setEditableColor(Colors.RED);
+			} else {
+				this.textInput.setEditableColor(Colors.WHITE);
+				value.set(path);
+			}
+		});
+		this.textInput.setTooltip(Tooltip.of(Text.translatable("config.snapper.snapper.customScreenshotFolder.input")));
 
-        children.forEach(c -> c.setY(WEIRD_FIX_OFFSET));
+		this.fileDialogButton = TextIconButtonWidget.builder(
+						Text.translatable("config.snapper.snapper.customScreenshotFolder.select"),
+						button -> {
+							ExternalDialogOverlay overlay = new ExternalDialogOverlay();
+							client.setOverlay(overlay);
 
-        return children;
-    }
+							DirectoryConfigUtil.openFolderSelect(
+											Text.translatable("prompt.snapper.folder_select")
+													.getString()
+									)
+									.thenAccept(path -> {
+										valueFromSelectDialog(path.orElse(null));
+										client.submit(overlay::close).join();
+									});
+						},
+						true
+				)
+				.width(20)
+				.texture(FOLDER_ICON, 15, 15)
+				.build();
+		this.fileDialogButton.setTooltip(Tooltip.of(Text.translatable("config.snapper.snapper.customScreenshotFolder.select")));
 
-    private void valueFromSelectDialog(@Nullable Path value) {
-        if (value == null) {
-            return;
-        }
-        if (Files.exists(value)) {
-            this.value.set(value);
-            this.textField.setText(this.value.get().toString());
-        }
-    }
+		this.resetButton = TextIconButtonWidget.builder(
+				Text.translatable("config.snapper.snapper.customScreenshotFolder.reset"),
+				button -> {
+					value.reset();
+					textInput.setText(value.get().toString());
+				},
+				true
+		).width(20).texture(RESET_ICON, 15, 15).build();
+		this.resetButton.setTooltip(Tooltip.of(Text.translatable("config.snapper.snapper.customScreenshotFolder.reset")));
+		resetButton.setX(BUTTON_WIDTH);
+	}
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int clicksRan = 0;
+	@Override
+	public List<? extends ClickableWidget> children() {
+		return List.of(
+				this.fileDialogButton, this.resetButton, this.textInput
+		);
+	}
 
-        for (ClickableWidget child : this.children()) {
-            if (child.isHovered()) {
-                clicksRan += 1;
-                this.playDownSound(MinecraftClient.getInstance().getSoundManager());
-                if (child instanceof TextFieldWidget textFieldWidget) {
-                    child.setFocused(true);
-                    this.setFocused(child);
-                    textFieldWidget.setFocusUnlocked(true);
-                }
-                child.onClick(mouseX - this.getX(), mouseY - this.getY() + WEIRD_FIX_OFFSET);
-            }
-        }
+	@Override
+	public void setX(int x) {
+		super.setX(x);
 
-        return clicksRan == 1;
-    }
+		fileDialogButton.setX(x);
+		resetButton.setX(x + BUTTON_WIDTH);
+		textInput.setX(x + (BUTTON_WIDTH * 2));
+	}
 
-    @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        // Jank is unavoidable sometimes
-        if (this.width != textField.getWidth() + 25 + 25) {
-            textField.setWidth(this.width - 25 - 25);
-            int originalCursor = textField.getCursor();
-            textField.setCursorToStart(false);
-            textField.setCursor(originalCursor, false);
-        }
+	@Override
+	public void setY(int y) {
+		super.setY(y);
 
-        // Special thanks to Falkreon for this workaround
-        this.children().forEach(child -> {
-            context.getMatrices().pushMatrix();
-            {
-                context.getMatrices().translate(this.getX(), this.getY() - WEIRD_FIX_OFFSET);
-                child.render(
-                        context,
-                        mouseX - this.getX(), mouseY - this.getY() + WEIRD_FIX_OFFSET,
-                        delta
-                );
-            }
-            context.getMatrices().popMatrix();
+		fileDialogButton.setY(y);
+		resetButton.setY(y);
+		textInput.setY(y);
+	}
 
-            if (child instanceof TextFieldWidget textFieldWidget) {
-                if (!Files.exists(Path.of(textFieldWidget.getText()))) {
-                    textFieldWidget.setEditableColor(0xFF0000);
-                    return;
-                }
+	@Override
+	public void setWidth(int width) {
+		super.setWidth(width);
 
-                textFieldWidget.setEditableColor(Colors.WHITE);
-            }
-        });
-    }
+		textInput.setWidth(width - (BUTTON_WIDTH * 2));
+	}
 
-    @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
-    }
+	private void valueFromSelectDialog(@Nullable Path value) {
+		if (value == null) {
+			return;
+		}
 
-    @Override
-    public void forEachChild(Consumer<ClickableWidget> consumer) {
-        this.children().forEach(consumer);
-    }
+		if (Files.exists(value)) {
+			this.value.set(value);
+			this.textInput.setText(this.value.get().toString());
+		}
+	}
 
-    @Override
-    protected int getContentsHeightWithPadding() {
-        return 20;
-    }
+	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		int clicksRan = 0;
 
-    @Override
-    protected double getDeltaYPerScroll() {
-        return 20 / 2f;
-    }
+		for (ClickableWidget child : this.children()) {
+			if (child.isHovered()) {
+				clicksRan += 1;
+				this.playDownSound(MinecraftClient.getInstance().getSoundManager());
 
-    @Override
-    public boolean isMouseOver(double mouseX, double mouseY) {
-        this.active = true;
-        var hovered = super.isMouseOver(mouseX, mouseY);
-        this.active = false;
-        return hovered;
-    }
+				if (child == textInput) {
+					textInput.setFocused(true);
+					this.setFocused(textInput);
+					textInput.setFocusUnlocked(true);
+				}
+
+				child.onClick(mouseX, mouseY);
+			}
+		}
+
+		return clicksRan == 1;
+	}
+
+	@Override
+	protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+		for (Drawable drawable : this.children()) {
+			drawable.render(context, mouseX, mouseY, deltaTicks);
+		}
+	}
+
+	@Override
+	protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+		fileDialogButton.appendClickableNarrations(builder);
+		resetButton.appendClickableNarrations(builder);
+		textInput.appendClickableNarrations(builder);
+	}
+
+	@Override
+	public void forEachChild(Consumer<ClickableWidget> consumer) {
+		this.children().forEach(consumer);
+	}
+
+	@Override
+	protected int getContentsHeightWithPadding() {
+		return 20;
+	}
+
+	@Override
+	protected double getDeltaYPerScroll() {
+		return 20 / 2f;
+	}
+
+	@Override
+	public boolean isMouseOver(double mouseX, double mouseY) {
+		this.active = true;
+		var hovered = super.isMouseOver(mouseX, mouseY);
+		this.active = false;
+		return hovered;
+	}
 }

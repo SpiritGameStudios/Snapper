@@ -53,7 +53,7 @@
   "config.snapper.snapper.useCustomScreenshotFolder": "Custom Folder",
   "config.snapper.snapper.useCustomScreenshotFolder.tooltip": "Whether to use a custom screenshot folder or the default",
   "config.snapper.snapper.customScreenshotFolder": "Screenshot Folder",
-  "config.snapper.snapper.customScreenshotFolder.placeholder": "Custom folder path (click to reveal)",
+  "config.snapper.snapper.customScreenshotFolder.placeholder": "Click to reveal",
   "config.snapper.snapper.customScreenshotFolder.input": "Folder for all screenshots to be saved and viewed from",
   "config.snapper.snapper.customScreenshotFolder.select": "Select folder",
   "config.snapper.snapper.customScreenshotFolder.reset": "Reset to default",

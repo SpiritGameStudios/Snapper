@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 public class PanoramaViewerScreen extends Screen {
@@ -40,11 +39,14 @@ public class PanoramaViewerScreen extends Screen {
         this.client = MinecraftClient.getInstance();
         assert client != null;
         this.texture = this.getTexture();
+        if (texture != null) {
+            client.getTextureManager().registerTexture(ID, texture);
+        }
     }
 
     @Nullable
     private DynamicCubemapTexture getTexture() {
-        Objects.requireNonNull(this.client);
+		assert client != null;
 
         Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
         if (!SnapperUtil.panoramaPresent(panoramaDir)) return null;
@@ -64,7 +66,7 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     public void close() {
-        Objects.requireNonNull(this.client);
+		assert client != null;
 
         if (texture != null) {
             client.getTextureManager().destroyTexture(ID);
@@ -76,6 +78,7 @@ public class PanoramaViewerScreen extends Screen {
 
     @Override
     protected void init() {
+        // This is called whenever the window is resized.
         assert client != null;
 
         if (this.texture == null) {
@@ -83,7 +86,6 @@ public class PanoramaViewerScreen extends Screen {
             close();
             return;
         }
-        client.getTextureManager().registerTexture(ID, texture);
 
         Path panoramaPath = Path.of(client.runDirectory.getPath(), "screenshots", "panorama");
         addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.folder"), button -> {
