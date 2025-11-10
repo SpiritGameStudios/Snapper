@@ -35,6 +35,7 @@ public class ScreenshotRenameScreen extends Screen {
         this.addDrawableChild(this.renameInput).setPosition(this.width / 2 - 100, this.height / 2);
 
         this.renameInput.setText(this.screenshot.getFileName().toString());
+        this.renameInput.setMaxLength(255);
         this.addDrawableChild(ButtonWidget.builder(
                 Text.translatable("button.snapper.rename"),
                 button -> this.renameScreenshot(this.renameInput.getText())
