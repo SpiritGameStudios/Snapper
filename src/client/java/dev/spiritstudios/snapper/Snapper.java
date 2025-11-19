@@ -9,16 +9,17 @@ import dev.spiritstudios.specter.api.config.client.ConfigScreenWidgets;
 import dev.spiritstudios.specter.api.config.client.ModMenuHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.Locale;
 
 public final class Snapper implements ClientModInitializer {
     public static final String MODID = "snapper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
+    public static final boolean IS_MAC_OS = System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("mac");
 
     @Override
     public void onInitializeClient() {
@@ -35,6 +36,6 @@ public final class Snapper implements ClientModInitializer {
     }
 
     public static PlatformHelper getPlatformHelper() {
-        return MinecraftClient.IS_SYSTEM_MAC ? new MacPlatformActions() : new GeneralPlatformActions();
+        return IS_MAC_OS ? new MacPlatformActions() : new GeneralPlatformActions();
     }
 }

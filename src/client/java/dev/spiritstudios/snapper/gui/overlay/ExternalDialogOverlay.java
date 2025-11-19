@@ -45,7 +45,7 @@ public class ExternalDialogOverlay extends Overlay {
                 Colors.WHITE
         );
 
-        if (InputUtil.isKeyPressed(client.getWindow().getHandle(), InputUtil.GLFW_KEY_ESCAPE)) close();
+        if (InputUtil.isKeyPressed(client.getWindow(), InputUtil.GLFW_KEY_ESCAPE)) close();
     }
 
     public void close() {

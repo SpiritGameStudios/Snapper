@@ -15,7 +15,7 @@ import net.minecraft.util.Identifier;
 import java.util.List;
 
 public class SnapperToast implements Toast {
-    private static final Identifier TEXTURE = Snapper.id("toast/snapper");
+    private static final Identifier TEXTURE = Snapper.id("push/snapper");
     private static final Identifier SCREENSHOT_ICON = Snapper.id("icon/image");
     private static final Identifier PANORAMA_ICON = Snapper.id("icon/panorama");
     private static final Identifier UPLOAD_ICON = Snapper.id("icon/upload");
@@ -38,6 +38,16 @@ public class SnapperToast implements Toast {
         MinecraftClient client = MinecraftClient.getInstance();
         TextRenderer textRenderer = client.textRenderer;
         this.lines = textRenderer.wrapLines(description, WIDTH - PADDING * 3 - 16);
+    }
+
+    public static void push(Type type, Text title, Text description) {
+        MinecraftClient.getInstance().getToastManager().add(
+                new SnapperToast(
+                        type,
+                        title,
+                        description
+                )
+        );
     }
 
     @Override

@@ -5,6 +5,7 @@ import dev.spiritstudios.snapper.gui.overlay.ExternalDialogOverlay;
 import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
 import dev.spiritstudios.specter.api.config.Value;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.ParentElement;
@@ -153,7 +154,7 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+	public boolean mouseClicked(Click click, boolean doubled) {
 		int clicksRan = 0;
 
 		for (ClickableWidget child : this.children()) {
@@ -167,7 +168,7 @@ public class FolderSelectWidget extends ContainerWidget implements ParentElement
 					textInput.setFocusUnlocked(true);
 				}
 
-				child.onClick(mouseX, mouseY);
+				child.onClick(click, doubled);
 			}
 		}
 

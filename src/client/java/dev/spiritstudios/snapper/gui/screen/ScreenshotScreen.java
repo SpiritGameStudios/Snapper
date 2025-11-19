@@ -2,6 +2,7 @@ package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
@@ -10,11 +11,8 @@ import dev.spiritstudios.specter.api.config.client.RootConfigScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.AxisGridWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
-import net.minecraft.client.gui.widget.SimplePositioningWidget;
-import net.minecraft.client.gui.widget.TextIconButtonWidget;
+import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
@@ -22,7 +20,6 @@ import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 import java.nio.file.Path;
 
@@ -239,28 +236,28 @@ public class ScreenshotScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (super.keyPressed(keyCode, scanCode, modifiers)) return true;
+    public boolean keyPressed(KeyInput input) {
         if (client == null) return false;
 
-        if (keyCode == GLFW.GLFW_KEY_F5) {
+        if (input.key() == InputUtil.GLFW_KEY_F5) {
             client.setScreen(new ScreenshotScreen(this.parent));
             return true;
         }
 
         if (selectedScreenshot == null) return false;
 
-        if ((modifiers & GLFW.GLFW_MOD_CONTROL) != 0 && keyCode == InputUtil.GLFW_KEY_C) {
+        if ((input.modifiers() & InputUtil.GLFW_MOD_CONTROL) != 0 && input.key() == InputUtil.GLFW_KEY_C) {
             Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.icon.getPath());
+            SnapperToast.push(SnapperToast.Type.SCREENSHOT, Text.translatable("toast.snapper.screenshot.copy"), null);
             return true;
         }
 
-        if (keyCode == GLFW.GLFW_KEY_ENTER) {
+        if (input.key() == InputUtil.GLFW_KEY_ENTER) {
             client.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.icon.getPath(), this));
             return true;
         }
 
-        return false;
+        return super.keyPressed(input);
     }
 
     @Override

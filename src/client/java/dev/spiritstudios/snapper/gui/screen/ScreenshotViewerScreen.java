@@ -30,9 +30,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 public class ScreenshotViewerScreen extends Screen {
     private static final Identifier MENU_DECOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_list_background.png");
@@ -290,34 +287,5 @@ public class ScreenshotViewerScreen extends Screen {
                 width, 2,
                 32, 2
         );
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (this.screenshotIndex == -1 || this.screenshots == null)
-            return super.keyPressed(keyCode, scanCode, modifiers);
-
-        Path imagePath = switch (keyCode) {
-            case GLFW_KEY_LEFT -> this.screenshotIndex >= 1 ?
-                    screenshots.get(screenshotIndex - 1) :
-                    screenshots.getLast();
-            case GLFW_KEY_RIGHT -> this.screenshotIndex < this.screenshots.size() - 1 ?
-                    screenshots.get(screenshotIndex + 1) :
-                    screenshots.getFirst();
-            default -> null;
-        };
-
-        if (imagePath == null) return super.keyPressed(keyCode, scanCode, modifiers);
-        CompletableFuture.supplyAsync(() -> DynamicTexture.createScreenshot(client.getTextureManager(), imagePath), Util.getIoWorkerExecutor())
-                .thenAccept(texture -> texture.ifPresent(dynamicTexture -> client.submit(() -> {
-                    client.setScreen(new ScreenshotViewerScreen(
-                            dynamicTexture, imagePath,
-                            this.parent,
-                            this.screenshots
-                    ));
-                    dynamicTexture.load();
-                })));
-
-        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

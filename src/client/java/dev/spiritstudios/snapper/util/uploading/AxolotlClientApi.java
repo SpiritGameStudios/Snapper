@@ -7,7 +7,6 @@ import com.mojang.serialization.JsonOps;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
-import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.session.Session;
 import net.minecraft.text.Text;
@@ -56,7 +55,7 @@ public class AxolotlClientApi implements Closeable {
             return CompletableFuture.failedFuture(e);
         }
 
-        SnapperUtil.toast(SnapperToast.Type.UPLOAD,
+        SnapperToast.push(SnapperToast.Type.UPLOAD,
                 Text.translatable("toast.snapper.upload.in_progress"),
                 Text.translatable("toast.snapper.upload.in_progress.description"));
 
@@ -77,7 +76,7 @@ public class AxolotlClientApi implements Closeable {
             return CompletableFuture.completedFuture(null);
 
         Session session = MinecraftClient.getInstance().getSession();
-        MinecraftSessionService sessionService = MinecraftClient.getInstance().getSessionService();
+        MinecraftSessionService sessionService = MinecraftClient.getInstance().getApiServices().sessionService();
         String serverId = new BigInteger(DigestUtils.sha1(RandomStringUtils.insecure().next(40).getBytes(StandardCharsets.UTF_8))).toString(16);
 
         try {

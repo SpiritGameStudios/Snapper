@@ -22,7 +22,7 @@ public class ScreenshotUploading {
 
     public static CompletableFuture<Void> upload(Path image) {
         if (SnapperUtil.isOfflineAccount()) {
-            SnapperUtil.toast(
+            SnapperToast.push(
                     SnapperToast.Type.DENY,
                     Text.translatable("toast.snapper.upload.axolotlclient.api_disabled"),
                     Text.translatable("toast.snapper.upload.offline")
@@ -42,7 +42,7 @@ public class ScreenshotUploading {
         }
 
         if (SnapperConfig.INSTANCE.termsAccepted.get() != AxolotlClientApi.TermsAcceptance.ACCEPTED) {
-            SnapperUtil.toast(
+            SnapperToast.push(
                     SnapperToast.Type.UPLOAD,
                     Text.translatable("toast.snapper.upload.failure"),
                     Text.translatable("toast.snapper.upload.axolotlclient.api_disabled")
@@ -57,7 +57,7 @@ public class ScreenshotUploading {
 
     private static void imageUploaded(String imageId) {
         if (imageId == null) {
-            SnapperUtil.toast(
+            SnapperToast.push(
                     SnapperToast.Type.DENY,
                     Text.translatable("toast.snapper.upload.failure"),
                     Text.translatable("toast.snapper.upload.failure.generic")
@@ -71,7 +71,7 @@ public class ScreenshotUploading {
         Snapper.LOGGER.info("Uploaded screenshot to: {}", snapperUrl);
 
         client.keyboard.setClipboard(snapperUrl);
-        SnapperUtil.toast(
+        SnapperToast.push(
                 SnapperToast.Type.UPLOAD,
                 Text.translatable("toast.snapper.upload.success"),
                 Text.translatable("toast.snapper.upload.success.description", snapperUrl)

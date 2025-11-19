@@ -47,12 +47,12 @@ public abstract class ScreenshotRecorderMixin {
 
     /**
      * @author WorldWidePixel
-     * @reason Okay, I know this is weird but it's so we can use our own wrapper text for the toast.
+     * @reason Okay, I know this is weird but it's so we can use our own wrapper text for the push.
      */
     @ModifyArg(method = "method_22691",
     at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Text;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/text/MutableText;", ordinal = 0))
     private static String changeSuccessTranslation(String existing) {
-        return "toast.snapper.screenshot.created.success";
+        return "push.snapper.screenshot.created.success";
     }
 
     @WrapMethod(method = "saveScreenshot(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;ILjava/util/function/Consumer;)V")

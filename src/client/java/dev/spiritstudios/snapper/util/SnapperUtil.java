@@ -2,9 +2,7 @@ package dev.spiritstudios.snapper.util;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import org.apache.commons.lang3.SystemProperties;
 
@@ -58,16 +56,6 @@ public final class SnapperUtil {
         public int size() {
             return size;
         }
-    }
-
-    public static void toast(SnapperToast.Type type, Text title, Text description) {
-        MinecraftClient.getInstance().getToastManager().add(
-                new SnapperToast(
-                        type,
-                        title,
-                        description
-                )
-        );
     }
 
     public static final Path UNIFIED_FOLDER = switch (Util.getOperatingSystem()) {

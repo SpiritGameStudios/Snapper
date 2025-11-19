@@ -57,10 +57,10 @@ public class PrivacyNoticeScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
-        graphics.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, getTitleY(), -1);
-        message.drawCenterWithShadow(graphics, width / 2, getMessageY());
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, getTitleY(), -1);
+        message.draw(context, MultilineText.Alignment.CENTER, width / 2, getMessageY(), 10, true, 0xFFFFFF);
     }
 
     @Override
@@ -114,6 +114,6 @@ public class PrivacyNoticeScreen extends Screen {
     }
 
     private int getMessagesHeight() {
-        return this.message.count() * 9;
+        return this.message.getLineCount() * 9;
     }
 }

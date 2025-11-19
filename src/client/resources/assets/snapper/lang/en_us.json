@@ -1,5 +1,5 @@
 {
-  "key.categories.snapper": "Snapper",
+  "key.category.snapper": "Snapper",
   "key.snapper.panorama": "Take Panoramic Screenshots",
   "key.snapper.huge": "Take Huge Screenshot",
   "key.snapper.screenshot_menu": "View Screenshots",
@@ -65,6 +65,8 @@
   "toast.snapper.screenshot.recent.failure": "Could not open latest screenshot",
   "toast.snapper.screenshot.recent.failure.not_exist": "Take a screenshot in order to view it!",
   "toast.snapper.screenshot.recent.failure.generic": "Check logs for more information",
+  "toast.snapper.screenshot.copy": "Screenshot copied to clipboard",
+  "toast.snapper.screenshot.copy.description": "",
   "toast.snapper.panorama.created": "Panorama captured",
   "toast.snapper.panorama.created.description": "Panorama saved. View by pressing %s",
   "toast.snapper.panorama.failed": "Failed to capture panorama",

@@ -5,7 +5,6 @@ import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.util.DynamicTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
-import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.specter.api.core.client.event.ClientKeybindEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
@@ -17,22 +16,24 @@ import java.nio.file.Path;
 import java.util.List;
 
 public final class SnapperKeybindings {
+    public static final KeyBinding.Category SNAPPER = KeyBinding.Category.create(Snapper.id("snapper"));
+
     public static final KeyBinding PANORAMA_KEY = new KeyBinding(
             "key.snapper.panorama",
             GLFW.GLFW_KEY_F8,
-            "key.categories.snapper"
+            SNAPPER
     );
 
     public static final KeyBinding RECENT_SCREENSHOT_KEY = new KeyBinding(
             "key.snapper.recent",
             GLFW.GLFW_KEY_O,
-            "key.categories.snapper"
+            SNAPPER
     );
 
     public static final KeyBinding SCREENSHOT_MENU_KEY = new KeyBinding(
             "key.snapper.screenshot_menu",
             GLFW.GLFW_KEY_V,
-            "key.categories.snapper"
+            SNAPPER
     );
 
     public static void init() {
@@ -51,7 +52,7 @@ public final class SnapperKeybindings {
         if (client.player == null) return;
         client.takePanorama(client.runDirectory);
 
-        SnapperUtil.toast(
+        SnapperToast.push(
                 SnapperToast.Type.PANORAMA,
                 Text.translatable("toast.snapper.panorama.created"),
                 Text.translatable(
@@ -64,7 +65,7 @@ public final class SnapperKeybindings {
     private static void openRecentScreenshot(MinecraftClient client) {
         List<Path> screenshots = ScreenshotActions.getScreenshots();
         if (screenshots.isEmpty()) {
-            SnapperUtil.toast(
+            SnapperToast.push(
                     SnapperToast.Type.SCREENSHOT,
                     Text.translatable("toast.snapper.screenshot.recent.failure"),
                     Text.translatable("toast.snapper.screenshot.recent.failure.not_exist")
@@ -83,7 +84,7 @@ public final class SnapperKeybindings {
                             ));
                             image.load();
                         },
-                        () -> SnapperUtil.toast(
+                        () -> SnapperToast.push(
                                 SnapperToast.Type.DENY,
                                 Text.translatable("toast.snapper.screenshot.recent.failure"),
                                 Text.translatable("toast.snapper.screenshot.recent.failure.generic")
