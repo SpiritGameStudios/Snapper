@@ -8,7 +8,6 @@ import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -65,7 +64,7 @@ public class ScreenshotScreen extends Screen {
 
     @Override
     protected void init() {
-        screenshotList = this.addRenderableOnly(new ScreenshotListWidget(
+        screenshotList = this.addRenderableWidget(new ScreenshotListWidget(
                 Minecraft.getInstance(),
                 width,
                 height - 48 - 68,
