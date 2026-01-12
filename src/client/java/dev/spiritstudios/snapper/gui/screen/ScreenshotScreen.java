@@ -211,7 +211,7 @@ public class ScreenshotScreen extends Screen {
 
         panoramaButton.setTooltip(Tooltip.create(Component.translatable(hasPanorama ?
                 "button.snapper.panorama.tooltip" :
-                "Component.snapper.panorama_encourage")));
+                "text.snapper.panorama_encourage")));
 
 
         this.imageSelected(selectedScreenshot);
