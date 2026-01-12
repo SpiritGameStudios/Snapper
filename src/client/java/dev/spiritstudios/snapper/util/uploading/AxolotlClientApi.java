@@ -3,17 +3,20 @@ package dev.spiritstudios.snapper.util.uploading;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.session.Session;
-import net.minecraft.text.Text;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.User;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -31,17 +34,30 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class AxolotlClientApi implements Closeable {
-    public enum TermsAcceptance {
-        ACCEPTED,
-        DENIED,
-        UNSET
+    public enum TermsAcceptance implements StringRepresentable {
+        ACCEPTED("accepted"),
+        DENIED("denied"),
+        UNSET("unset");
+
+        public static final Codec<TermsAcceptance> CODEC = StringRepresentable.fromEnum(TermsAcceptance::values);
+
+        private final String name;
+
+        TermsAcceptance(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public @NonNull String getSerializedName() {
+            return name;
+        }
     }
 
     private static final String BASE_URL = "https://api.axolotlclient.com/v1/";
 
     private final HttpClient client = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.NORMAL)
-            .executor(Util.getIoWorkerExecutor())
+            .executor(Util.ioPool())
             .build();
 
     private Instant authTime = Instant.EPOCH;
@@ -56,8 +72,8 @@ public class AxolotlClientApi implements Closeable {
         }
 
         SnapperToast.push(SnapperToast.Type.UPLOAD,
-                Text.translatable("toast.snapper.upload.in_progress"),
-                Text.translatable("toast.snapper.upload.in_progress.description"));
+                Component.translatable("toast.snapper.upload.in_progress"),
+                Component.translatable("toast.snapper.upload.in_progress.description"));
 
         return authenticate()
                 .thenCompose(ignored -> post("image/" + image.getFileName().toString(), bytes))
@@ -75,17 +91,17 @@ public class AxolotlClientApi implements Closeable {
         if (authTime.plus(24, ChronoUnit.HOURS).isAfter(Instant.now()))
             return CompletableFuture.completedFuture(null);
 
-        Session session = MinecraftClient.getInstance().getSession();
-        MinecraftSessionService sessionService = MinecraftClient.getInstance().getApiServices().sessionService();
+        User session = Minecraft.getInstance().getUser();
+        MinecraftSessionService sessionService = Minecraft.getInstance().services().sessionService();
         String serverId = new BigInteger(DigestUtils.sha1(RandomStringUtils.insecure().next(40).getBytes(StandardCharsets.UTF_8))).toString(16);
 
         try {
-            sessionService.joinServer(session.getUuidOrNull(), session.getAccessToken(), serverId);
+            sessionService.joinServer(session.getProfileId(), session.getAccessToken(), serverId);
         } catch (AuthenticationException e) {
             return CompletableFuture.failedFuture(e);
         }
 
-        return this.get("authenticate", Map.of("username", session.getUsername(), "server_id", serverId))
+        return this.get("authenticate", Map.of("username", session.getName(), "server_id", serverId))
                 .thenApply(response ->
                         AxolotlAuthentication.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(response.body()))
                                 .getOrThrow())
@@ -104,7 +120,7 @@ public class AxolotlClientApi implements Closeable {
     }
 
     private CompletableFuture<HttpResponse<String>> request(String route, Map<String, String> query, byte[] rawBody, String method) {
-        if (SnapperConfig.INSTANCE.termsAccepted.get() != TermsAcceptance.ACCEPTED)
+        if (SnapperConfig.HOLDER.get().axolotlClient().termsStatus() != TermsAcceptance.ACCEPTED)
             return CompletableFuture.failedFuture(new IllegalStateException("Terms not accepted"));
 
         StringBuilder url = new StringBuilder(BASE_URL);

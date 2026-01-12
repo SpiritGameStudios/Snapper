@@ -29,7 +29,9 @@ loom {
 }
 
 repositories {
+	mavenLocal() // TODO: Remove me after Greenhouse Config releases.
 	mavenCentral()
+	maven("https://maven.parchmentmc.org/")
 	maven("https://maven.spiritstudios.dev/releases/")
 	maven("https://moehreag.duckdns.org/maven/releases") {
 		content {
@@ -37,17 +39,24 @@ repositories {
 			includeGroup("io.github.axolotlclient.AxolotlClient-config")
 		}
 	}
+	maven("https://maven.greenhouse.lgbt/releases/")
 }
 
 dependencies {
 	minecraft(libs.minecraft)
-	mappings(variantOf(libs.yarn) { classifier("v2") })
+	mappings(loom.layered {
+		officialMojangMappings()
+		parchment(libs.parchment)
+	})
 	modImplementation(libs.fabric.loader)
 
 	modImplementation(libs.fabric.api)
 
 	include(libs.bundles.specter)
 	modImplementation(libs.bundles.specter)
+
+	include(libs.greenhouse.config)
+	modImplementation(libs.greenhouse.config)
 
 	implementation(libs.objc.bridge)
 }

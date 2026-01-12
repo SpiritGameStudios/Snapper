@@ -3,17 +3,13 @@ package dev.spiritstudios.snapper;
 import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.actions.GeneralPlatformActions;
 import dev.spiritstudios.snapper.util.actions.MacPlatformActions;
-import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
-import dev.spiritstudios.specter.api.config.client.ConfigScreenWidgets;
-import dev.spiritstudios.specter.api.config.client.ModMenuHelper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
 import java.util.Locale;
 
 public final class Snapper implements ClientModInitializer {
@@ -23,16 +19,13 @@ public final class Snapper implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ConfigScreenWidgets.add(Path.class, DirectoryConfigUtil.PATH_WIDGET_FACTORY);
+        SnapperConfig.init();
         SnapperKeybindings.init();
-
-        ModMenuHelper.addConfig(Snapper.MODID, SnapperConfig.HOLDER.id());
-
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> ScreenshotUploading.close());
     }
 
-    public static Identifier id(String path) {
-        return Identifier.of(MODID, path);
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
     public static PlatformHelper getPlatformHelper() {

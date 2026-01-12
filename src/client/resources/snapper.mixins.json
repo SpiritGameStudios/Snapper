@@ -4,14 +4,14 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "CameraMixin",
-    "GameMenuMixin",
-    "KeyboardMixin",
+    "PauseScreenMixin",
+    "KeyboardHandlerMixin",
     "InGameHudMixin",
-    "MinecraftClientMixin",
+    "MinecraftMixin",
     "ScreenshotRecorderMixin",
     "TitleScreenMixin",
     "accessor.CameraAccessor",
-    "accessor.EntryListWidgetAccessor"
+    "accessor.AbstractSelectionListAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

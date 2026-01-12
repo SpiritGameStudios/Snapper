@@ -4,27 +4,26 @@ import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import dev.spiritstudios.snapper.gui.screen.PanoramaViewerScreen;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screens.LevelLoadingScreen;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(InGameHud.class)
+@Mixin(Gui.class)
 public class InGameHudMixin {
-
     @Shadow
     @Final
-    private MinecraftClient client;
+    private Minecraft minecraft;
 
     @Definition(id = "LevelLoadingScreen", type = LevelLoadingScreen.class)
-    @Definition(id = "client", field = "Lnet/minecraft/client/gui/hud/InGameHud;client:Lnet/minecraft/client/MinecraftClient;")
-    @Definition(id = "currentScreen", field = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;")
-    @Expression("(this.client.currentScreen instanceof LevelLoadingScreen)")
+    @Definition(id = "minecraft", field = "Lnet/minecraft/client/gui/Gui;minecraft:Lnet/minecraft/client/Minecraft;")
+    @Definition(id = "screen", field = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;")
+    @Expression("(this.minecraft.screen instanceof LevelLoadingScreen)")
     @ModifyExpressionValue(method = "render", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
     private boolean cancelRenderingHudInPanoramaScreen(boolean original) {
-        return original || client.currentScreen instanceof PanoramaViewerScreen;
+        return original || minecraft.screen instanceof PanoramaViewerScreen;
     }
 }

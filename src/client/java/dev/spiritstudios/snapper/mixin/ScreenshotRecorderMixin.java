@@ -2,12 +2,12 @@ package dev.spiritstudios.snapper.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.platform.NativeImage;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.util.ScreenshotRecorder;
-import net.minecraft.text.Text;
+import net.minecraft.client.Screenshot;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.function.Consumer;
 
-@Mixin(ScreenshotRecorder.class)
+@Mixin(Screenshot.class)
 public abstract class ScreenshotRecorderMixin {
     /**
      * @author hama
@@ -28,19 +28,19 @@ public abstract class ScreenshotRecorderMixin {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Inject(
             method = "method_22691",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/NativeImage;writeTo(Ljava/io/File;)V")
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/NativeImage;writeToFile(Ljava/io/File;)V")
     )
-    private static void lookBeforeYouLeap(NativeImage nativeImage, File screenshotFile, Consumer<Text> messageReceiver, CallbackInfo ci) throws IOException {
+    private static void lookBeforeYouLeap(NativeImage nativeImage, File screenshotFile, Consumer<Component> messageReceiver, CallbackInfo ci) throws IOException {
         screenshotFile.getParentFile().mkdirs();
         screenshotFile.createNewFile();
     }
 
     @Inject(
             method = "method_22691",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Text;literal(Ljava/lang/String;)Lnet/minecraft/text/MutableText;", shift = At.Shift.AFTER)
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Component;literal(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;", shift = At.Shift.AFTER)
     )
-    private static void saveWrittenFileToClipboard(NativeImage nativeImage, File screenshotFile, Consumer<Text> messageReceiver, CallbackInfo ci) {
-        if (!screenshotFile.getAbsolutePath().contains("/panorama/") && SnapperConfig.INSTANCE.copyTakenScreenshot.get()) {
+    private static void saveWrittenFileToClipboard(NativeImage nativeImage, File screenshotFile, Consumer<Component> messageReceiver, CallbackInfo ci) {
+        if (!screenshotFile.getAbsolutePath().contains("/panorama/") && SnapperConfig.HOLDER.get().copyTakenScreenshot()) {
             Snapper.getPlatformHelper().copyScreenshot(screenshotFile.toPath());
         }
     }
@@ -50,19 +50,19 @@ public abstract class ScreenshotRecorderMixin {
      * @reason Okay, I know this is weird but it's so we can use our own wrapper text for the push.
      */
     @ModifyArg(method = "method_22691",
-    at = @At(value = "INVOKE", target = "Lnet/minecraft/text/Text;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/text/MutableText;", ordinal = 0))
+    at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = 0))
     private static String changeSuccessTranslation(String existing) {
-        return "push.snapper.screenshot.created.success";
+        return "toast.snapper.screenshot.created.success";
     }
 
-    @WrapMethod(method = "saveScreenshot(Ljava/io/File;Ljava/lang/String;Lnet/minecraft/client/gl/Framebuffer;ILjava/util/function/Consumer;)V")
-    private static void getConfiguredGameDirectory(File gameDirectory, String fileName, Framebuffer framebuffer, int downscaleFactor, Consumer<Text> messageReceiver, Operation<Void> original) {
+    @WrapMethod(method = "grab(Ljava/io/File;Ljava/lang/String;Lcom/mojang/blaze3d/pipeline/RenderTarget;ILjava/util/function/Consumer;)V")
+    private static void getConfiguredGameDirectory(File gameDirectory, String fileName, RenderTarget renderTarget, int downscaleFactor, Consumer<Component> messageReceiver, Operation<Void> original) {
         original.call(
-                SnapperConfig.INSTANCE.useCustomScreenshotFolder.get() && Files.exists(SnapperConfig.INSTANCE.customScreenshotFolder.get()) ?
-                        SnapperConfig.INSTANCE.customScreenshotFolder.get().toFile() :
+                SnapperConfig.HOLDER.get().customScreenshotPath().enabled() && Files.exists(SnapperConfig.HOLDER.get().customScreenshotPath().path()) ?
+                        SnapperConfig.HOLDER.get().customScreenshotPath().path().toFile() :
                         gameDirectory,
                 fileName,
-                framebuffer,
+                renderTarget,
                 downscaleFactor,
                 messageReceiver
         );

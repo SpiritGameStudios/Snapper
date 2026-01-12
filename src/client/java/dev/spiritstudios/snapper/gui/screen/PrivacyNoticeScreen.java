@@ -28,19 +28,17 @@
 
 package dev.spiritstudios.snapper.gui.screen;
 
-import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
-import net.minecraft.client.font.MultilineText;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 import java.net.URI;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public class PrivacyNoticeScreen extends Screen {
@@ -48,65 +46,61 @@ public class PrivacyNoticeScreen extends Screen {
 
     private final Screen parent;
     private final Consumer<Boolean> accepted;
-    private MultilineText message;
+    private MultiLineLabel message;
 
     public PrivacyNoticeScreen(Screen parent, Consumer<Boolean> accepted) {
-        super(Text.translatable("snapper.privacy_notice"));
+        super(Component.translatable("snapper.privacy_notice"));
         this.parent = parent;
         this.accepted = accepted;
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, getTitleY(), -1);
-        message.draw(context, MultilineText.Alignment.CENTER, width / 2, getMessageY(), 10, true, 0xFFFFFF);
+        context.drawCenteredString(this.font, this.title, this.width / 2, getTitleY(), -1);
+        message.render(context, MultiLineLabel.Align.CENTER, width / 2, getMessageY(), 10, true, 0xFFFFFF);
     }
 
     @Override
-    public Text getNarratedTitle() {
-        return ScreenTexts.joinSentences(super.getNarratedTitle(),
-                Text.translatable("snapper.privacy_notice.description"));
+    public Component getNarrationMessage() {
+        return CommonComponents.joinForNarration(super.getNarrationMessage(),
+                Component.translatable("snapper.privacy_notice.description"));
     }
 
     @Override
     protected void init() {
-        Objects.requireNonNull(client);
+        message = MultiLineLabel.create(Minecraft.getInstance().font,
+                Component.translatable("snapper.privacy_notice.description"), width - 50);
 
-        message = MultilineText.create(client.textRenderer,
-                Text.translatable("snapper.privacy_notice.description"), width - 50);
-
-        int y = MathHelper.clamp(this.getMessageY() + this.getMessagesHeight() + 20, this.height / 6 + 96, this.height - 24);
+        int y = Mth.clamp(this.getMessageY() + this.getMessagesHeight() + 20, this.height / 6 + 96, this.height - 24);
 
         this.addButtons(y);
     }
 
     private void addButtons(int y) {
-        Objects.requireNonNull(client);
-
         int buttonWidth = 120;
 
-        addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.view_terms"), buttonWidget ->
-                Util.getOperatingSystem().open(TERMS_URI)).dimensions(width / 2 - (buttonWidth / 2) - buttonWidth - 5, y, buttonWidth, 20).build());
+        addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.view_terms"), buttonWidget ->
+                Util.getPlatform().openUri(TERMS_URI)).bounds(width / 2 - (buttonWidth / 2) - buttonWidth - 5, y, buttonWidth, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.accept"), buttonWidget -> {
-            client.setScreen(parent);
-            SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.ACCEPTED);
-            SnapperConfig.HOLDER.save();
+        addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.accept"), buttonWidget -> {
+            Minecraft.getInstance().setScreen(parent);
+//            SnapperConfig.INSTANCE.termsStatus.set(AxolotlClientApi.TermsAcceptance.ACCEPTED);
+//            SnapperConfig.HOLDER.save();
             accepted.accept(true);
-        }).dimensions(width / 2 - (buttonWidth / 2), y, buttonWidth, 20).build());
+        }).bounds(width / 2 - (buttonWidth / 2), y, buttonWidth, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(Text.translatable("snapper.privacy_notice.deny"), buttonWidget -> {
-            client.setScreen(parent);
-            SnapperConfig.INSTANCE.termsAccepted.set(AxolotlClientApi.TermsAcceptance.DENIED);
-            SnapperConfig.HOLDER.save();
+        addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.deny"), buttonWidget -> {
+            Minecraft.getInstance().setScreen(parent);
+//            SnapperConfig.INSTANCE.termsStatus.set(AxolotlClientApi.TermsAcceptance.DENIED);
+//            SnapperConfig.HOLDER.save();
             accepted.accept(false);
-        }).dimensions(width / 2 - (buttonWidth / 2) + buttonWidth + 5, y, buttonWidth, 20).build());
+        }).bounds(width / 2 - (buttonWidth / 2) + buttonWidth + 5, y, buttonWidth, 20).build());
     }
 
     private int getTitleY() {
         int i = (this.height - this.getMessagesHeight()) / 2;
-        return MathHelper.clamp(i - 20 - 9, 10, 80);
+        return Mth.clamp(i - 20 - 9, 10, 80);
     }
 
     private int getMessageY() {

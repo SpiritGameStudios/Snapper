@@ -1,13 +1,13 @@
 package dev.spiritstudios.snapper.mixin.accessor;
 
-import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(EntryListWidget.class)
-public interface EntryListWidgetAccessor {
+@Mixin(AbstractSelectionList.class)
+public interface AbstractSelectionListAccessor {
     @Mutable
     @Accessor
-    void setItemHeight(int height);
+    void setDefaultEntryHeight(int height);
 }

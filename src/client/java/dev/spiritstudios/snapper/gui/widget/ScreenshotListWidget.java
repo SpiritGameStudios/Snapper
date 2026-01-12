@@ -1,31 +1,31 @@
 package dev.spiritstudios.snapper.gui.widget;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
-import dev.spiritstudios.snapper.mixin.accessor.EntryListWidgetAccessor;
-import dev.spiritstudios.snapper.util.DynamicTexture;
+import dev.spiritstudios.snapper.mixin.accessor.AbstractSelectionListAccessor;
+import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.specter.api.core.exception.UnreachableException;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.navigation.NavigationDirection;
-import net.minecraft.client.gui.screen.LoadingDisplay;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.StringHelper;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.navigation.ScreenDirection;
+import net.minecraft.client.gui.screens.LoadingDotsText;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.Mth;
+import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -43,11 +43,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
-public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<ScreenshotListWidget.Entry> {
-    private static final Identifier VIEW_SPRITE = Snapper.id("screenshots/view");
-    private static final Identifier VIEW_HIGHLIGHTED_SPRITE = Snapper.id("screenshots/view_highlighted");
+public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidget.Entry> {
+    private static final ResourceLocation VIEW_SPRITE = Snapper.id("screenshots/view");
+    private static final ResourceLocation VIEW_HIGHLIGHTED_SPRITE = Snapper.id("screenshots/view_highlighted");
 
-    private static final Identifier GRID_SELECTION_BACKGROUND_TEXTURE = Snapper.id("textures/gui/grid_selection_background.png");
+    private static final ResourceLocation GRID_SELECTION_BACKGROUND_TEXTURE = Snapper.id("textures/gui/grid_selection_background.png");
 
     private final Screen parent;
 
@@ -60,7 +60,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     private boolean showGrid = false;
 
     public ScreenshotListWidget(
-            MinecraftClient client,
+            Minecraft client,
             int width, int height,
             int y, int itemHeight,
             @Nullable ScreenshotListWidget previous,
@@ -82,9 +82,9 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             }
         });
 
-        this.showGrid = SnapperConfig.INSTANCE.viewMode.get().equals(ScreenshotScreen.ViewMode.GRID);
+        this.showGrid = SnapperConfig.HOLDER.get().viewMode().equals(ScreenshotScreen.ViewMode.GRID);
 
-        ((EntryListWidgetAccessor) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
+        ((AbstractSelectionListAccessor) this).setDefaultEntryHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
     }
 
     @Override
@@ -94,20 +94,20 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     }
 
     @Override
-    public boolean keyPressed(KeyInput input) {
-        if (input.key() == InputUtil.GLFW_KEY_ENTER) {
-            Entry entry = this.getSelectedOrNull();
+    public boolean keyPressed(KeyEvent input) {
+        if (input.key() == InputConstants.KEY_RETURN) {
+            Entry entry = this.getSelected();
             if (entry instanceof ScreenshotEntry screenshotEntry) return screenshotEntry.click();
         }
         return super.keyPressed(input);
     }
 
-    public CompletableFuture<List<ScreenshotEntry>> load(MinecraftClient client) {
+    public CompletableFuture<List<ScreenshotEntry>> load(Minecraft client) {
         return CompletableFuture.supplyAsync(() -> {
                     List<Path> screenshots = ScreenshotActions.getScreenshots();
 
                     return screenshots.parallelStream()
-                            .flatMap(path -> DynamicTexture.createScreenshot(client.getTextureManager(), path).stream())
+                            .flatMap(path -> ScreenshotTexture.createScreenshot(client.getTextureManager(), path).stream())
                             .peek(screenshotImage -> screenshotImage.load()
                                     .exceptionally(throwable -> {
                                         Snapper.LOGGER.error("An error occurred while loading the screenshot list", throwable);
@@ -131,8 +131,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     }
 
     private int getColumnCount() {
-        if (client.currentScreen != null) {
-            int width = client.currentScreen.width;
+        if (minecraft.screen != null) {
+            int width = minecraft.screen.width;
 
             if (width < 480) {
                 return 2;
@@ -151,13 +151,13 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     }
 
     @Override
-    protected void renderList(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderListItems(GuiGraphics context, int mouseX, int mouseY, float delta) {
         if (showGrid) {
             int rowLeft = this.getRowLeft(); //FIXME MATH
             int rowWidth = this.getRowWidth();
-            int entryHeight = this.itemHeight - 4;
+            int entryHeight = this.defaultEntryHeight - 4;
             int entryWidth = GRID_ENTRY_WIDTH;
-            int entryCount = this.getEntryCount();
+            int entryCount = this.getItemCount();
             int spacing = (rowWidth - (getColumnCount() * entryWidth)) / (getColumnCount() - 1);
 
             for (int index = 0; index < entryCount; index++) {
@@ -168,11 +168,11 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
                 if (rowBottom >= this.getY() && rowTop <= this.getBottom()) {
                     //this.renderEntry(context, mouseX, mouseY, delta, index, rowLeft + leftOffset, rowTop, entryWidth, entryHeight); //TODO MATH
-                    this.renderEntry(context, mouseX, mouseY, delta, this.children().get(index));
+                    this.renderItem(context, mouseX, mouseY, delta, this.children().get(index));
                 }
             }
         } else {
-            super.renderList(context, mouseX, mouseY, delta);
+            super.renderListItems(context, mouseX, mouseY, delta);
         }
     }
 
@@ -182,30 +182,32 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     }
 
     @Override
-    protected void drawSelectionHighlight(DrawContext context, Entry entry, int color) {
+    protected void renderSelection(GuiGraphics context, Entry entry, int color) {
         // let elements handle it
     }
 
     @Override
-    public int getMaxScrollY() {
-        int totalRows = (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
-        return showGrid ? Math.max(0, totalRows * itemHeight - this.height + 4) : super.getMaxScrollY();
+    public int maxScrollAmount() {
+        int totalRows = (getItemCount() / getColumnCount()) + (getItemCount() % getColumnCount() > 0 ? 1 : 0);
+        return showGrid ? Math.max(0, totalRows * defaultEntryHeight - this.height + 4) : super.maxScrollAmount();
     }
 
     @Override
-    protected int getContentsHeightWithPadding() {
-        if (!this.showGrid) return super.getContentsHeightWithPadding();
-        int totalRows = (getEntryCount() / getColumnCount()) + (getEntryCount() % getColumnCount() > 0 ? 1 : 0);
+    protected int contentHeight() {
+        if (!this.showGrid) return super.contentHeight();
+        int totalRows = (getItemCount() / getColumnCount()) + (getItemCount() % getColumnCount() > 0 ? 1 : 0);
         //return totalRows * this.itemHeight + this.headerHeight + 4;
-        return totalRows * this.itemHeight + 4; // TODO HEADERHEIGHT WAS KILLED
+        return totalRows * this.defaultEntryHeight + 4; // TODO HEADERHEIGHT WAS KILLED
     }
 
     public void toggleGrid() {
         this.showGrid = !this.showGrid;
-        ((EntryListWidgetAccessor) this).setItemHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
+        ((AbstractSelectionListAccessor) this).setDefaultEntryHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
         for (var entry : this.children()) if (entry instanceof ScreenshotEntry sc) sc.setShowGrid(this.showGrid);
 
-        SnapperConfig.INSTANCE.viewMode.set(this.showGrid ? ScreenshotScreen.ViewMode.GRID : ScreenshotScreen.ViewMode.LIST);
+        SnapperConfig.Mutable mutable = SnapperConfig.mutable();
+        mutable.viewMode = this.showGrid ? ScreenshotScreen.ViewMode.GRID : ScreenshotScreen.ViewMode.LIST;
+        mutable.save();
     }
 
     @Override
@@ -213,27 +215,27 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         if (!showGrid) return super.getEntryAtPosition(x, y);
 
         int rowWidth = this.getRowWidth();
-        int relX = MathHelper.floor(x - this.getRowLeft());
+        int relX = Mth.floor(x - this.getRowLeft());
         //int relY = MathHelper.floor(y - (double) this.getY()) - this.headerHeight;
-        int relY = MathHelper.floor(y - (double) this.getY()); // FIXME HEADERHEIGHT WAS KILLED
+        int relY = Mth.floor(y - (double) this.getY()); // FIXME HEADERHEIGHT WAS KILLED
 
         if (relX < 0 || relX > rowWidth || relY < 0 || relY > getBottom()) return null;
 
-        int rowIndex = (relY + (int) this.getScrollY()) / this.itemHeight;
-        int colIndex = MathHelper.floor(((float) relX / (float) rowWidth) * (float) getColumnCount());
+        int rowIndex = (relY + (int) this.scrollAmount()) / this.defaultEntryHeight;
+        int colIndex = Mth.floor(((float) relX / (float) rowWidth) * (float) getColumnCount());
         int entryIndex = rowIndex * getColumnCount() + colIndex;
 
-        return entryIndex >= 0 && entryIndex < getEntryCount() ? this.children().get(entryIndex) : null;
+        return entryIndex >= 0 && entryIndex < getItemCount() ? this.children().get(entryIndex) : null;
     }
 
-    public abstract static class Entry extends AlwaysSelectedEntryListWidget.Entry<Entry> implements AutoCloseable {
+    public abstract static class Entry extends ObjectSelectionList.Entry<Entry> implements AutoCloseable {
         public void close() {
         }
     }
 
     @Override
-    protected @Nullable Entry getNeighboringEntry(NavigationDirection direction, Predicate<Entry> predicate, @Nullable Entry selected) {
-        if (!showGrid) return super.getNeighboringEntry(direction, predicate, selected);
+    protected @Nullable Entry nextEntry(ScreenDirection direction, Predicate<Entry> predicate, @Nullable Entry selected) {
+        if (!showGrid) return super.nextEntry(direction, predicate, selected);
         int offset = switch (direction) {
             case LEFT -> -1;
             case RIGHT -> 1;
@@ -241,10 +243,10 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             case DOWN -> getColumnCount();
         };
 
-        if (getEntryCount() > 0) {
+        if (getItemCount() > 0) {
             int entryIndex;
             if (selected == null) {
-                entryIndex = offset > 0 ? 0 : getEntryCount() - 1;
+                entryIndex = offset > 0 ? 0 : getItemCount() - 1;
             } else {
                 entryIndex = this.children().indexOf(selected) + offset;
             }
@@ -261,77 +263,77 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
     }
 
     public static class LoadingEntry extends Entry implements AutoCloseable {
-        private static final Text LOADING_LIST_TEXT = Text.translatable("text.snapper.loading");
-        private final MinecraftClient client;
+        private static final Component LOADING_LIST_TEXT = Component.translatable("text.snapper.loading");
+        private final Minecraft client;
 
-        public LoadingEntry(MinecraftClient client) {
+        public LoadingEntry(Minecraft client) {
             this.client = client;
         }
 
         @Override
-        public Text getNarration() {
+        public Component getNarration() {
             return LOADING_LIST_TEXT;
         }
 
         @Override
-        public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
-            if (this.client.currentScreen == null) throw new UnreachableException();
+        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+            if (this.client.screen == null) throw new UnreachableException();
 
-            context.drawText(
-                    this.client.textRenderer,
+            context.drawString(
+                    this.client.font,
                     LOADING_LIST_TEXT,
-                    (this.client.currentScreen.width - this.client.textRenderer.getWidth(LOADING_LIST_TEXT)) / 2,
+                    (this.client.screen.width - this.client.font.width(LOADING_LIST_TEXT)) / 2,
                     getY() + (getHeight() - 9) / 2,
-                    Colors.WHITE,
+                    CommonColors.WHITE,
                     false
             );
 
-            String loadString = LoadingDisplay.get(Util.getMeasuringTimeMs());
+            String loadString = LoadingDotsText.get(Util.getMillis());
 
-            context.drawText(
-                    this.client.textRenderer,
+            context.drawString(
+                    this.client.font,
                     loadString,
-                    (this.client.currentScreen.width - this.client.textRenderer.getWidth(loadString)) / 2,
+                    (this.client.screen.width - this.client.font.width(loadString)) / 2,
                     getY() + (getHeight() - 9) / 2 + 9,
-                    Colors.GRAY,
+                    CommonColors.GRAY,
                     false
             );
         }
     }
 
     public static class EmptyEntry extends Entry implements AutoCloseable {
-        private static final Text EMPTY_LIST_TEXT = Text.translatable("text.snapper.empty");
-        private static final Text EMPTY_CUSTOM_LIST_TEXT = Text.translatable("text.snapper.empty.custom");
-        private final MinecraftClient client;
+        private static final Component EMPTY_LIST_TEXT = Component.translatable("text.snapper.empty");
+        private static final Component EMPTY_CUSTOM_LIST_TEXT = Component.translatable("text.snapper.empty.custom");
+        private final Minecraft minecraft;
 
-        public EmptyEntry(MinecraftClient client) {
-            this.client = client;
+        public EmptyEntry(Minecraft minecraft) {
+            this.minecraft = minecraft;
         }
 
         @Override
-        public Text getNarration() {
+        public Component getNarration() {
             return EMPTY_LIST_TEXT;
         }
 
         @Override
-        public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
-            if (this.client.currentScreen == null) throw new UnreachableException();
+        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+            if (this.minecraft.screen == null) throw new UnreachableException();
 
-            context.drawText(
-                    this.client.textRenderer,
+            context.drawString(
+                    this.minecraft.font,
                     EMPTY_LIST_TEXT,
-                    (this.client.currentScreen.width - this.client.textRenderer.getWidth(EMPTY_LIST_TEXT)) / 2,
+                    (this.minecraft.screen.width - this.minecraft.font.width(EMPTY_LIST_TEXT)) / 2,
                     getY() + getHeight() / 2,
-                    Colors.WHITE,
+                    CommonColors.WHITE,
                     false
             );
 
-            context.drawText(
-                    this.client.textRenderer,
+            context.drawString(
+                    this.minecraft.font,
                     EMPTY_CUSTOM_LIST_TEXT,
-                    (this.client.currentScreen.width - this.client.textRenderer.getWidth(EMPTY_CUSTOM_LIST_TEXT)) / 2,
+                    (this.minecraft.screen.width - this.minecraft.font.width(EMPTY_CUSTOM_LIST_TEXT)) / 2,
                     getY() + getHeight() / 2 + 10,
-                    Colors.WHITE,
+                    CommonColors.WHITE,
                     false
             );
         }
@@ -343,8 +345,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 .withZone(ZoneId.systemDefault());
 
         public final FileTime lastModified;
-        private final MinecraftClient client;
-        public final DynamicTexture icon;
+        private final Minecraft client;
+        public final ScreenshotTexture icon;
         public final String iconFileName;
         public final Screen screenParent;
         private long time;
@@ -353,7 +355,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         private boolean clickThroughHovered = false;
         private final int index;
 
-        public ScreenshotEntry(DynamicTexture icon, MinecraftClient client, Screen parent, List<Path> screenshots) {
+        public ScreenshotEntry(ScreenshotTexture icon, Minecraft client, Screen parent, List<Path> screenshots) {
             this.showGrid = ScreenshotListWidget.this.showGrid;
             this.client = client;
             this.screenParent = parent;
@@ -369,20 +371,20 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         }
 
         private boolean safeIsSelected(Entry entry) {
-            @Nullable Entry nullableSelected = getSelectedOrNull();
+            @Nullable Entry nullableSelected = getSelected();
             return (nullableSelected != null && nullableSelected.equals(entry));
         }
 
         @Override
-        public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTicks) {
+        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             if (this.showGrid) {
-                renderGrid(context, mouseX, mouseY, hovered, deltaTicks);
+                renderGrid(context, mouseX, mouseY, hovered, tickDelta);
                 return;
             }
-            renderList(context, mouseX, mouseY, hovered, deltaTicks);
+            renderList(context, mouseX, mouseY, hovered, tickDelta);
         }
 
-        public void renderList(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void renderList(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             String fileName = this.iconFileName;
             String creationString = "undefined";
 
@@ -394,29 +396,29 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             }
 
             if (creationTime != -1L)
-                creationString = Text.translatable("text.snapper.created").getString() + " " + DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
+                creationString = Component.translatable("text.snapper.created").getString() + " " + DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
 
-            if (StringHelper.isEmpty(fileName))
-                fileName = Text.translatable("text.snapper.generic") + " " + (this.index + 1);
+            if (StringUtil.isNullOrEmpty(fileName))
+                fileName = Component.translatable("text.snapper.generic") + " " + (this.index + 1);
 
-            context.drawText(
-                    this.client.textRenderer,
+            context.drawString(
+                    this.client.font,
                     truncateFileName(fileName, getWidth() - 32 - 6, 29),
                     getX() + 32 + 3, getY() + 1,
-                    Colors.WHITE,
+                    CommonColors.WHITE,
                     false
             );
 
-            context.drawText(
-                    this.client.textRenderer,
+            context.drawString(
+                    this.client.font,
                     creationString,
                     getX() + 35, getY() + 12,
-                    Colors.GRAY,
+                    CommonColors.GRAY,
                     false
             );
 
             if (icon.loaded()) {
-                context.drawTexture(
+                context.blit(
                         RenderPipelines.GUI_TEXTURED,
                         this.icon.getTextureId(),
                         getX(), getY(),
@@ -427,9 +429,9 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 );
             }
 
-            if (this.client.options.getTouchscreen().getValue() || hovered) {
+            if (this.client.options.touchscreen().get() || hovered) {
                 context.fill(getX(), getY(), getX() + 32, getY() + 32, 0xA0909090);
-                context.drawGuiTexture(
+                context.blitSprite(
                         RenderPipelines.GUI_TEXTURED,
                         mouseX - getX() < 32 && this.icon.loaded() ?
                                 ScreenshotListWidget.VIEW_HIGHLIGHTED_SPRITE :
@@ -440,14 +442,14 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             }
         }
 
-        public void renderGrid(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void renderGrid(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             int centreX = getX() + getWidth() / 2;
             int centreY = getY() + getHeight() / 2;
 
             clickThroughHovered = SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY);
 
             if (this.icon.loaded()) {
-                context.drawTexture(
+                context.blit(
                         RenderPipelines.GUI_TEXTURED,
                         this.icon.getTextureId(),
                         getX(), getY(),
@@ -458,19 +460,19 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                 );
             }
 
-            if (this.client.options.getTouchscreen().getValue() || (hovered && mouseX < getX() + getWidth()) || safeIsSelected(this)) {
+            if (this.client.options.touchscreen().get() || (hovered && mouseX < getX() + getWidth()) || safeIsSelected(this)) {
                 renderMetadata(context, mouseX, mouseY, hovered, tickDelta);
             }
         }
 
-        public void renderMetadata(DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTick) {
+        public void renderMetadata(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTick) {
             String fileName = this.iconFileName;
 
             int centreX = getX() + getWidth() / 2;
             int centreY = getY() + getHeight() / 2;
 
-            if (StringHelper.isEmpty(fileName))
-                fileName = Text.translatable("text.snapper.generic") + " " + (this.index + 1);
+            if (StringUtil.isNullOrEmpty(fileName))
+                fileName = Component.translatable("text.snapper.generic") + " " + (this.index + 1);
 
             String creationString = "undefined";
             long creationTime = 0;
@@ -483,7 +485,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             if (creationTime != -1L)
                 creationString = DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
 
-            context.drawTexture(
+            context.blit(
                     RenderPipelines.GUI_TEXTURED,
                     GRID_SELECTION_BACKGROUND_TEXTURE,
                     getX(), getY(),
@@ -493,7 +495,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
             );
 
 
-            context.drawGuiTexture(
+            context.blitSprite(
                     RenderPipelines.GUI_TEXTURED,
                     clickThroughHovered && icon.loaded() ?
                             ScreenshotListWidget.VIEW_HIGHLIGHTED_SPRITE : ScreenshotListWidget.VIEW_SPRITE,
@@ -503,37 +505,37 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                     32
             );
 
-            context.drawText(
-                    this.client.textRenderer,
+            context.drawString(
+                    this.client.font,
                     truncateFileName(fileName, getWidth(), 24),
                     getX() + 5,
                     getY() + 6,
-                    Colors.WHITE,
+                    CommonColors.WHITE,
                     true
             );
 
-            context.drawText(
-                    this.client.textRenderer,
-                    Text.translatable("text.snapper.created"),
+            context.drawString(
+                    this.client.font,
+                    Component.translatable("text.snapper.created"),
                     getX() + 5,
                     getY() + getHeight() - 22,
-                    Colors.LIGHT_GRAY,
+                    CommonColors.LIGHT_GRAY,
                     true
             );
 
-            context.drawText(
-                    this.client.textRenderer,
+            context.drawString(
+                    this.client.font,
                     creationString,
                     getX() + 5,
                     getY() + getHeight() - 12,
-                    Colors.LIGHT_GRAY,
+                    CommonColors.LIGHT_GRAY,
                     true
             );
         }
 
         public String truncateFileName(String fileName, int maxWidth, int truncateLength) {
             String truncatedName = fileName;
-            if (this.client.textRenderer.getWidth(truncatedName) > maxWidth)
+            if (this.client.font.width(truncatedName) > maxWidth)
                 truncatedName = truncatedName.substring(0, Math.min(fileName.length(), truncateLength)) + "...";
             return truncatedName;
         }
@@ -555,12 +557,12 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
         }
 
         @Override
-        public Text getNarration() {
-            return Text.literal(this.iconFileName);
+        public Component getNarration() {
+            return Component.literal(this.iconFileName);
         }
 
         @Override
-        public boolean mouseClicked(Click click, boolean doubled) {
+        public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
             ScreenshotListWidget.this.setEntrySelected(this);
 
             boolean clickThrough =
@@ -572,8 +574,8 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
                                     this.showGrid &&
                                             clickThroughHovered
                             );
-            if (!clickThrough && Util.getMeasuringTimeMs() - this.time >= 250L) {
-                this.time = Util.getMeasuringTimeMs();
+            if (!clickThrough && Util.getMillis() - this.time >= 250L) {
+                this.time = Util.getMillis();
                 return super.mouseClicked(click, doubled);
             }
 
@@ -582,7 +584,7 @@ public class ScreenshotListWidget extends AlwaysSelectedEntryListWidget<Screensh
 
         public boolean click() {
             if (this.icon == null) return false;
-            playClickSound(this.client.getSoundManager());
+            playButtonClickSound(this.client.getSoundManager());
             this.client.setScreen(new ScreenshotViewerScreen(this.icon, icon.getPath(), this.screenParent, this.screenshots));
             return true;
         }

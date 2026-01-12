@@ -4,17 +4,17 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.DynamicCubemapTexture;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.CubeMapRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.RotatingCubeMapRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.CubeMap;
+import net.minecraft.client.renderer.PanoramaRenderer;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -23,30 +23,28 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 public class PanoramaViewerScreen extends Screen {
-    protected static final Identifier ID = Snapper.id("screenshots/panorama");
-    protected static final CubeMapRenderer PANORAMA_RENDERER = new CubeMapRenderer(ID);
+    protected static final ResourceLocation ID = Snapper.id("screenshots/panorama");
+    protected static final CubeMap PANORAMA_RENDERER = new CubeMap(ID);
 
-    private final RotatingCubeMapRenderer rotatingPanoramaRenderer = new RotatingCubeMapRenderer(PANORAMA_RENDERER);
+    private final PanoramaRenderer rotatingPanoramaRenderer = new PanoramaRenderer(PANORAMA_RENDERER);
     private final DynamicCubemapTexture texture;
 
     private final String title;
     private final Screen parent;
 
     protected PanoramaViewerScreen(String title, Screen parent) {
-        super(Text.translatable("menu.snapper.viewer_menu"));
+        super(Component.translatable("menu.snapper.viewer_menu"));
         this.title = title;
         this.parent = parent;
-        this.client = MinecraftClient.getInstance();
-        assert client != null;
         this.texture = this.getTexture();
         if (texture != null) {
-            client.getTextureManager().registerTexture(ID, texture);
+            Minecraft.getInstance().getTextureManager().registerAndLoad(ID, texture);
         }
     }
 
     @Nullable
     private DynamicCubemapTexture getTexture() {
-		assert client != null;
+		assert minecraft != null;
 
         Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
         if (!SnapperUtil.panoramaPresent(panoramaDir)) return null;
@@ -65,55 +63,51 @@ public class PanoramaViewerScreen extends Screen {
     }
 
     @Override
-    public void close() {
-		assert client != null;
-
+    public void onClose() {
         if (texture != null) {
-            client.getTextureManager().destroyTexture(ID);
+            Minecraft.getInstance().getTextureManager().release(ID);
             texture.close();
         }
 
-        client.setScreen(this.parent);
+        Minecraft.getInstance().setScreen(this.parent);
     }
 
     @Override
     protected void init() {
         // This is called whenever the window is resized.
-        assert client != null;
-
         if (this.texture == null) {
             Snapper.LOGGER.error("No panorama found");
-            close();
+            onClose();
             return;
         }
 
-        Path panoramaPath = Path.of(client.runDirectory.getPath(), "screenshots", "panorama");
-        addDrawableChild(ButtonWidget.builder(Text.translatable("button.snapper.folder"), button -> {
-            Util.getOperatingSystem().open(panoramaPath);
-        }).dimensions(width / 2 - 150 - 4, height - 32, 150, 20).build());
+        Path panoramaPath = Path.of(Minecraft.getInstance().gameDirectory.getPath(), "screenshots", "panorama");
+        addRenderableWidget(Button.builder(Component.translatable("button.snapper.folder"), button -> {
+            Util.getPlatform().openPath(panoramaPath);
+        }).bounds(width / 2 - 150 - 4, height - 32, 150, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(
-                ScreenTexts.DONE,
-                button -> this.close()
-        ).dimensions(width / 2 + 4, height - 32, 150, 20).build());
+        addRenderableWidget(Button.builder(
+                CommonComponents.GUI_DONE,
+                button -> this.onClose()
+        ).bounds(width / 2 + 4, height - 32, 150, 20).build());
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         rotatingPanoramaRenderer.render(context, this.width, this.height, true);
 
-        context.drawCenteredTextWithShadow(
-                this.textRenderer,
+        context.drawCenteredString(
+                this.font,
                 this.title,
                 this.width / 2,
                 20,
-                Colors.WHITE
+                CommonColors.WHITE
         );
 
         super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float delta) {
     }
 }
