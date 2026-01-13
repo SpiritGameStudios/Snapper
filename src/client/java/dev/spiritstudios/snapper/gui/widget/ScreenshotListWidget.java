@@ -200,7 +200,7 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
     @Override
     public int maxScrollAmount() {
         int totalColumns = (getItemCount() / getColumnCount()) + (getItemCount() % getColumnCount() > 0 ? 1 : 0);
-        return showGrid ? Math.max(0, totalColumns * defaultEntryHeight - this.height) : super.maxScrollAmount();
+        return showGrid ? Math.max(0, totalColumns * defaultEntryHeight - defaultEntryHeight - this.height + 17) : super.maxScrollAmount();
     }
 
     @Override
