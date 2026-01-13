@@ -189,14 +189,14 @@ public class ScreenshotViewerScreen extends Screen {
         this.drawHeaderAndFooterSeparators(context);
         context.drawCenteredString(this.font, this.title, this.width / 2, 20, CommonColors.WHITE);
 
-        int finalHeight = this.height - 46 - 68;
+        int finalHeight = this.height - 50 - 68;
         float scaleFactor = (float) finalHeight / imageHeight;
         int finalWidth = (int) (imageWidth * scaleFactor);
 
         context.blit(
                 RenderPipelines.GUI_TEXTURED,
                 this.image.getTextureId(),
-                (this.width / 2) - (finalWidth / 2), this.height - 68 - finalHeight,
+                (this.width / 2) - (finalWidth / 2), this.height - 70 - finalHeight,
                 0, 0,
                 finalWidth, finalHeight,
                 finalWidth, finalHeight
@@ -217,7 +217,7 @@ public class ScreenshotViewerScreen extends Screen {
 
     private void renderDebugInfo(GuiGraphics context) {
         context.pose().pushMatrix();
-        int finalHeight = this.height - 46 - 68;
+        int finalHeight = this.height - 50 - 68;
         float scaleFactor = (float) finalHeight / imageHeight;
         int finalWidth = (int) (imageWidth * scaleFactor);
 
