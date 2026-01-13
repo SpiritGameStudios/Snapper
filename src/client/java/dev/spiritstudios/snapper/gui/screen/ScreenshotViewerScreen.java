@@ -13,6 +13,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.EqualSpacingLayout;
 import net.minecraft.client.gui.layouts.FrameLayout;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -45,6 +46,7 @@ public class ScreenshotViewerScreen extends Screen {
     private final @Nullable List<Path> screenshots;
     private final int screenshotIndex;
     private final Path iconPath;
+    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 
     public ScreenshotViewerScreen(ScreenshotTexture icon, Path screenshot, Screen parent) {
         this(icon, screenshot, parent, null);
@@ -174,6 +176,9 @@ public class ScreenshotViewerScreen extends Screen {
 
         verticalButtonLayout.arrangeElements();
         FrameLayout.centerInRectangle(verticalButtonLayout, 0, this.height - 66, this.width, 64);
+
+        layout.setHeaderHeight(46);
+        layout.setFooterHeight(height - 68);
     }
 
     @Override
@@ -184,7 +189,7 @@ public class ScreenshotViewerScreen extends Screen {
         this.drawHeaderAndFooterSeparators(context);
         context.drawCenteredString(this.font, this.title, this.width / 2, 20, CommonColors.WHITE);
 
-        int finalHeight = this.height - 48 - 68;
+        int finalHeight = this.height - 46 - 68;
         float scaleFactor = (float) finalHeight / imageHeight;
         int finalWidth = (int) (imageWidth * scaleFactor);
 
@@ -212,7 +217,7 @@ public class ScreenshotViewerScreen extends Screen {
 
     private void renderDebugInfo(GuiGraphics context) {
         context.pose().pushMatrix();
-        int finalHeight = this.height - 48 - 48;
+        int finalHeight = this.height - 46 - 68;
         float scaleFactor = (float) finalHeight / imageHeight;
         int finalWidth = (int) (imageWidth * scaleFactor);
 
@@ -271,7 +276,7 @@ public class ScreenshotViewerScreen extends Screen {
                 this.client.level == null ?
                         Screen.HEADER_SEPARATOR :
                         Screen.INWORLD_HEADER_SEPARATOR,
-                0, 48 - 2,
+                0, layout.getHeaderHeight(),
                 0, 0,
                 width, 2,
                 32, 2
@@ -282,7 +287,7 @@ public class ScreenshotViewerScreen extends Screen {
                 this.client.level == null ?
                         Screen.FOOTER_SEPARATOR :
                         Screen.INWORLD_FOOTER_SEPARATOR,
-                0, height - 68,
+                0, this.layout.getFooterHeight() - 2,
                 0, 0,
                 width, 2,
                 32, 2

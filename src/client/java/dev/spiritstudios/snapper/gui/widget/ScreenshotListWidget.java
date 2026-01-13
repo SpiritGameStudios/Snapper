@@ -80,11 +80,14 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
             if (entries.isEmpty()) {
                 this.addEntry(new EmptyEntry(client));
             }
+
+            repositionEntries();
         });
 
         this.showGrid = SnapperConfig.HOLDER.get().viewMode().equals(ScreenshotScreen.ViewMode.GRID);
 
         ((AbstractSelectionListAccessor) this).setDefaultEntryHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
+        repositionEntries();
     }
 
     @Override
@@ -151,28 +154,36 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
     }
 
     @Override
-    protected void renderListItems(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void repositionEntries() {
+        int entryCount = this.getItemCount();
         if (showGrid) {
-            int rowLeft = this.getRowLeft(); //FIXME MATH
+            int rowTop = this.getY() + 2 - (int)this.scrollAmount();
+
+            int rowLeft = this.getRowLeft();
             int rowWidth = this.getRowWidth();
             int entryHeight = this.defaultEntryHeight - 4;
             int entryWidth = GRID_ENTRY_WIDTH;
-            int entryCount = this.getItemCount();
             int spacing = (rowWidth - (getColumnCount() * entryWidth)) / (getColumnCount() - 1);
 
             for (int index = 0; index < entryCount; index++) {
-                int rowTop = this.getRowTop(index);
-                int rowBottom = this.getRowBottom(index);
                 int colIndex = index % getColumnCount();
                 int leftOffset = colIndex * (entryWidth + spacing);
 
-                if (rowBottom >= this.getY() && rowTop <= this.getBottom()) {
-                    //this.renderEntry(context, mouseX, mouseY, delta, index, rowLeft + leftOffset, rowTop, entryWidth, entryHeight); //TODO MATH
-                    this.renderItem(context, mouseX, mouseY, delta, this.children().get(index));
+                ScreenshotListWidget.Entry entry = this.children().get(index);
+                entry.setY(rowTop);
+                entry.setX(rowLeft + leftOffset);
+                entry.setWidth(entryWidth);
+                entry.setHeight(entryHeight);
+
+                if (colIndex == getColumnCount() - 1) {
+                    rowTop += entry.getHeight();
                 }
             }
         } else {
-            super.renderListItems(context, mouseX, mouseY, delta);
+            super.repositionEntries();
+            for (var entry : this.children()) {
+                entry.setHeight(defaultEntryHeight);
+            }
         }
     }
 
@@ -188,16 +199,15 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
 
     @Override
     public int maxScrollAmount() {
-        int totalRows = (getItemCount() / getColumnCount()) + (getItemCount() % getColumnCount() > 0 ? 1 : 0);
-        return showGrid ? Math.max(0, totalRows * defaultEntryHeight - this.height + 4) : super.maxScrollAmount();
+        int totalColumns = (getItemCount() / getColumnCount()) + (getItemCount() % getColumnCount() > 0 ? 1 : 0);
+        return showGrid ? Math.max(0, totalColumns * defaultEntryHeight - this.height) : super.maxScrollAmount();
     }
 
     @Override
     protected int contentHeight() {
         if (!this.showGrid) return super.contentHeight();
         int totalRows = (getItemCount() / getColumnCount()) + (getItemCount() % getColumnCount() > 0 ? 1 : 0);
-        //return totalRows * this.itemHeight + this.headerHeight + 4;
-        return totalRows * this.defaultEntryHeight + 4; // TODO HEADERHEIGHT WAS KILLED
+        return totalRows * this.defaultEntryHeight + 4;
     }
 
     public void toggleGrid() {
@@ -208,6 +218,8 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
         SnapperConfig.Mutable mutable = SnapperConfig.mutable();
         mutable.viewMode = this.showGrid ? ScreenshotScreen.ViewMode.GRID : ScreenshotScreen.ViewMode.LIST;
         mutable.save();
+
+        repositionEntries();
     }
 
     @Override
@@ -216,8 +228,7 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
 
         int rowWidth = this.getRowWidth();
         int relX = Mth.floor(x - this.getRowLeft());
-        //int relY = MathHelper.floor(y - (double) this.getY()) - this.headerHeight;
-        int relY = Mth.floor(y - (double) this.getY()); // FIXME HEADERHEIGHT WAS KILLED
+        int relY = Mth.floor(y - (double) this.getY());
 
         if (relX < 0 || relX > rowWidth || relY < 0 || relY > getBottom()) return null;
 
@@ -403,8 +414,8 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
 
             context.drawString(
                     this.client.font,
-                    truncateFileName(fileName, getWidth() - 32 - 6, 29),
-                    getX() + 32 + 3, getY() + 1,
+                    truncateFileName(fileName, getContentWidth() - 32 - 6, 29),
+                    getContentX() + 32 + 3, getContentY() + 1,
                     CommonColors.WHITE,
                     false
             );
@@ -412,7 +423,7 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
             context.drawString(
                     this.client.font,
                     creationString,
-                    getX() + 35, getY() + 12,
+                    getContentX() + 35, getContentY() + 12,
                     CommonColors.GRAY,
                     false
             );
@@ -421,30 +432,30 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
                 context.blit(
                         RenderPipelines.GUI_TEXTURED,
                         this.icon.getTextureId(),
-                        getX(), getY(),
+                        getContentX(), getContentY(),
                         (icon.getHeight()) / 3.0f + 32, 0,
-                        getHeight(), getHeight(),
+                        getContentHeight(), getContentHeight(),
                         icon.getHeight(), icon.getHeight(),
                         icon.getWidth(), icon.getHeight()
                 );
             }
 
             if (this.client.options.touchscreen().get() || hovered) {
-                context.fill(getX(), getY(), getX() + 32, getY() + 32, 0xA0909090);
+                context.fill(getContentX(), getContentY(), getContentX() + 32, getContentY() + 32, 0xA0909090);
                 context.blitSprite(
                         RenderPipelines.GUI_TEXTURED,
-                        mouseX - getX() < 32 && this.icon.loaded() ?
+                        mouseX - getContentX() < 32 && this.icon.loaded() ?
                                 ScreenshotListWidget.VIEW_HIGHLIGHTED_SPRITE :
                                 ScreenshotListWidget.VIEW_SPRITE,
-                        getX(), getY(),
+                        getContentX(), getContentY(),
                         32, 32
                 );
             }
         }
 
         public void renderGrid(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            int centreX = getX() + getWidth() / 2;
-            int centreY = getY() + getHeight() / 2;
+            int centreX = getContentX() + getContentWidth() / 2;
+            int centreY = getContentY() + getContentHeight() / 2;
 
             clickThroughHovered = SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY);
 
@@ -452,9 +463,9 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
                 context.blit(
                         RenderPipelines.GUI_TEXTURED,
                         this.icon.getTextureId(),
-                        getX(), getY(),
+                        getContentX(), getContentY(),
                         0, 0,
-                        getWidth(), getHeight(),
+                        getContentWidth(), getContentHeight(),
                         icon.getWidth(), icon.getHeight(),
                         icon.getWidth(), icon.getHeight()
                 );
@@ -468,8 +479,8 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
         public void renderMetadata(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTick) {
             String fileName = this.iconFileName;
 
-            int centreX = getX() + getWidth() / 2;
-            int centreY = getY() + getHeight() / 2;
+            int centreX = getContentX() + getContentWidth() / 2;
+            int centreY = getContentY() + getContentHeight() / 2;
 
             if (StringUtil.isNullOrEmpty(fileName))
                 fileName = Component.translatable("text.snapper.generic") + " " + (this.index + 1);
@@ -488,9 +499,9 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
             context.blit(
                     RenderPipelines.GUI_TEXTURED,
                     GRID_SELECTION_BACKGROUND_TEXTURE,
-                    getX(), getY(),
+                    getContentX(), getContentY(),
                     0, 0,
-                    getWidth(), getHeight(),
+                    getContentWidth(), getContentHeight(),
                     16, 16
             );
 
@@ -507,9 +518,9 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
 
             context.drawString(
                     this.client.font,
-                    truncateFileName(fileName, getWidth(), 24),
-                    getX() + 5,
-                    getY() + 6,
+                    truncateFileName(fileName, getContentWidth(), 24),
+                    getContentX() + 5,
+                    getContentY() + 6,
                     CommonColors.WHITE,
                     true
             );
@@ -517,8 +528,8 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
             context.drawString(
                     this.client.font,
                     Component.translatable("text.snapper.created"),
-                    getX() + 5,
-                    getY() + getHeight() - 22,
+                    getContentX() + 5,
+                    getContentY() + getContentHeight() - 22,
                     CommonColors.LIGHT_GRAY,
                     true
             );
@@ -526,8 +537,8 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
             context.drawString(
                     this.client.font,
                     creationString,
-                    getX() + 5,
-                    getY() + getHeight() - 12,
+                    getContentX() + 5,
+                    getContentY() + getContentHeight() - 12,
                     CommonColors.LIGHT_GRAY,
                     true
             );
@@ -539,14 +550,6 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
                 truncatedName = truncatedName.substring(0, Math.min(fileName.length(), truncateLength)) + "...";
             return truncatedName;
         }
-
-        /*@Override //FIXME BORDER KILLED
-        public void drawBorder(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            if (isSelectedEntry(index)) {
-                context.fill(x - 2, y - 2, x + entryWidth + 2, y + entryHeight + 2, -1);
-                context.fill(x - 1, y - 1, x + entryWidth + 1, y + entryHeight + 1, -16777216);
-            }
-        }*/
 
         @Override
         public void setFocused(boolean focused) {
