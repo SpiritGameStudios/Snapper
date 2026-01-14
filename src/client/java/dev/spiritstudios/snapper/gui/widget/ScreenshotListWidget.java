@@ -24,7 +24,6 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -220,23 +219,6 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
         mutable.save();
 
         repositionEntries();
-    }
-
-    @Override
-    protected @Nullable Entry getEntryAtPosition(double x, double y) {
-        if (!showGrid) return super.getEntryAtPosition(x, y);
-
-        int rowWidth = this.getRowWidth();
-        int relX = Mth.floor(x - this.getRowLeft());
-        int relY = Mth.floor(y - (double) this.getY());
-
-        if (relX < 0 || relX > rowWidth || relY < 0 || relY > getBottom()) return null;
-
-        int rowIndex = (relY + (int) this.scrollAmount()) / this.defaultEntryHeight;
-        int colIndex = Mth.floor(((float) relX / (float) rowWidth) * (float) getColumnCount());
-        int entryIndex = rowIndex * getColumnCount() + colIndex;
-
-        return entryIndex >= 0 && entryIndex < getItemCount() ? this.children().get(entryIndex) : null;
     }
 
     public abstract static class Entry extends ObjectSelectionList.Entry<Entry> implements AutoCloseable {
@@ -479,8 +461,8 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
         public void renderMetadata(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTick) {
             String fileName = this.iconFileName;
 
-            int centreX = getContentX() + getContentWidth() / 2;
-            int centreY = getContentY() + getContentHeight() / 2;
+            int centreX = getX() + getWidth() / 2;
+            int centreY = getY() + getHeight() / 2;
 
             if (StringUtil.isNullOrEmpty(fileName))
                 fileName = Component.translatable("text.snapper.generic") + " " + (this.index + 1);
