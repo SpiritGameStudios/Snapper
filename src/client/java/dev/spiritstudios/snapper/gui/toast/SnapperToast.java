@@ -21,7 +21,7 @@ public class SnapperToast implements Toast {
     private static final ResourceLocation UPLOAD_ICON = Snapper.id("icon/upload");
     private static final ResourceLocation DENY_ICON = Snapper.id("icon/nuh_uh");
     private static final int VISIBILITY_DURATION = 5000;
-    private static final int TEXT_WIDTH = 192;
+    private static final int WIDTH = 256;
     private static final int LINE_HEIGHT = 12;
     private static final int PADDING = 10;
 
@@ -37,7 +37,7 @@ public class SnapperToast implements Toast {
         this.title = title;
         Minecraft minecraft = Minecraft.getInstance();
         Font textRenderer = minecraft.font;
-        this.lines = textRenderer.split(description, TEXT_WIDTH - PADDING * 3 - 16);
+        this.lines = textRenderer.split(description, WIDTH - PADDING * 3 - 16);
     }
 
     public static void push(Type type, Component title, Component description) {
@@ -77,10 +77,7 @@ public class SnapperToast implements Toast {
     }
 
     public int width() {
-        Font font = Minecraft.getInstance().font;
-        return PADDING + lines.stream().mapToInt(font::width)
-                .max()
-                .orElse(202) + 28;
+        return WIDTH;
     }
 
     public int height() {
