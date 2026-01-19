@@ -31,7 +31,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
             configBuilder -> configBuilder
                     .withValue(
                             "copy_taken_screenshot",
-                            "Whether to copy screenshots to the clipboard when taken.",
+                            "Whether to copy screenshots to the clipboard when taken",
                             Codec.BOOL,
                             false,
                             SnapperConfig::copyTakenScreenshot
@@ -43,13 +43,13 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                             mapBuilder -> mapBuilder
                                     .withValue(
                                             "show_on_title_screen",
-                                            "Whether to show Snapper button on title screen.",
+                                            "Whether to show Snapper button on title screen",
                                             Codec.BOOL,
                                             true,
                                             SnapperButton::showOnTitleScreen
                                     ).withValue(
                                             "show_in_game_menu",
-                                            "Whether to show Snapper button in game menu.",
+                                            "Whether to show Snapper button in game menu",
                                             Codec.BOOL,
                                             true,
                                             SnapperButton::showInGameMenu
@@ -57,23 +57,23 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                     ).withValue(
                             "view_mode",
                             """
-                                    Whether to show the screenshot menu in a grid or a list.
-                                    May be either 'grid' or 'list'.""",
+                                    Whether to show the screenshot menu in a grid or a list
+                                    May be either 'grid' or 'list'""",
                             ScreenshotScreen.ViewMode.CODEC,
                             ScreenshotScreen.ViewMode.GRID,
                             SnapperConfig::viewMode
                     ).withValue(
                             "panorama_size",
                             """
-                                    Dimensions of individual panorama images when saved.
-                                    May be 1024, 2048, or 4096.""",
+                                    Dimensions of individual panorama images when saved
+                                    May be 1024, 2048, or 4096""",
                             SnapperUtil.PanoramaSize.CODEC,
                             SnapperUtil.PanoramaSize.ONE_THOUSAND_TWENTY_FOUR,
                             SnapperConfig::panoramaDimensions
                     ).withMapValue(
                             CustomScreenshotFolder.class,
                             "custom_screenshot_path",
-                            "Settings relating to the custom screenshot path",
+                            "Settings relating to a custom screenshot path",
                             SnapperConfig::customScreenshotPath,
                             mapBuilder -> mapBuilder
                                     .withValue(
@@ -84,7 +84,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             CustomScreenshotFolder::enabled
                                     ).withValue(
                                             "path",
-                                            "The path to use if custom screenshot folders are enabled.",
+                                            "The path to use if custom screenshot folders are enabled",
                                             DirectoryConfigUtil.PATH_CODEC,
                                             SnapperUtil.UNIFIED_FOLDER,
                                             CustomScreenshotFolder::path
@@ -92,15 +92,15 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                     ).withMapValue(
                             AxolotlClient.class,
                             "axolotl_client",
-                            "Settings relating to Axolotl Client.",
+                            "Settings relating to Axolotl Client",
                             SnapperConfig::axolotlClient,
                             mapBuilder -> mapBuilder
                                     .withValue(
                                             "terms_status",
                                             """
-                                                    Whether the terms of AxolotlClient have been accepted.
-                                                    These terms must be accepted to share screenshots via AxolotlClient's image host.
-                                                    May be 'accept', 'deny', or 'unset'.""",
+                                                    Whether the terms of AxolotlClient have been accepted
+                                                    These terms must be accepted to share screenshots via AxolotlClient's image host
+                                                    May be 'accept', 'deny', or 'unset'""",
                                             AxolotlClientApi.TermsAcceptance.CODEC,
                                             AxolotlClientApi.TermsAcceptance.UNSET,
                                             AxolotlClient::termsStatus
@@ -141,19 +141,17 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                                     mapBuilder -> mapBuilder
                                                             .withField("terms_status", TypeTemplateBuilder.STRING)
                                             ))
-                                            .noInheritance(),
+                                            .nonRecursive(),
                                     schema -> GreenhouseConfigRelocateFieldsFix.create(
                                             schema,
-                                            Map.of(
-                                                    "copyTakenScreenshot", "copy_taken_screenshot",
-                                                    "showSnapperTitleScreen", "snapper_button.show_on_title_screen",
-                                                    "showSnapperGameMenu", "snapper_button.show_in_game_menu",
-                                                    "viewMode", "view_mode",
-                                                    "panoramaDimensions", "panorama_dimensions",
-                                                    "useCustomScreenshotFolder", "custom_screenshot_path.enabled",
-                                                    "customScreenshotFolder", "custom_screenshot_path.path",
-                                                    "termsAccepted", "axolotl_client.terms_status"
-                                            )
+                                            GreenhouseConfigRelocateFieldsFix.function("copyTakenScreenshot", "copy_taken_screenshot"),
+                                            GreenhouseConfigRelocateFieldsFix.function("showSnapperTitleScreen", "snapper_button.show_on_title_screen"),
+                                            GreenhouseConfigRelocateFieldsFix.function("showSnapperGameMenu", "snapper_button.show_in_game_menu"),
+                                            GreenhouseConfigRelocateFieldsFix.function("viewMode", "view_mode"),
+                                            GreenhouseConfigRelocateFieldsFix.function("panoramaDimensions", "panorama_dimensions"),
+                                            GreenhouseConfigRelocateFieldsFix.function("useCustomScreenshotFolder", "custom_screenshot_path.enabled"),
+                                            GreenhouseConfigRelocateFieldsFix.function("customScreenshotFolder", "custom_screenshot_path.path"),
+                                            GreenhouseConfigRelocateFieldsFix.function("termsAccepted", "axolotl_client.terms_status")
                                     )
                             )
                     )

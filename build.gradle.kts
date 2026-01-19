@@ -55,8 +55,10 @@ dependencies {
 	include(libs.bundles.specter)
 	modImplementation(libs.bundles.specter)
 
+	// TODO: Replace me with API when I can confirm a Fabric Loom remapping bug has been fixed or when deobfuscation happens.
+	modCompileOnly(libs.greenhouse.config)
+	modRuntimeOnly(libs.greenhouse.config)
 	include(libs.greenhouse.config)
-	modImplementation(libs.greenhouse.config)
 
 	implementation(libs.objc.bridge)
 }
