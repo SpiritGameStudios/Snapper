@@ -4,6 +4,8 @@ plugins {
 	alias(libs.plugins.minotaur)
 }
 
+val mappingsAttribute = Attribute.of("net.minecraft.mappings", String::class.java)!!
+
 class ModInfo {
 	val id = property("mod.id").toString()
 	val group = property("mod.group").toString()
@@ -55,8 +57,11 @@ dependencies {
 	include(libs.bundles.specter)
 	modImplementation(libs.bundles.specter)
 
-	// TODO: Replace me with API when I can confirm a Fabric Loom remapping bug has been fixed or when deobfuscation happens.
-	modCompileOnly(libs.greenhouse.config)
+	modCompileOnlyApi(libs.greenhouse.config.api) {
+		attributes {
+			attribute(mappingsAttribute, "mojmap") // Use Mojmap at runtime.
+		}
+	}
 	modRuntimeOnly(libs.greenhouse.config)
 	include(libs.greenhouse.config)
 

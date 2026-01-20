@@ -26,8 +26,8 @@ fabric_api = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.r
 specter_core = { group = "dev.spiritstudios.specter", name = "core", version.ref = "specter" }
 specter_gui = { group = "dev.spiritstudios.specter", name = "gui", version.ref = "specter" }
 
-greenhouse_config_api = { group = "lgbt.greenhouse.config", name = "greenhouseconfig-api", version.ref = "greenhouse_config" }
-greenhouse_config = { group = "lgbt.greenhouse.config", name = "greenhouseconfig-fabric", version.ref = "greenhouse_config" }
+greenhouse_config_api = { group = "lgbt.greenhouse.config", name = "greenhouse-config-api", version.ref = "greenhouse_config" }
+greenhouse_config = { group = "lgbt.greenhouse.config", name = "greenhouse-config-fabric", version.ref = "greenhouse_config" }
 
 objc_bridge = { group = "ca.weblite", name = "java-objc-bridge", version.ref = "objc_bridge" }
 
