@@ -31,7 +31,6 @@ loom {
 }
 
 repositories {
-	mavenLocal() // TODO: Remove me after Greenhouse Config releases.
 	mavenCentral()
 	maven("https://maven.parchmentmc.org/")
 	maven("https://maven.spiritstudios.dev/releases/")
@@ -42,6 +41,7 @@ repositories {
 		}
 	}
 	maven("https://maven.greenhouse.lgbt/releases/")
+	maven("https://maven.greenhouse.lgbt/snapshots/")
 }
 
 dependencies {
