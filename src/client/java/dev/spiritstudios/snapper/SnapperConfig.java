@@ -25,7 +25,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
     public static final GreenhouseConfigHolder<SnapperConfig> HOLDER = GreenhouseConfigHolder.register(
             SnapperConfig.class,
             "snapper",
-            1,
+            10100,
             GreenhouseConfigJsonCLang.INSTANCE,
             GreenhouseConfigSide.CLIENT,
             configBuilder -> configBuilder
@@ -121,7 +121,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             .withField("customScreenshotFolder", TypeTemplateBuilder.STRING)
                     ).withPreviousLang(0, GreenhouseConfigJsonLang.INSTANCE)
                     .withSchemaAndFixes(
-                            1,
+							10100,
                             DataFixerBuilderFunctions.create(
                                     builder -> builder
                                             .withField("copy_taken_screenshot", TypeTemplateBuilder.BOOL)
