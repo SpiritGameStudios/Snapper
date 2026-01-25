@@ -59,7 +59,7 @@ dependencies {
 
 	modCompileOnlyApi(libs.greenhouse.config.api) {
 		attributes {
-			attribute(mappingsAttribute, "mojmap") // Use Mojmap build for compilation. Fabric Loom Remap is bugged at this moment.
+			attribute(mappingsAttribute, "intermediary")
 		}
 	}
 	modRuntimeOnly(libs.greenhouse.config)
