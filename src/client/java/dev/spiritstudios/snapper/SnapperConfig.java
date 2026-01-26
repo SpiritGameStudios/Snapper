@@ -6,7 +6,7 @@ import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import lgbt.greenhouse.config.api.v3.GreenhouseConfigSide;
-import lgbt.greenhouse.config.api.v3.config.GreenhouseConfigHolder;
+import lgbt.greenhouse.config.api.v3.GreenhouseConfigHolder;
 import lgbt.greenhouse.config.api.v3.dfu.builder.DataFixerBuilderFunctions;
 import lgbt.greenhouse.config.api.v3.dfu.builder.schema.TypeTemplateBuilder;
 import lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigRelocateFieldsFix;
@@ -25,7 +25,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
     public static final GreenhouseConfigHolder<SnapperConfig> HOLDER = GreenhouseConfigHolder.register(
             SnapperConfig.class,
             "snapper",
-            10100,
+            10101,
             GreenhouseConfigJsonCLang.INSTANCE,
             GreenhouseConfigSide.CLIENT,
             configBuilder -> configBuilder
