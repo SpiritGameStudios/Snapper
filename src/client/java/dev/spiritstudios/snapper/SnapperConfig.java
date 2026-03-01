@@ -14,7 +14,6 @@ import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonCLang;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
 
 import java.nio.file.Path;
-import java.util.Map;
 
 public record SnapperConfig(boolean copyTakenScreenshot,
                             SnapperButton snapperButton,
@@ -144,14 +143,14 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             .nonRecursive(),
                                     schema -> GreenhouseConfigRelocateFieldsFix.create(
                                             schema,
-                                            GreenhouseConfigRelocateFieldsFix.function("copyTakenScreenshot", "copy_taken_screenshot"),
-                                            GreenhouseConfigRelocateFieldsFix.function("showSnapperTitleScreen", "snapper_button.show_on_title_screen"),
-                                            GreenhouseConfigRelocateFieldsFix.function("showSnapperGameMenu", "snapper_button.show_in_game_menu"),
-                                            GreenhouseConfigRelocateFieldsFix.function("viewMode", "view_mode"),
-                                            GreenhouseConfigRelocateFieldsFix.function("panoramaDimensions", "panorama_dimensions"),
-                                            GreenhouseConfigRelocateFieldsFix.function("useCustomScreenshotFolder", "custom_screenshot_path.enabled"),
-                                            GreenhouseConfigRelocateFieldsFix.function("customScreenshotFolder", "custom_screenshot_path.path"),
-                                            GreenhouseConfigRelocateFieldsFix.function("termsAccepted", "axolotl_client.terms_status")
+                                            GreenhouseConfigRelocateFieldsFix.data("copyTakenScreenshot", "copy_taken_screenshot"),
+                                            GreenhouseConfigRelocateFieldsFix.data("showSnapperTitleScreen", "snapper_button.show_on_title_screen"),
+                                            GreenhouseConfigRelocateFieldsFix.data("showSnapperGameMenu", "snapper_button.show_in_game_menu"),
+                                            GreenhouseConfigRelocateFieldsFix.data("viewMode", "view_mode"),
+                                            GreenhouseConfigRelocateFieldsFix.data("panoramaDimensions", "panorama_dimensions"),
+                                            GreenhouseConfigRelocateFieldsFix.data("useCustomScreenshotFolder", "custom_screenshot_path.enabled"),
+                                            GreenhouseConfigRelocateFieldsFix.data("customScreenshotFolder", "custom_screenshot_path.path"),
+                                            GreenhouseConfigRelocateFieldsFix.data("termsAccepted", "axolotl_client.terms_status")
                                     )
                             )
                     )
