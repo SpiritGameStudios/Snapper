@@ -1,9 +1,9 @@
 package dev.spiritstudios.snapper.mixin;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.BlockView;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.BlockGetter;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,15 +11,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
-    @Inject(method = "update", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "setup", at = @At("HEAD"), cancellable = true)
     private void blockUpdateDuringPanoramaRender(
-            BlockView area,
-            Entity focusedEntity,
-            boolean thirdPerson,
-            boolean inverseView,
-            float tickDelta,
+            BlockGetter level,
+            Entity entity,
+            boolean detached,
+            boolean thirdPersonReverse,
+            float partialTick,
             CallbackInfo ci
     ) {
-        if (MinecraftClient.getInstance().gameRenderer.isRenderingPanorama() && thirdPerson) ci.cancel();
+        if (Minecraft.getInstance().gameRenderer.isPanoramicMode() && detached) ci.cancel();
     }
 }

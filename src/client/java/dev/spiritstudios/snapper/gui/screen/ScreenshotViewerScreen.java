@@ -1,25 +1,26 @@
 package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.util.DynamicTexture;
+import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.AxisGridWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.DirectionalLayoutWidget;
-import net.minecraft.client.gui.widget.SimplePositioningWidget;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.layouts.EqualSpacingLayout;
+import net.minecraft.client.gui.layouts.FrameLayout;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
@@ -32,11 +33,11 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class ScreenshotViewerScreen extends Screen {
-    private static final Identifier MENU_DECOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_list_background.png");
-    private static final Identifier INWORLD_MENU_DECOR_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/inworld_menu_list_background.png");
+    private static final ResourceLocation MENU_DECOR_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/menu_list_background.png");
+    private static final ResourceLocation INWORLD_MENU_DECOR_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
 
-    private final MinecraftClient client = MinecraftClient.getInstance();
-    private final DynamicTexture image;
+    private final Minecraft client = Minecraft.getInstance();
+    private final ScreenshotTexture image;
     private final String title;
     private final int imageWidth;
     private final int imageHeight;
@@ -45,13 +46,14 @@ public class ScreenshotViewerScreen extends Screen {
     private final @Nullable List<Path> screenshots;
     private final int screenshotIndex;
     private final Path iconPath;
+    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 
-    public ScreenshotViewerScreen(DynamicTexture icon, Path screenshot, Screen parent) {
+    public ScreenshotViewerScreen(ScreenshotTexture icon, Path screenshot, Screen parent) {
         this(icon, screenshot, parent, null);
     }
 
-    public ScreenshotViewerScreen(DynamicTexture icon, Path iconPath, Screen parent, @Nullable List<Path> screenshots) {
-        super(Text.translatable("menu.snapper.viewer_menu"));
+    public ScreenshotViewerScreen(ScreenshotTexture icon, Path iconPath, Screen parent, @Nullable List<Path> screenshots) {
+        super(Component.translatable("menu.snapper.viewer_menu"));
         this.parent = parent;
         this.iconPath = iconPath;
 
@@ -77,7 +79,7 @@ public class ScreenshotViewerScreen extends Screen {
     }
 
     @Override
-    public void close() {
+    public void  onClose() {
         this.client.setScreen(this.parent);
     }
 
@@ -88,9 +90,9 @@ public class ScreenshotViewerScreen extends Screen {
 
         // OPEN FOLDER
 
-        ButtonWidget folderButton = addDrawableChild(ButtonWidget.builder(
-                                Text.translatable("button.snapper.folder"),
-                                button -> Util.getOperatingSystem().open(new File(client.runDirectory, "screenshots"))
+        Button folderButton = addRenderableWidget(Button.builder(
+                                Component.translatable("button.snapper.folder"),
+                                button -> Util.getPlatform().openFile(new File(client.gameDirectory, "screenshots"))
                         )
                         .width(100)
                         .build()
@@ -98,29 +100,29 @@ public class ScreenshotViewerScreen extends Screen {
 
         // OPEN IMAGE EXTERNALLY
 
-        ButtonWidget openButton = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("button.snapper.open"),
-                button -> Util.getOperatingSystem().open(this.iconPath)
+        Button openButton = addRenderableWidget(Button.builder(
+                Component.translatable("button.snapper.open"),
+                button -> Util.getPlatform().openPath(this.iconPath)
         ).width(100).build());
 
         // EXIT PAGE
 
-        ButtonWidget doneButton = addDrawableChild(ButtonWidget.builder(
-                ScreenTexts.DONE,
-                button -> this.close()
+        Button doneButton = addRenderableWidget(Button.builder(
+                CommonComponents.GUI_DONE,
+                button -> this.onClose()
         ).width(100).build());
 
         // DELETE SCREENSHOT
 
-        ButtonWidget deleteButton = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("button.snapper.delete"),
+        Button deleteButton = addRenderableWidget(Button.builder(
+                Component.translatable("button.snapper.delete"),
                 button -> ScreenshotActions.deleteScreenshot(this.screenshot, this.parent)
         ).width(firstRowButtonWidth).build());
 
         // RENAME SCREENSHOT
 
-        ButtonWidget renameButton = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("button.snapper.rename"),
+        Button renameButton = addRenderableWidget(Button.builder(
+                Component.translatable("button.snapper.rename"),
                 button -> {
                     if (this.screenshot != null)
                         client.setScreen(new ScreenshotRenameScreen(this.screenshot, this.parent));
@@ -129,15 +131,15 @@ public class ScreenshotViewerScreen extends Screen {
 
         // COPY SCREENSHOT
 
-        ButtonWidget copyButton = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("button.snapper.copy"),
+        Button copyButton = addRenderableWidget(Button.builder(
+                Component.translatable("button.snapper.copy"),
                 button -> Snapper.getPlatformHelper().copyScreenshot(this.screenshot)
         ).width(firstRowButtonWidth).build());
 
         // UPLOAD SCREENSHOT
 
-        ButtonWidget uploadButton = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("button.snapper.upload"),
+        Button uploadButton = addRenderableWidget(Button.builder(
+                Component.translatable("button.snapper.upload"),
                 button -> {
                     button.active = false;
                     ScreenshotUploading.upload(iconPath).thenRun(() -> button.active = true);
@@ -146,112 +148,115 @@ public class ScreenshotViewerScreen extends Screen {
 
         if (SnapperUtil.isOfflineAccount()) {
             uploadButton.active = false;
-            uploadButton.setTooltip(Tooltip.of(Text.translatable("button.snapper.upload.tooltip")));
+            uploadButton.setTooltip(Tooltip.create(Component.translatable("button.snapper.upload.tooltip")));
         }
 
-        DirectionalLayoutWidget verticalButtonLayout = DirectionalLayoutWidget.vertical().spacing(4);
+        LinearLayout verticalButtonLayout = LinearLayout.vertical().spacing(4);
 
-        AxisGridWidget firstRowWidget = verticalButtonLayout.add(new AxisGridWidget(
+        EqualSpacingLayout firstRowWidget = verticalButtonLayout.addChild(new EqualSpacingLayout(
                 308,
                 20,
-                AxisGridWidget.DisplayAxis.HORIZONTAL)
+                EqualSpacingLayout.Orientation.HORIZONTAL)
         );
 
-        firstRowWidget.add(deleteButton);
-        firstRowWidget.add(renameButton);
-        firstRowWidget.add(copyButton);
-        firstRowWidget.add(uploadButton);
+        firstRowWidget.addChild(deleteButton);
+        firstRowWidget.addChild(renameButton);
+        firstRowWidget.addChild(copyButton);
+        firstRowWidget.addChild(uploadButton);
 
-        AxisGridWidget secondRowWidget = verticalButtonLayout.add(new AxisGridWidget(
+        EqualSpacingLayout secondRowWidget = verticalButtonLayout.addChild(new EqualSpacingLayout(
                 308,
                 20,
-                AxisGridWidget.DisplayAxis.HORIZONTAL)
+                EqualSpacingLayout.Orientation.HORIZONTAL)
         );
 
-        secondRowWidget.add(folderButton);
-        secondRowWidget.add(openButton);
-        secondRowWidget.add(doneButton);
+        secondRowWidget.addChild(folderButton);
+        secondRowWidget.addChild(openButton);
+        secondRowWidget.addChild(doneButton);
 
-        verticalButtonLayout.refreshPositions();
-        SimplePositioningWidget.setPos(verticalButtonLayout, 0, this.height - 66, this.width, 64);
+        verticalButtonLayout.arrangeElements();
+        FrameLayout.centerInRectangle(verticalButtonLayout, 0, this.height - 66, this.width, 64);
+
+        layout.setHeaderHeight(46);
+        layout.setFooterHeight(height - 68);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
         this.drawMenuBackground(context);
         this.drawHeaderAndFooterSeparators(context);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 20, Colors.WHITE);
+        context.drawCenteredString(this.font, this.title, this.width / 2, 20, CommonColors.WHITE);
 
-        int finalHeight = this.height - 48 - 68;
+        int finalHeight = this.height - 50 - 68;
         float scaleFactor = (float) finalHeight / imageHeight;
         int finalWidth = (int) (imageWidth * scaleFactor);
 
-        context.drawTexture(
+        context.blit(
                 RenderPipelines.GUI_TEXTURED,
                 this.image.getTextureId(),
-                (this.width / 2) - (finalWidth / 2), this.height - 68 - finalHeight,
+                (this.width / 2) - (finalWidth / 2), this.height - 70 - finalHeight,
                 0, 0,
                 finalWidth, finalHeight,
                 finalWidth, finalHeight
         );
 
         if (screenshotIndex != -1 && screenshots != null) {
-            context.drawCenteredTextWithShadow(
-                    this.textRenderer,
+            context.drawCenteredString(
+                    this.font,
                     "Screenshot %d/%d".formatted(screenshotIndex + 1, screenshots.size()),
                     this.width / 2,
                     30,
-                    Colors.WHITE
+                    CommonColors.WHITE
             );
         }
 
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) renderDebugInfo(context);
     }
 
-    private void renderDebugInfo(DrawContext context) {
-        context.getMatrices().pushMatrix();
-        int finalHeight = this.height - 48 - 48;
+    private void renderDebugInfo(GuiGraphics context) {
+        context.pose().pushMatrix();
+        int finalHeight = this.height - 50 - 68;
         float scaleFactor = (float) finalHeight / imageHeight;
         int finalWidth = (int) (imageWidth * scaleFactor);
 
-        context.drawCenteredTextWithShadow(
-                this.textRenderer,
+        context.drawCenteredString(
+                this.font,
                 "Image Size: %dx%d".formatted(imageWidth, imageHeight),
                 this.width / 2,
                 40,
-                Colors.WHITE
+                CommonColors.WHITE
         );
 
-        context.drawCenteredTextWithShadow(
-                this.textRenderer,
+        context.drawCenteredString(
+                this.font,
                 "Screen Size: %dx%d".formatted(this.width, this.height),
                 this.width / 2,
                 50,
-                Colors.WHITE
+                CommonColors.WHITE
         );
 
-        context.drawCenteredTextWithShadow(this.textRenderer,
+        context.drawCenteredString(this.font,
                 "Scale Factor: %s".formatted(scaleFactor),
                 this.width / 2,
                 60,
-                Colors.WHITE
+                CommonColors.WHITE
         );
 
-        context.drawCenteredTextWithShadow(
-                this.textRenderer,
+        context.drawCenteredString(
+                this.font,
                 "Scaled Size: %dx%d".formatted(finalWidth, finalHeight),
                 this.width / 2,
                 70,
-                Colors.WHITE
+                CommonColors.WHITE
         );
     }
 
-    private void drawMenuBackground(DrawContext context) {
-        context.drawTexture(
+    private void drawMenuBackground(GuiGraphics context) {
+        context.blit(
                 RenderPipelines.GUI_TEXTURED,
-                this.client.world == null ?
+                this.client.level == null ?
                         MENU_DECOR_BACKGROUND_TEXTURE :
                         INWORLD_MENU_DECOR_BACKGROUND_TEXTURE,
                 0,
@@ -265,24 +270,24 @@ public class ScreenshotViewerScreen extends Screen {
         );
     }
 
-    private void drawHeaderAndFooterSeparators(DrawContext context) {
-        context.drawTexture(
+    private void drawHeaderAndFooterSeparators(GuiGraphics context) {
+        context.blit(
                 RenderPipelines.GUI_TEXTURED,
-                this.client.world == null ?
-                        Screen.HEADER_SEPARATOR_TEXTURE :
-                        Screen.INWORLD_HEADER_SEPARATOR_TEXTURE,
-                0, 48 - 2,
+                this.client.level == null ?
+                        Screen.HEADER_SEPARATOR :
+                        Screen.INWORLD_HEADER_SEPARATOR,
+                0, layout.getHeaderHeight(),
                 0, 0,
                 width, 2,
                 32, 2
         );
 
-        context.drawTexture(
+        context.blit(
                 RenderPipelines.GUI_TEXTURED,
-                this.client.world == null ?
-                        Screen.FOOTER_SEPARATOR_TEXTURE :
-                        Screen.INWORLD_FOOTER_SEPARATOR_TEXTURE,
-                0, height - 68,
+                this.client.level == null ?
+                        Screen.FOOTER_SEPARATOR :
+                        Screen.INWORLD_FOOTER_SEPARATOR,
+                0, this.layout.getFooterHeight() - 2,
                 0, 0,
                 width, 2,
                 32, 2

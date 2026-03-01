@@ -1,12 +1,12 @@
 package dev.spiritstudios.snapper.util;
 
 import dev.spiritstudios.snapper.Snapper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ConfirmScreen;
-import net.minecraft.client.gui.screen.ProgressScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.ProgressScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,7 +20,7 @@ public class ScreenshotActions {
     public static void deleteScreenshot(Path path, Screen screen) {
         if (!Files.exists(path)) return;
 
-        MinecraftClient client = MinecraftClient.getInstance();
+        Minecraft client = Minecraft.getInstance();
         client.setScreen(
                 new ConfirmScreen(
                         confirmed -> {
@@ -34,10 +34,10 @@ public class ScreenshotActions {
                             }
                             client.setScreen(screen);
                         },
-                        Text.translatable("text.snapper.delete_question"),
-                        Text.translatable("text.snapper.delete_warning", path.getFileName()),
-                        Text.translatable("button.snapper.delete"),
-                        ScreenTexts.CANCEL
+                        Component.translatable("text.snapper.delete_question"),
+                        Component.translatable("text.snapper.delete_warning", path.getFileName()),
+                        Component.translatable("button.snapper.delete"),
+                        CommonComponents.GUI_CANCEL
                 )
         );
     }

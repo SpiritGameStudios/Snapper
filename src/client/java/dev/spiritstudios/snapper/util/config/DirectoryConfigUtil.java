@@ -3,9 +3,8 @@ package dev.spiritstudios.snapper.util.config;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import dev.spiritstudios.snapper.gui.widget.FolderSelectWidget;
-import dev.spiritstudios.specter.api.config.Value;
 import joptsimple.internal.Strings;
-import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.components.AbstractWidget;
 import org.apache.commons.lang3.SystemProperties;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
@@ -48,11 +47,11 @@ public class DirectoryConfigUtil {
                 });
     }
 
-    public static final BiFunction<Value<?>, String, ? extends ClickableWidget> PATH_WIDGET_FACTORY = (configValue, id) -> {
-        @SuppressWarnings("unchecked") Value<Path> value = (Value<Path>) configValue;
-
-        return new FolderSelectWidget(0, 0, 10, 10, value, "%s.placeholder".formatted(configValue.translationKey(id)));
-    };
+//    public static final BiFunction<Value<?>, String, ? extends AbstractWidget> PATH_WIDGET_FACTORY = (configValue, id) -> {
+//        @SuppressWarnings("unchecked") Value<Path> value = (Value<Path>) configValue;
+//
+//        return new FolderSelectWidget(0, 0, 10, 10, value, "%s.placeholder".formatted(configValue.translationKey(id)));
+//    };
 
     public static String escapePath(String path) {
         return path.replace("\\", "\\\\");

@@ -1,47 +1,47 @@
 package dev.spiritstudios.snapper.gui.toast;
 
 import dev.spiritstudios.snapper.Snapper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.toast.Toast;
-import net.minecraft.client.toast.ToastManager;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.components.toasts.ToastManager;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.FormattedCharSequence;
 
 import java.util.List;
 
 public class SnapperToast implements Toast {
-    private static final Identifier TEXTURE = Snapper.id("push/snapper");
-    private static final Identifier SCREENSHOT_ICON = Snapper.id("icon/image");
-    private static final Identifier PANORAMA_ICON = Snapper.id("icon/panorama");
-    private static final Identifier UPLOAD_ICON = Snapper.id("icon/upload");
-    private static final Identifier DENY_ICON = Snapper.id("icon/nuh_uh");
+    private static final ResourceLocation TEXTURE = Snapper.id("toast/snapper");
+    private static final ResourceLocation SCREENSHOT_ICON = Snapper.id("icon/image");
+    private static final ResourceLocation PANORAMA_ICON = Snapper.id("icon/panorama");
+    private static final ResourceLocation UPLOAD_ICON = Snapper.id("icon/upload");
+    private static final ResourceLocation DENY_ICON = Snapper.id("icon/nuh_uh");
     private static final int VISIBILITY_DURATION = 5000;
     private static final int WIDTH = 256;
     private static final int LINE_HEIGHT = 12;
     private static final int PADDING = 10;
 
     private final Type type;
-    private final Text title;
-    private final List<OrderedText> lines;
+    private final Component title;
+    private final List<FormattedCharSequence> lines;
     private Visibility visibility;
 
-    public SnapperToast(Type type, Text title, Text description) {
+    public SnapperToast(Type type, Component title, Component description) {
         this.type = type;
         this.visibility = Visibility.HIDE;
 
         this.title = title;
-        MinecraftClient client = MinecraftClient.getInstance();
-        TextRenderer textRenderer = client.textRenderer;
-        this.lines = textRenderer.wrapLines(description, WIDTH - PADDING * 3 - 16);
+        Minecraft minecraft = Minecraft.getInstance();
+        Font textRenderer = minecraft.font;
+        this.lines = textRenderer.split(description, WIDTH - PADDING * 3 - 16);
     }
 
-    public static void push(Type type, Text title, Text description) {
-        MinecraftClient.getInstance().getToastManager().add(
+    public static void push(Type type, Component title, Component description) {
+        Minecraft.getInstance().getToastManager().addToast(
                 new SnapperToast(
                         type,
                         title,
@@ -51,11 +51,11 @@ public class SnapperToast implements Toast {
     }
 
     @Override
-    public Visibility getVisibility() {
+    public Visibility getWantedVisibility() {
         return this.visibility;
     }
 
-    public Visibility setVisibility(Visibility visibility) {
+    public Visibility setWantedVisibility(Visibility visibility) {
         return this.visibility = visibility;
     }
 
@@ -65,26 +65,26 @@ public class SnapperToast implements Toast {
     }
 
     @Override
-    public void draw(DrawContext context, TextRenderer textRenderer, long startTime) {
-        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, 0, 0, this.getWidth(), this.getHeight());
-        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, getCurrentTexture(), PADDING, PADDING, 16, 16);
+    public void render(GuiGraphics context, Font font, long startTime) {
+        context.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURE, 0, 0, this.width(), this.height());
+        context.blitSprite(RenderPipelines.GUI_TEXTURED, getCurrentComponenture(), PADDING, PADDING, 16, 16);
 
-        context.drawText(textRenderer, title, PADDING * 2 + 14, this.lines.isEmpty() ? 12 : 7, Colors.YELLOW, false);
+        context.drawString(font, title, PADDING * 2 + 12, this.lines.isEmpty() ? 12 : 7, CommonColors.YELLOW, false);
 
         for (int i = 0; i < this.lines.size(); ++i) {
-            context.drawText(textRenderer, this.lines.get(i), PADDING * 2 + 14, 18 + i * 12, Colors.WHITE, false);
+            context.drawString(font, this.lines.get(i), PADDING * 2 + 12, 18 + i * 12, CommonColors.WHITE, false);
         }
     }
 
-    public int getWidth() {
+    public int width() {
         return WIDTH;
     }
 
-    public int getHeight() {
+    public int height() {
         return PADDING * 2 + Math.max(this.lines.size(), 1) * LINE_HEIGHT;
     }
 
-    private Identifier getCurrentTexture() {
+    private ResourceLocation getCurrentComponenture() {
         return switch (type) {
             case UPLOAD -> UPLOAD_ICON;
             case PANORAMA -> PANORAMA_ICON;
