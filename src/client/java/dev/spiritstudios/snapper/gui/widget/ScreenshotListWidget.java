@@ -10,7 +10,6 @@ import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import dev.spiritstudios.specter.api.core.exception.UnreachableException;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -270,7 +269,7 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
 
         @Override
         public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
-            if (this.client.screen == null) throw new UnreachableException();
+            if (this.client.screen == null) throw new IllegalStateException();
 
             context.drawString(
                     this.client.font,
@@ -310,7 +309,7 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
 
         @Override
         public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
-            if (this.minecraft.screen == null) throw new UnreachableException();
+            if (this.minecraft.screen == null) throw new IllegalStateException();
 
             context.drawString(
                     this.minecraft.font,

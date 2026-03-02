@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "snapper",
-	"version": "${mod_version}",
+	"version": "${version}",
 	"name": "Snapper",
 	"description": "Screenshots, made simple.",
 	"authors": [
@@ -25,13 +25,13 @@
 			"dev.spiritstudios.snapper.Snapper"
 		]
 	},
-	"accessWidener": "snapper.accesswidener",
+	"accessWidener": "snapper.classtweaker",
 	"mixins": [
 		"snapper.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=${fabric_loader_version}",
-		"minecraft": "${minecraft_version}",
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "1.21.10",
 		"fabric-api": "*",
 		"java": ">=21",
 		"greenhouseconfig": ">=3.0.0-"

@@ -5,7 +5,7 @@ import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
-import dev.spiritstudios.specter.api.core.client.event.ClientKeybindEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -41,11 +41,11 @@ public final class SnapperKeybindings {
         KeyBindingHelper.registerKeyBinding(RECENT_SCREENSHOT_KEY);
         KeyBindingHelper.registerKeyBinding(SCREENSHOT_MENU_KEY);
 
-        ClientKeybindEvents.pressed(SCREENSHOT_MENU_KEY).register(client ->
-                client.setScreen(new ScreenshotScreen(client.screen)));
-
-        ClientKeybindEvents.pressed(PANORAMA_KEY).register(SnapperKeybindings::takePanorama);
-        ClientKeybindEvents.pressed(RECENT_SCREENSHOT_KEY).register(SnapperKeybindings::openRecentScreenshot);
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (PANORAMA_KEY.consumeClick()) SnapperKeybindings.takePanorama(client);
+            while (RECENT_SCREENSHOT_KEY.consumeClick()) SnapperKeybindings.openRecentScreenshot(client);
+            while (SCREENSHOT_MENU_KEY.consumeClick()) client.setScreen(new ScreenshotScreen(client.screen));
+        });
     }
 
     private static void takePanorama(Minecraft client) {
