@@ -178,14 +178,14 @@ public class ScreenshotScreen extends Screen {
         verticalButtonLayout.arrangeElements();
         FrameLayout.centerInRectangle(verticalButtonLayout, 0, this.height - 66, this.width, 64);
 
-//        SpriteIconButton settingsButton = addRenderableWidget(SpriteIconButton.builder(
-//                Component.translatable("config.snapper.snapper.title"),
-//                button -> this.minecraft.setScreen(
-//                        new RootConfigScreen(SnapperConfig.HOLDER, new ScreenshotScreen(this.parent))),
-//                true
-//        ).width(20).sprite(SETTINGS_ICON, 15, 15).build());
+        SpriteIconButton settingsButton = addRenderableWidget(SpriteIconButton.builder(
+                Component.translatable("config.snapper.title"),
+                button -> this.minecraft.setScreen(
+                        new ConfigScreen(new ScreenshotScreen(this.parent))),
+                true
+        ).width(20).sprite(SETTINGS_ICON, 15, 15).build());
 
-//        settingsButton.setPosition(width / 2 - 178, height - 32);
+        settingsButton.setPosition(width / 2 - 178, height - 32);
 
 
         this.viewModeButton = addRenderableWidget(SpriteIconButton.builder(
@@ -234,7 +234,7 @@ public class ScreenshotScreen extends Screen {
 
         removeWidget(this.viewModeButton);
         this.viewModeButton = addRenderableWidget(SpriteIconButton.builder(
-                Component.translatable("config.snapper.snapper.viewMode"),
+                Component.translatable("config.snapper.viewMode"),
                 button -> this.toggleGrid(),
                 true
         ).width(20).sprite(showGrid ? VIEW_MODE_ICON_LIST : VIEW_MODE_ICON_GRID, 15, 15).build());

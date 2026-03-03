@@ -12,6 +12,7 @@ import lgbt.greenhouse.config.api.v3.dfu.builder.schema.TypeTemplateBuilder;
 import lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigRelocateFieldsFix;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonCLang;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
+import net.minecraft.Util;
 
 import java.nio.file.Path;
 
@@ -199,6 +200,10 @@ public record SnapperConfig(boolean copyTakenScreenshot,
 
         public void save() {
             HOLDER.save(build(), null);
+        }
+
+        public void saveAsync() {
+            Util.ioPool().execute(this::save);
         }
 
         private SnapperConfig build() {
