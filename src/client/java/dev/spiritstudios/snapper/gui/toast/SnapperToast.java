@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FormattedCharSequence;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class SnapperToast implements Toast {
     }
 
     @Override
-    public Visibility getWantedVisibility() {
+    public @NonNull Visibility getWantedVisibility() {
         return this.visibility;
     }
 

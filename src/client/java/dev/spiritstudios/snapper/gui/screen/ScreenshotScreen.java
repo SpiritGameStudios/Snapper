@@ -64,6 +64,8 @@ public class ScreenshotScreen extends Screen {
 
     @Override
     protected void init() {
+        assert minecraft != null;
+
         screenshotList = this.addRenderableWidget(new ScreenshotListWidget(
                 Minecraft.getInstance(),
                 width,
@@ -172,7 +174,7 @@ public class ScreenshotScreen extends Screen {
         ));
 
         secondRowWidget.addChild(folderButton);
-        secondRowWidget.addChild(this.openButton);
+        secondRowWidget.addChild(openButton);
         secondRowWidget.addChild(doneButton);
 
         verticalButtonLayout.arrangeElements();
@@ -189,7 +191,7 @@ public class ScreenshotScreen extends Screen {
 
 
         this.viewModeButton = addRenderableWidget(SpriteIconButton.builder(
-                Component.translatable("config.snapper.snapper.viewMode"),
+                Component.translatable("config.snapper.viewMode"),
                 button -> this.toggleGrid(),
                 true
         ).width(20).sprite(showGrid ? VIEW_MODE_ICON_LIST : VIEW_MODE_ICON_GRID, 15, 15).build());
@@ -243,7 +245,11 @@ public class ScreenshotScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        if (minecraft == null) return false;
+        assert minecraft != null;
+
+        if (super.keyPressed(input)) {
+            return true;
+        }
 
         if (input.key() == InputConstants.KEY_F5) {
             minecraft.setScreen(new ScreenshotScreen(this.parent));
@@ -263,12 +269,11 @@ public class ScreenshotScreen extends Screen {
             return true;
         }
 
-        return super.keyPressed(input);
+        return false;
     }
 
     @Override
     public void onClose() {
-//        SnapperConfig.HOLDER.save();
         super.onClose();
     }
 
