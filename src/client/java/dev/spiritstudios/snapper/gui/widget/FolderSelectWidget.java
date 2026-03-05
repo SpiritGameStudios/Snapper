@@ -2,7 +2,7 @@ package dev.spiritstudios.snapper.gui.widget;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.overlay.ExternalDialogOverlay;
-import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
+import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

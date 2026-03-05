@@ -59,7 +59,7 @@ public abstract class MinecraftMixin {
             method = "grabPanoramixScreenshot",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setYRot(F)V")
     )
-    private void captureSetYaw(LocalPlayer player, float value, Operation<Void> op, @Share("yaw")LocalFloatRef yaw) {
+    private void captureSetYaw(LocalPlayer player, float value, Operation<Void> op, @Share("yaw") LocalFloatRef yaw) {
         if (!this.options.getCameraType().isFirstPerson()) yaw.set(value);
         else op.call(player, value);
     }
@@ -68,7 +68,7 @@ public abstract class MinecraftMixin {
             method = "grabPanoramixScreenshot",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setYRot(F)V")
     )
-    private void applyThirdPersonCameraRotation(LocalPlayer player, float value, Operation<Void> op, @Share("yaw")LocalFloatRef yaw) {
+    private void applyThirdPersonCameraRotation(LocalPlayer player, float value, Operation<Void> op, @Share("yaw") LocalFloatRef yaw) {
         if (!this.options.getCameraType().isFirstPerson())
             ((CameraAccessor) this.gameRenderer.getMainCamera()).invokeSetRotation(yaw.get(), value);
         else op.call(player, value);

@@ -50,6 +50,8 @@ repositories {
 }
 
 loom {
+    runtimeOnlyLog4j = true
+
     splitEnvironmentSourceSets()
 
     mods.create(modId) {

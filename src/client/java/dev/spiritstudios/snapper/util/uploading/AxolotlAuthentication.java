@@ -9,7 +9,7 @@ import java.util.UUID;
 public record AxolotlAuthentication(String username, UUID uuid, String accessToken) {
     public static final Codec<AxolotlAuthentication> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("username").forGetter(AxolotlAuthentication::username),
-            UUIDUtil.CODEC.fieldOf("uuid").forGetter(AxolotlAuthentication::uuid),
+            UUIDUtil.LENIENT_CODEC.fieldOf("uuid").forGetter(AxolotlAuthentication::uuid),
             Codec.STRING.fieldOf("access_token").forGetter(AxolotlAuthentication::accessToken)
     ).apply(instance, AxolotlAuthentication::new));
 }

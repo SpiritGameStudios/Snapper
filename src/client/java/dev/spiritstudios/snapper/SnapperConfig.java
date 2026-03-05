@@ -3,7 +3,7 @@ package dev.spiritstudios.snapper;
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import dev.spiritstudios.snapper.util.config.DirectoryConfigUtil;
+import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import lgbt.greenhouse.config.api.v3.GreenhouseConfigSide;
 import lgbt.greenhouse.config.api.v3.GreenhouseConfigHolder;

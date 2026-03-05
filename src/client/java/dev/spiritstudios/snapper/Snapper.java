@@ -11,8 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Locale;
-
 public final class Snapper implements ClientModInitializer {
     public static final String MODID = "snapper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);

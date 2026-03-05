@@ -212,11 +212,11 @@ public class ScreenshotViewerScreen extends Screen {
             );
         }
 
+        // TODO: Maybe add an option to the debug menu to turn this off
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) renderDebugInfo(context);
     }
 
     private void renderDebugInfo(GuiGraphics context) {
-        context.pose().pushMatrix();
         int finalHeight = this.height - 50 - 68;
         float scaleFactor = (float) finalHeight / imageHeight;
         int finalWidth = (int) (imageWidth * scaleFactor);

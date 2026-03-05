@@ -1,10 +1,8 @@
-package dev.spiritstudios.snapper.util.config;
+package dev.spiritstudios.snapper.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import dev.spiritstudios.snapper.gui.widget.FolderSelectWidget;
 import joptsimple.internal.Strings;
-import net.minecraft.client.gui.components.AbstractWidget;
 import org.apache.commons.lang3.SystemProperties;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
@@ -13,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
 
 public class DirectoryConfigUtil {
     public static final Codec<Path> PATH_CODEC = Codec.STRING.comapFlatMap(
