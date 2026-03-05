@@ -52,7 +52,7 @@ public abstract class MinecraftMixin {
             at = @At("TAIL")
     )
     private void init(GameConfig args, CallbackInfo ci) {
-        if (!Util.getPlatform().equals(Util.OS.OSX)) System.setProperty("java.awt.headless", "false");
+        if (Util.getPlatform() != Util.OS.OSX) System.setProperty("java.awt.headless", "false");
     }
 
     @WrapOperation(

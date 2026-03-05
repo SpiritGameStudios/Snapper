@@ -36,8 +36,13 @@ public class DirectoryConfigUtil {
     );
 
     public static CompletableFuture<Optional<Path>> openFolderSelect(String title) {
-		// replaceAll is to prevent an ACE exploit in TinyFD
-        return CompletableFuture.supplyAsync(() -> TinyFileDialogs.tinyfd_selectFolderDialog(title.replaceAll("[^a-zA-Z0-9 .,]", ""), SystemProperties.getUserHome()))
+        // replaceAll is to prevent an ACE exploit in TinyFD
+        return CompletableFuture.supplyAsync(
+                        () -> TinyFileDialogs.tinyfd_selectFolderDialog(
+                                title.replaceAll("[^a-zA-Z0-9 .,]", ""),
+                                SystemProperties.getUserHome()
+                        )
+                )
                 .thenApply(selectedPath -> {
                     if (Strings.isNullOrEmpty(selectedPath)) {
                         return Optional.empty();
@@ -46,12 +51,6 @@ public class DirectoryConfigUtil {
                     return Optional.of(Path.of(selectedPath));
                 });
     }
-
-//    public static final BiFunction<Value<?>, String, ? extends AbstractWidget> PATH_WIDGET_FACTORY = (configValue, id) -> {
-//        @SuppressWarnings("unchecked") Value<Path> value = (Value<Path>) configValue;
-//
-//        return new FolderSelectWidget(0, 0, 10, 10, value, "%s.placeholder".formatted(configValue.translationKey(id)));
-//    };
 
     public static String escapePath(String path) {
         return path.replace("\\", "\\\\");

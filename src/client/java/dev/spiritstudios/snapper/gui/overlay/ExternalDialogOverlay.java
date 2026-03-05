@@ -16,32 +16,26 @@ public class ExternalDialogOverlay extends Overlay {
     private static final ResourceLocation INWORLD_MENU_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/inworld_menu_background.png");
 
     @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
-
-    @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (this.client.screen != null) {
-            this.client.screen.renderBackground(context, mouseX, mouseY, delta);
-            this.client.screen.render(context, mouseX, mouseY, delta);
+            this.client.screen.renderWithTooltipAndSubtitles(graphics, mouseX, mouseY, partialTick);
         }
 
-        this.client.gameRenderer.processBlurEffect();
+        graphics.nextStratum();
 
-        context.blit(
+        graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
                 this.client.level == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE,
                 0, 0,
                 0, 0,
-                context.guiWidth(), context.guiHeight(),
+                graphics.guiWidth(), graphics.guiHeight(),
                 32, 32
         );
 
-        context.drawCenteredString(
+        graphics.drawCenteredString(
                 client.font,
                 Component.translatable("overlay.snapper.external_dialog.folder"),
-                context.guiWidth() / 2, context.guiHeight() / 2,
+                graphics.guiWidth() / 2, graphics.guiHeight() / 2,
                 CommonColors.WHITE
         );
 
