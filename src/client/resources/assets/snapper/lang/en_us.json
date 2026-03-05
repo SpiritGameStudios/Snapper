@@ -18,7 +18,7 @@
   "button.snapper.upload": "Upload",
   "button.snapper.upload.tooltip": "Unable to upload screenshots while offline",
   "text.snapper.created": "Created",
-  "text.snapper.generic": "Screenshot",
+  "text.snapper.generic": "Screenshot %d",
   "text.snapper.loading": "Loading Screenshots",
   "text.snapper.empty": "Take a screenshot in-game to see it here!",
   "text.snapper.empty.custom": "Can't find your screenshots? Try disabling custom screenshot folders.",

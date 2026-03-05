@@ -6,6 +6,7 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
+import dev.spiritstudios.snapper.gui.widget.ScreenshotWidget;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
@@ -42,7 +43,8 @@ public class ScreenshotScreen extends Screen {
     private final Screen parent;
     private final boolean isOffline;
 
-    private ScreenshotListWidget screenshotList;
+    private ScreenshotWidget screenshots = null;
+
     private Button deleteButton;
     private Button renameButton;
     private Button viewButton;
@@ -51,29 +53,46 @@ public class ScreenshotScreen extends Screen {
     private Button uploadButton;
     private SpriteIconButton viewModeButton;
     private @Nullable ScreenshotListWidget.ScreenshotEntry selectedScreenshot = null;
-    private boolean showGrid;
 
     public ScreenshotScreen(Screen parent) {
         super(Component.translatable("menu.snapper.screenshot_menu"));
         this.parent = parent;
-
-        this.showGrid = SnapperConfig.HOLDER.get().viewMode().equals(ViewMode.GRID);
         this.isOffline = SnapperUtil.isOfflineAccount();
+    }
+
+    private void recreateList() {
+        if (screenshots != null) {
+            this.removeWidget(screenshots);
+        }
+
+        screenshots = this.addRenderableWidget(ScreenshotWidget.create(
+                minecraft,
+                width,
+                height - 48 - 68,
+                48,
+                screenshots,
+                this
+        ));
+    }
+
+    private void recreateViewModeButton() {
+        if (viewModeButton != null) {
+            removeWidget(this.viewModeButton);
+        }
+
+        this.viewModeButton = addRenderableWidget(SpriteIconButton.builder(
+                Component.translatable("config.snapper.viewMode"),
+                button -> this.toggleGrid(),
+                true
+        ).width(20).sprite(SnapperConfig.HOLDER.get().viewMode() == ViewMode.LIST ? VIEW_MODE_ICON_LIST : VIEW_MODE_ICON_GRID, 15, 15).build());
+        viewModeButton.setPosition(width / 2 - 178, height - 56);
     }
 
     @Override
     protected void init() {
         assert minecraft != null;
 
-        screenshotList = this.addRenderableWidget(new ScreenshotListWidget(
-                minecraft,
-                width,
-                height - 48 - 68,
-                48,
-                36,
-                screenshotList,
-                this
-        ));
+        recreateList();
 
         int secondRowButtonWidth = 100;
 
@@ -188,14 +207,7 @@ public class ScreenshotScreen extends Screen {
 
         settingsButton.setPosition(width / 2 - 178, height - 32);
 
-
-        this.viewModeButton = addRenderableWidget(SpriteIconButton.builder(
-                Component.translatable("config.snapper.viewMode"),
-                button -> this.toggleGrid(),
-                true
-        ).width(20).sprite(showGrid ? VIEW_MODE_ICON_LIST : VIEW_MODE_ICON_GRID, 15, 15).build());
-
-        viewModeButton.setPosition(width / 2 - 178, height - 56);
+        recreateViewModeButton();
 
         Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
         boolean hasPanorama = SnapperUtil.panoramaPresent(panoramaDir);
@@ -229,17 +241,10 @@ public class ScreenshotScreen extends Screen {
     }
 
     public void toggleGrid() {
-        screenshotList.toggleGrid();
-        screenshotList.refreshScrollAmount();
-        this.showGrid = !this.showGrid;
+        SnapperConfig.edit(m -> m.viewMode = SnapperConfig.HOLDER.get().viewMode() == ViewMode.GRID ? ViewMode.LIST : ViewMode.GRID);
 
-        removeWidget(this.viewModeButton);
-        this.viewModeButton = addRenderableWidget(SpriteIconButton.builder(
-                Component.translatable("config.snapper.viewMode"),
-                button -> this.toggleGrid(),
-                true
-        ).width(20).sprite(showGrid ? VIEW_MODE_ICON_LIST : VIEW_MODE_ICON_GRID, 15, 15).build());
-        viewModeButton.setPosition(width / 2 - 178, height - 56);
+        recreateList();
+        recreateViewModeButton();
     }
 
     @Override
@@ -272,14 +277,9 @@ public class ScreenshotScreen extends Screen {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
-    }
-
-    @Override
-    public void render(GuiGraphics conComponent, int mouseX, int mouseY, float delta) {
-        super.render(conComponent, mouseX, mouseY, delta);
-        conComponent.drawCenteredString(this.font, this.title, this.width / 2, 20, CommonColors.WHITE);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        super.render(graphics, mouseX, mouseY, delta);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, CommonColors.WHITE);
     }
 
     public enum ViewMode implements StringRepresentable {
