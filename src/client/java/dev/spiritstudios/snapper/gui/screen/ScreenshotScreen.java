@@ -10,7 +10,6 @@ import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
@@ -26,6 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 
@@ -66,7 +66,7 @@ public class ScreenshotScreen extends Screen {
         assert minecraft != null;
 
         screenshotList = this.addRenderableWidget(new ScreenshotListWidget(
-                Minecraft.getInstance(),
+                minecraft,
                 width,
                 height - 48 - 68,
                 48,
@@ -295,7 +295,7 @@ public class ScreenshotScreen extends Screen {
         }
 
         @Override
-        public String getSerializedName() {
+        public @NonNull String getSerializedName() {
             return name;
         }
     }

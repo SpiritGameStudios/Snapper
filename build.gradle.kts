@@ -19,36 +19,32 @@ base.archivesName = modId
 
 version = "$modVersion+${libs.versions.minecraft.get()}"
 
+@Suppress("UnstableApiUsage")
 repositories {
-    maven {
-        name = "Spirit Studios Releases"
-        url = uri("https://maven.spiritstudios.dev/releases/")
-
-        content {
-            @Suppress("UnstableApiUsage")
-            includeGroupAndSubgroups("dev.spiritstudios")
-        }
-    }
-
-    maven {
+    maven("https://maven.parchmentmc.org/") {
         name = "ParchmentMC"
-        url = uri("https://maven.parchmentmc.org")
-
-        content {
-            @Suppress("UnstableApiUsage")
-            includeGroupAndSubgroups("org.parchmentmc")
-        }
+        content { includeGroupAndSubgroups("org.parchmentmc") }
     }
 
-    maven("https://moehreag.duckdns.org/maven/releases") {
-        content {
-            includeGroup("io.github.axolotlclient.AxolotlClient")
-            includeGroup("io.github.axolotlclient.AxolotlClient-config")
-        }
+    maven("https://maven.terraformersmc.com/") {
+        name = "Terraformers"
+        content { includeGroupAndSubgroups("com.terraformersmc") }
     }
 
-    maven("https://maven.greenhouse.lgbt/releases/")
-    maven("https://maven.greenhouse.lgbt/snapshots/")
+    maven("https://moehreag.duckdns.org/maven/releases/") {
+        name = "AxolotlClient Releases"
+        content { includeGroupAndSubgroups("io.github.axolotlclient") }
+    }
+
+    maven("https://maven.greenhouse.lgbt/releases/") {
+        name = "Greenhouse Releases"
+        content { includeGroupAndSubgroups("lgbt.greenhouse") }
+    }
+
+    maven("https://maven.greenhouse.lgbt/snapshots/") {
+        name = "Greenhouse Snapshots"
+        content { includeGroupAndSubgroups("lgbt.greenhouse") }
+    }
 
     mavenCentral()
 }
@@ -83,6 +79,8 @@ dependencies {
 
     modRuntimeOnly(libs.greenhouse.config)
     include(libs.greenhouse.config)
+
+    modCompileOnly(libs.modmenu)
 
     implementation(libs.objc.bridge)
 }
@@ -130,5 +128,6 @@ publishMods {
         projectDescription = providers.fileContents(layout.projectDirectory.file("README.md")).asText
 
         requires("fabric-api")
+        embeds("greenhouse-config")
     }
 }

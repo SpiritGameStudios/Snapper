@@ -82,7 +82,7 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
             repositionEntries();
         });
 
-        this.showGrid = SnapperConfig.HOLDER.get().viewMode().equals(ScreenshotScreen.ViewMode.GRID);
+        this.showGrid = SnapperConfig.HOLDER.get().viewMode() == ScreenshotScreen.ViewMode.GRID;
 
         ((AbstractSelectionListAccessor) this).setDefaultEntryHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
         repositionEntries();

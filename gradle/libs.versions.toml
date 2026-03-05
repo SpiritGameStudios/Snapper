@@ -9,6 +9,8 @@ fabric_loader = "0.18.1"
 fabric_api = "0.138.3+1.21.10"
 
 greenhouse_config = "3.0.0-beta.4+1.21.10"
+modmenu = "16.0.0"
+
 objc_bridge = "1.0.0"
 
 [plugins]
@@ -24,5 +26,7 @@ fabric_api = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.r
 
 greenhouse_config_api = { group = "lgbt.greenhouse.config", name = "greenhouse-config-api", version.ref = "greenhouse_config" }
 greenhouse_config = { group = "lgbt.greenhouse.config", name = "greenhouse-config-fabric", version.ref = "greenhouse_config" }
+
+modmenu = { group = "com.terraformersmc", name = "modmenu", version.ref = "modmenu" }
 
 objc_bridge = { group = "ca.weblite", name = "java-objc-bridge", version.ref = "objc_bridge" }

@@ -10,7 +10,12 @@
 		"hama"
 	],
 	"contributors": [
-		"ChrysanthCow"
+		"ChrysanthCow",
+		"moehreag",
+		"seriousfreezing",
+		"getchoo",
+		"vortixo",
+		"xaerfly"
 	],
 	"contact": {
 		"homepage": "https://spiritstudios.dev",
@@ -23,6 +28,9 @@
 	"entrypoints": {
 		"client": [
 			"dev.spiritstudios.snapper.Snapper"
+		],
+		"modmenu": [
+			"dev.spiritstudios.snapper.compat.SnapperModMenu"
 		]
 	},
 	"accessWidener": "snapper.classtweaker",

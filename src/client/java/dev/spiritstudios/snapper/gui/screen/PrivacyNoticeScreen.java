@@ -38,7 +38,9 @@ import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.NonNull;
 
 import java.net.URI;
 import java.util.function.Consumer;
@@ -59,12 +61,12 @@ public class PrivacyNoticeScreen extends Screen {
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredString(this.font, this.title, this.width / 2, getTitleY(), -1);
-        message.render(context, MultiLineLabel.Align.CENTER, width / 2, getMessageY(), 10, true, 0xFFFFFF);
+        context.drawCenteredString(this.font, this.title, this.width / 2, getTitleY(), CommonColors.WHITE);
+        message.render(context, MultiLineLabel.Align.CENTER, width / 2, getMessageY(), 10, true, CommonColors.WHITE);
     }
 
     @Override
-    public Component getNarrationMessage() {
+    public @NonNull Component getNarrationMessage() {
         return CommonComponents.joinForNarration(super.getNarrationMessage(),
                 Component.translatable("snapper.privacy_notice.description"));
     }

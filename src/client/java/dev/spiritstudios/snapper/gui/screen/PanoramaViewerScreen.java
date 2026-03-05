@@ -37,25 +37,26 @@ public class PanoramaViewerScreen extends Screen {
         this.title = title;
         this.parent = parent;
         this.texture = this.getTexture();
+
         if (texture != null) {
+            // TODO: May be worth doing texture loading here off-thread as not to cause a freeze
             Minecraft.getInstance().getTextureManager().registerAndLoad(ID, texture);
         }
     }
 
     @Nullable
     private DynamicCubemapTexture getTexture() {
-		assert minecraft != null;
+        assert minecraft != null;
 
         Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
         if (!SnapperUtil.panoramaPresent(panoramaDir)) return null;
 
         try (Stream<Path> stream = Files.list(panoramaDir)) {
-            return stream
-                    .allMatch(path -> {
-                        if (Files.isDirectory(path)) return false;
+            return stream.allMatch(path -> {
+                if (Files.isDirectory(path)) return false;
 
-                        return SafeFiles.isContentType(path, "image/png", ".png");
-                    }) ? DynamicCubemapTexture.createPanorama(ID, panoramaDir).orElse(null) : null;
+                return SafeFiles.isContentType(path, "image/png", ".png");
+            }) ? DynamicCubemapTexture.createPanorama(ID, panoramaDir).orElse(null) : null;
         } catch (IOException | NullPointerException e) {
             Snapper.LOGGER.error("Failed to list the contents of directory", e);
             return null;
