@@ -87,13 +87,13 @@ public class PrivacyNoticeScreen extends Screen {
 
         addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.accept"), buttonWidget -> {
             Minecraft.getInstance().setScreen(parent);
-            SnapperConfig.edit(m -> m.termsAccepted = AxolotlClientApi.TermsAcceptance.ACCEPTED);
+            SnapperConfig.editAsync(m -> m.termsAccepted = AxolotlClientApi.TermsAcceptance.ACCEPTED);
             accepted.accept(true);
         }).bounds(width / 2 - (buttonWidth / 2), y, buttonWidth, 20).build());
 
         addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.deny"), buttonWidget -> {
             Minecraft.getInstance().setScreen(parent);
-            SnapperConfig.edit(m -> m.termsAccepted = AxolotlClientApi.TermsAcceptance.DENIED);
+            SnapperConfig.editAsync(m -> m.termsAccepted = AxolotlClientApi.TermsAcceptance.DENIED);
             accepted.accept(false);
         }).bounds(width / 2 - (buttonWidth / 2) + buttonWidth + 5, y, buttonWidth, 20).build());
     }

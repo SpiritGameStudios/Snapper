@@ -29,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 
-// TODO: Config Screen.
 public class ScreenshotScreen extends Screen {
     private static final ResourceLocation PANORAMA_BUTTON_ICON = Snapper.id("screenshots/panorama");
     private static final ResourceLocation PANORAMA_BUTTON_DISABLED_ICON = Snapper.id("screenshots/panorama_disabled");

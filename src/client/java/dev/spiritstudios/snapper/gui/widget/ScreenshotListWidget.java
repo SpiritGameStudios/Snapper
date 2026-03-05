@@ -213,9 +213,7 @@ public class ScreenshotListWidget extends ObjectSelectionList<ScreenshotListWidg
         ((AbstractSelectionListAccessor) this).setDefaultEntryHeight(this.showGrid ? this.gridItemHeight : this.listItemHeight);
         for (var entry : this.children()) if (entry instanceof ScreenshotEntry sc) sc.setShowGrid(this.showGrid);
 
-        SnapperConfig.Mutable mutable = SnapperConfig.mutable();
-        mutable.viewMode = this.showGrid ? ScreenshotScreen.ViewMode.GRID : ScreenshotScreen.ViewMode.LIST;
-        mutable.save();
+        SnapperConfig.editAsync(m -> m.viewMode = this.showGrid ? ScreenshotScreen.ViewMode.GRID : ScreenshotScreen.ViewMode.LIST);
 
         repositionEntries();
     }
