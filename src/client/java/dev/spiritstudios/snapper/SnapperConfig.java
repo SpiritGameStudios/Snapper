@@ -15,6 +15,7 @@ import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
 import net.minecraft.Util;
 
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 public record SnapperConfig(boolean copyTakenScreenshot,
                             SnapperButton snapperButton,
@@ -164,6 +165,18 @@ public record SnapperConfig(boolean copyTakenScreenshot,
     public static void init() {}
     public static Mutable mutable() {
         return new Mutable();
+    }
+
+    public static void edit(Consumer<Mutable> editor) {
+        var mutable = mutable();
+        editor.accept(mutable);
+        mutable.save();
+    }
+
+    public static void editAsync(Consumer<Mutable> editor) {
+        var mutable = mutable();
+        editor.accept(mutable);
+        mutable.saveAsync();
     }
 
     public static class Mutable {

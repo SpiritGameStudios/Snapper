@@ -28,6 +28,8 @@
 
 package dev.spiritstudios.snapper.gui.screen;
 
+import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -85,15 +87,13 @@ public class PrivacyNoticeScreen extends Screen {
 
         addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.accept"), buttonWidget -> {
             Minecraft.getInstance().setScreen(parent);
-//            SnapperConfig.INSTANCE.termsStatus.set(AxolotlClientApi.TermsAcceptance.ACCEPTED);
-//            SnapperConfig.HOLDER.save();
+            SnapperConfig.edit(m -> m.termsAccepted = AxolotlClientApi.TermsAcceptance.ACCEPTED);
             accepted.accept(true);
         }).bounds(width / 2 - (buttonWidth / 2), y, buttonWidth, 20).build());
 
         addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.deny"), buttonWidget -> {
             Minecraft.getInstance().setScreen(parent);
-//            SnapperConfig.INSTANCE.termsStatus.set(AxolotlClientApi.TermsAcceptance.DENIED);
-//            SnapperConfig.HOLDER.save();
+            SnapperConfig.edit(m -> m.termsAccepted = AxolotlClientApi.TermsAcceptance.DENIED);
             accepted.accept(false);
         }).bounds(width / 2 - (buttonWidth / 2) + buttonWidth + 5, y, buttonWidth, 20).build());
     }

@@ -5,7 +5,7 @@ modpublish = "1.1.0"
 minecraft = "1.21.10"
 parchment = "2025.10.12"
 
-fabric_loader = "0.17.3"
+fabric_loader = "0.18.1"
 fabric_api = "0.138.3+1.21.10"
 
 greenhouse_config = "3.0.0-beta.3+1.21.10"
