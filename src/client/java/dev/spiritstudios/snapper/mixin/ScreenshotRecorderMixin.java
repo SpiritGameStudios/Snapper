@@ -6,6 +6,7 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.NativeImage;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.util.PlatformHelper;
 import net.minecraft.client.Screenshot;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -41,7 +42,7 @@ public abstract class ScreenshotRecorderMixin {
     )
     private static void saveWrittenFileToClipboard(NativeImage nativeImage, File screenshotFile, Consumer<Component> messageReceiver, CallbackInfo ci) {
         if (!screenshotFile.getAbsolutePath().contains("/panorama/") && SnapperConfig.HOLDER.get().copyTakenScreenshot()) {
-            Snapper.getPlatformHelper().copyScreenshot(screenshotFile.toPath());
+            PlatformHelper.INSTANCE.copyScreenshot(screenshotFile.toPath());
         }
     }
 

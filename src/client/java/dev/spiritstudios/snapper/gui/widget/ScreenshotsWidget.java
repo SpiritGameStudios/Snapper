@@ -3,7 +3,7 @@ package dev.spiritstudios.snapper.gui.widget;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
@@ -37,7 +37,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class ScreenshotWidget extends ObjectSelectionList<ScreenshotWidget.Entry> {
+public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsWidget.Entry> {
     protected static final ResourceLocation VIEW_SPRITE = Snapper.id("screenshots/view");
     protected static final ResourceLocation VIEW_HIGHLIGHTED_SPRITE = Snapper.id("screenshots/view_highlighted");
     protected static final ResourceLocation GRID_SELECTION_BACKGROUND_TEXTURE = Snapper.id("textures/gui/grid_selection_background.png");
@@ -45,30 +45,30 @@ public abstract class ScreenshotWidget extends ObjectSelectionList<ScreenshotWid
     protected final Screen parent;
     public final CompletableFuture<List<ScreenshotTexture>> loadFuture;
 
-    public static ScreenshotWidget create(
+    public static ScreenshotsWidget create(
             Minecraft client,
             int width, int height,
-            int y, @Nullable ScreenshotWidget previous,
+            int y, @Nullable ScreenshotsWidget previous,
             Screen parent
     ) {
-        if (SnapperConfig.HOLDER.get().viewMode() == ScreenshotScreen.ViewMode.GRID) {
+        if (SnapperConfig.HOLDER.get().viewMode() == ScreenshotListScreen.ViewMode.GRID) {
             return new ScreenshotGridWidget(client, width, height, y, previous, parent);
         } else {
             return new ScreenshotListWidget(client, width, height, y, previous, parent);
         }
     }
 
-    public ScreenshotWidget(
+    public ScreenshotsWidget(
             Minecraft client,
             int width, int height,
             int y, int itemHeight,
-            @Nullable ScreenshotWidget previous,
+            @Nullable ScreenshotsWidget previous,
             Screen parent
     ) {
         super(client, width, height, y, itemHeight);
 
         this.parent = parent;
-        this.addEntry(new ScreenshotWidget.LoadingEntry(client));
+        this.addEntry(new ScreenshotsWidget.LoadingEntry(client));
 
         this.loadFuture = previous != null ? previous.loadFuture : load(client);
 
@@ -76,7 +76,7 @@ public abstract class ScreenshotWidget extends ObjectSelectionList<ScreenshotWid
             this.clearEntries();
 
             if (textures.isEmpty()) {
-                this.addEntry(new ScreenshotWidget.EmptyEntry(client));
+                this.addEntry(new ScreenshotsWidget.EmptyEntry(client));
             } else {
                 for (ScreenshotTexture texture : textures) {
                     addEntry(createEntry(texture));
@@ -97,7 +97,7 @@ public abstract class ScreenshotWidget extends ObjectSelectionList<ScreenshotWid
 
     protected void setEntrySelected(@Nullable ScreenshotEntry entry) {
         super.setSelected(entry);
-        if (this.parent instanceof ScreenshotScreen screenshotScreen) {
+        if (this.parent instanceof ScreenshotListScreen screenshotScreen) {
             screenshotScreen.imageSelected(entry);
         }
     }
@@ -253,7 +253,7 @@ public abstract class ScreenshotWidget extends ObjectSelectionList<ScreenshotWid
             try {
                 creationTime = Files.readAttributes(icon.getPath(), BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException e) {
-                minecraft.setScreen(new ScreenshotScreen(screenParent));
+                minecraft.setScreen(new ScreenshotListScreen(screenParent));
             }
 
             if (creationTime != -1L)
@@ -272,7 +272,7 @@ public abstract class ScreenshotWidget extends ObjectSelectionList<ScreenshotWid
             context.blitSprite(
                     RenderPipelines.GUI_TEXTURED,
                     clickThroughHovered && icon.loaded() ?
-                            ScreenshotWidget.VIEW_HIGHLIGHTED_SPRITE : ScreenshotWidget.VIEW_SPRITE,
+                            ScreenshotsWidget.VIEW_HIGHLIGHTED_SPRITE : ScreenshotsWidget.VIEW_SPRITE,
                     centreX - 16,
                     centreY - 16,
                     32,

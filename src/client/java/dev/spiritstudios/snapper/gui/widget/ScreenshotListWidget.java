@@ -17,12 +17,12 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 
-public class ScreenshotListWidget extends ScreenshotWidget {
+public class ScreenshotListWidget extends ScreenshotsWidget {
     public ScreenshotListWidget(
             Minecraft client,
             int width, int height,
             int y,
-            @Nullable ScreenshotWidget previous,
+            @Nullable ScreenshotsWidget previous,
             Screen parent
     ) {
         super(client, width, height, y, 36, previous, parent);
@@ -103,8 +103,8 @@ public class ScreenshotListWidget extends ScreenshotWidget {
                 graphics.blitSprite(
                         RenderPipelines.GUI_TEXTURED,
                         mouseX - getContentX() < 32 && this.icon.loaded() ?
-                                ScreenshotWidget.VIEW_HIGHLIGHTED_SPRITE :
-                                ScreenshotWidget.VIEW_SPRITE,
+                                ScreenshotsWidget.VIEW_HIGHLIGHTED_SPRITE :
+                                ScreenshotsWidget.VIEW_SPRITE,
                         getContentX(), getContentY(),
                         32, 32
                 );

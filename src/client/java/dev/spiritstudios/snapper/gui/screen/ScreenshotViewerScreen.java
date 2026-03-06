@@ -1,6 +1,7 @@
 package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
@@ -133,7 +134,7 @@ public class ScreenshotViewerScreen extends Screen {
 
         Button copyButton = addRenderableWidget(Button.builder(
                 Component.translatable("button.snapper.copy"),
-                button -> Snapper.getPlatformHelper().copyScreenshot(this.screenshot)
+                button -> PlatformHelper.INSTANCE.copyScreenshot(this.screenshot)
         ).width(firstRowButtonWidth).build());
 
         // UPLOAD SCREENSHOT

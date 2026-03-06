@@ -51,7 +51,7 @@ public class ConfigScreen extends Screen {
                         "viewMode",
                         b -> config.viewMode = b,
                         config.viewMode,
-                        ScreenshotScreen.ViewMode.class
+                        ScreenshotListScreen.ViewMode.class
                 )
         );
 
@@ -80,7 +80,6 @@ public class ConfigScreen extends Screen {
         );
 
         this.list.addHeader(Component.translatable("config.snapper.customScreenshotFolder"));
-
 
         var folderSelect = folderSelectWidget(
                 "customScreenshotFolder",
@@ -250,7 +249,13 @@ public class ConfigScreen extends Screen {
 
     @Override
     public void onClose() {
+        assert minecraft != null;
+
         minecraft.setScreen(lastScreen);
-        config.saveAsync();
+        config.saveAsync().thenRun(() -> {
+            if (lastScreen instanceof ScreenshotListScreen screenshotsScreen) {
+                screenshotsScreen.refresh();
+            }
+        });
     }
 }

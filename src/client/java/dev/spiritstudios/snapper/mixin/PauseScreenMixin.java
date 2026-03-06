@@ -2,7 +2,7 @@ package dev.spiritstudios.snapper.mixin;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.PauseScreen;
@@ -34,7 +34,7 @@ public abstract class PauseScreenMixin extends Screen {
                     SpriteIconButton.builder(
                             Component.translatable("button.snapper.screenshots"),
                             button -> {
-                                Minecraft.getInstance().setScreen(new ScreenshotScreen(new PauseScreen(true)));
+                                Minecraft.getInstance().setScreen(new ScreenshotListScreen(new PauseScreen(true)));
                             },
                             true
                     ).width(20).sprite(SNAPPER_BUTTON_ICON, 15, 15).build()

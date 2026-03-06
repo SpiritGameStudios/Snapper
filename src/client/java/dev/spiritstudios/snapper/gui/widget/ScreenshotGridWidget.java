@@ -13,14 +13,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
-public class ScreenshotGridWidget extends ScreenshotWidget {
+public class ScreenshotGridWidget extends ScreenshotsWidget {
     public static final int GRID_ENTRY_WIDTH = 144;
 
     public ScreenshotGridWidget(
             Minecraft client,
             int width, int height,
             int y,
-            @Nullable ScreenshotWidget previous,
+            @Nullable ScreenshotsWidget previous,
             Screen parent
     ) {
         super(client, width, height, y, 81, previous, parent);

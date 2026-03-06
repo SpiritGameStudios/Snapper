@@ -2,7 +2,7 @@ package dev.spiritstudios.snapper.mixin;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -39,7 +39,7 @@ public abstract class TitleScreenMixin extends Screen {
             this.addRenderableWidget(
                     SpriteIconButton.builder(
                             Component.translatable("button.snapper.screenshots"),
-                            button -> this.minecraft.setScreen(new ScreenshotScreen((TitleScreen) ((Object) this))),
+                            button -> this.minecraft.setScreen(new ScreenshotListScreen((TitleScreen) ((Object) this))),
                             true
                     ).width(20).sprite(SNAPPER_BUTTON_ICON, 15, 15).build()
             ).setPosition(this.width / 2 - 124, y + spacingY);

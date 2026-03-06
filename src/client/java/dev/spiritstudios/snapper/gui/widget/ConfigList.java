@@ -1,14 +1,10 @@
 package dev.spiritstudios.snapper.gui.widget;
 
-import com.google.common.collect.ImmutableList;
-import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ConfigScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
-import net.minecraft.client.gui.components.OptionsList;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -121,7 +117,7 @@ public class ConfigList extends ContainerObjectSelectionList<ConfigList.Abstract
         }
 
         @Override
-        public List<? extends NarratableEntry> narratables() {
+        public @NonNull List<? extends NarratableEntry> narratables() {
             return List.of(this.widget);
         }
 
@@ -131,7 +127,7 @@ public class ConfigList extends ContainerObjectSelectionList<ConfigList.Abstract
             this.widget.render(graphics, mouseX, mouseY, a);
         }
 
-        public List<? extends GuiEventListener> children() {
+        public @NonNull List<? extends GuiEventListener> children() {
             return List.of(this.widget);
         }
     }

@@ -6,7 +6,8 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
-import dev.spiritstudios.snapper.gui.widget.ScreenshotWidget;
+import dev.spiritstudios.snapper.gui.widget.ScreenshotsWidget;
+import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
@@ -30,7 +31,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 
-public class ScreenshotScreen extends Screen {
+public class ScreenshotListScreen extends Screen {
     private static final ResourceLocation PANORAMA_BUTTON_ICON = Snapper.id("screenshots/panorama");
     private static final ResourceLocation PANORAMA_BUTTON_DISABLED_ICON = Snapper.id("screenshots/panorama_disabled");
 
@@ -43,7 +44,7 @@ public class ScreenshotScreen extends Screen {
     private final Screen parent;
     private final boolean isOffline;
 
-    private ScreenshotWidget screenshots = null;
+    private ScreenshotsWidget screenshots = null;
 
     private Button deleteButton;
     private Button renameButton;
@@ -54,10 +55,15 @@ public class ScreenshotScreen extends Screen {
     private SpriteIconButton viewModeButton;
     private @Nullable ScreenshotListWidget.ScreenshotEntry selectedScreenshot = null;
 
-    public ScreenshotScreen(Screen parent) {
+    public ScreenshotListScreen(Screen parent) {
         super(Component.translatable("menu.snapper.screenshot_menu"));
         this.parent = parent;
         this.isOffline = SnapperUtil.isOfflineAccount();
+    }
+
+    public synchronized void refresh() {
+        recreateList();
+        recreateViewModeButton();
     }
 
     private void recreateList() {
@@ -65,7 +71,7 @@ public class ScreenshotScreen extends Screen {
             this.removeWidget(screenshots);
         }
 
-        screenshots = this.addRenderableWidget(ScreenshotWidget.create(
+        screenshots = this.addRenderableWidget(ScreenshotsWidget.create(
                 minecraft,
                 width,
                 height - 48 - 68,
@@ -140,7 +146,7 @@ public class ScreenshotScreen extends Screen {
                 Component.translatable("button.snapper.copy"),
                 button -> {
                     if (selectedScreenshot != null) {
-                        Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.icon.getPath());
+                        PlatformHelper.INSTANCE.copyScreenshot(selectedScreenshot.icon.getPath());
                     }
                 }
         ).width(firstRowButtonWidth).build());
@@ -201,7 +207,7 @@ public class ScreenshotScreen extends Screen {
         SpriteIconButton settingsButton = addRenderableWidget(SpriteIconButton.builder(
                 Component.translatable("config.snapper.title"),
                 button -> this.minecraft.setScreen(
-                        new ConfigScreen(new ScreenshotScreen(this.parent))),
+                        new ConfigScreen(new ScreenshotListScreen(this.parent))),
                 true
         ).width(20).sprite(SETTINGS_ICON, 15, 15).build());
 
@@ -243,8 +249,7 @@ public class ScreenshotScreen extends Screen {
     public void toggleGrid() {
         SnapperConfig.edit(m -> m.viewMode = SnapperConfig.HOLDER.get().viewMode() == ViewMode.GRID ? ViewMode.LIST : ViewMode.GRID);
 
-        recreateList();
-        recreateViewModeButton();
+        refresh();
     }
 
     @Override
@@ -256,14 +261,14 @@ public class ScreenshotScreen extends Screen {
         }
 
         if (input.key() == InputConstants.KEY_F5) {
-            minecraft.setScreen(new ScreenshotScreen(this.parent));
+            minecraft.setScreen(new ScreenshotListScreen(this.parent));
             return true;
         }
 
         if (selectedScreenshot == null) return false;
 
         if ((input.modifiers() & InputConstants.MOD_CONTROL) != 0 && input.key() == InputConstants.KEY_C) {
-            Snapper.getPlatformHelper().copyScreenshot(selectedScreenshot.icon.getPath());
+            PlatformHelper.INSTANCE.copyScreenshot(selectedScreenshot.icon.getPath());
             SnapperToast.push(SnapperToast.Type.SCREENSHOT, Component.translatable("toast.snapper.screenshot.copy"), null);
             return true;
         }

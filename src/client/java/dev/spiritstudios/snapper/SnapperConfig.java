@@ -1,7 +1,7 @@
 package dev.spiritstudios.snapper;
 
 import com.mojang.serialization.Codec;
-import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
@@ -15,11 +15,12 @@ import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
 import net.minecraft.Util;
 
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public record SnapperConfig(boolean copyTakenScreenshot,
                             SnapperButton snapperButton,
-                            ScreenshotScreen.ViewMode viewMode,
+                            ScreenshotListScreen.ViewMode viewMode,
                             SnapperUtil.PanoramaSize panoramaDimensions,
                             CustomScreenshotFolder customScreenshotPath,
                             AxolotlClient axolotlClient) {
@@ -60,8 +61,8 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                             """
                                     Whether to show the screenshot menu in a grid or a list
                                     May be either 'grid' or 'list'""",
-                            ScreenshotScreen.ViewMode.CODEC,
-                            ScreenshotScreen.ViewMode.GRID,
+                            ScreenshotListScreen.ViewMode.CODEC,
+                            ScreenshotListScreen.ViewMode.GRID,
                             SnapperConfig::viewMode
                     ).withValue(
                             "panorama_size",
@@ -122,7 +123,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             .withField("customScreenshotFolder", TypeTemplateBuilder.STRING)
                     ).withPreviousLang(0, GreenhouseConfigJsonLang.INSTANCE)
                     .withSchemaAndFixes(
-							10100,
+                            10100,
                             DataFixerBuilderFunctions.create(
                                     builder -> builder
                                             .withField("copy_taken_screenshot", TypeTemplateBuilder.BOOL)
@@ -158,11 +159,18 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                     )
     );
 
-    public record SnapperButton(boolean showOnTitleScreen, boolean showInGameMenu) {}
-    public record CustomScreenshotFolder(boolean enabled, Path path) {}
-    public record AxolotlClient(AxolotlClientApi.TermsAcceptance termsStatus) {}
+    public record SnapperButton(boolean showOnTitleScreen, boolean showInGameMenu) {
+    }
 
-    public static void init() {}
+    public record CustomScreenshotFolder(boolean enabled, Path path) {
+    }
+
+    public record AxolotlClient(AxolotlClientApi.TermsAcceptance termsStatus) {
+    }
+
+    public static void init() {
+    }
+
     public static Mutable mutable() {
         return new Mutable();
     }
@@ -173,16 +181,16 @@ public record SnapperConfig(boolean copyTakenScreenshot,
         mutable.save();
     }
 
-    public static void editAsync(Consumer<Mutable> editor) {
+    public static CompletableFuture<Void> editAsync(Consumer<Mutable> editor) {
         var mutable = mutable();
         editor.accept(mutable);
-        mutable.saveAsync();
+        return mutable.saveAsync();
     }
 
     public static class Mutable {
         // Root
         public boolean copyTakenScreenshot;
-        public ScreenshotScreen.ViewMode viewMode;
+        public ScreenshotListScreen.ViewMode viewMode;
         public SnapperUtil.PanoramaSize panoramaDimensions;
 
         // Snapper Button
@@ -215,8 +223,8 @@ public record SnapperConfig(boolean copyTakenScreenshot,
             HOLDER.save(build(), null);
         }
 
-        public void saveAsync() {
-            Util.ioPool().execute(this::save);
+        public CompletableFuture<Void> saveAsync() {
+            return CompletableFuture.runAsync(this::save, Util.ioPool());
         }
 
         private SnapperConfig build() {

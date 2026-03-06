@@ -1,6 +1,6 @@
 package dev.spiritstudios.snapper;
 
-import dev.spiritstudios.snapper.gui.screen.ScreenshotScreen;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
@@ -44,7 +44,7 @@ public final class SnapperKeybindings {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (PANORAMA_KEY.consumeClick()) SnapperKeybindings.takePanorama(client);
             while (RECENT_SCREENSHOT_KEY.consumeClick()) SnapperKeybindings.openRecentScreenshot(client);
-            while (SCREENSHOT_MENU_KEY.consumeClick()) client.setScreen(new ScreenshotScreen(client.screen));
+            while (SCREENSHOT_MENU_KEY.consumeClick()) client.setScreen(new ScreenshotListScreen(client.screen));
         });
     }
 
