@@ -51,16 +51,13 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
         return super.getRowTop(index / getColumnCount());
     }
 
-    @Override
-    public int maxScrollAmount() {
-        int totalColumns = (getItemCount() / getColumnCount()) + (getItemCount() % getColumnCount() > 0 ? 1 : 0);
-        return Math.max(0, totalColumns * defaultEntryHeight - defaultEntryHeight - this.height + 17);
+    public int getRows() {
+        return (getItemCount() / getColumnCount()) + (getItemCount() % getColumnCount() > 0 ? 1 : 0);
     }
 
     @Override
     protected int contentHeight() {
-        int totalRows = (getItemCount() / getColumnCount()) + (getItemCount() % getColumnCount() > 0 ? 1 : 0);
-        return totalRows * this.defaultEntryHeight + 4;
+        return this.getRows() * (this.defaultEntryHeight - 4);
     }
 
     @Override
@@ -80,8 +77,8 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
                 entryIndex = this.children().indexOf(selected) + offset;
             }
 
-            for (int k = entryIndex; k >= 0 && k < this.children().size(); k += offset) {
-                Entry entry = this.children().get(k);
+            for (int i = entryIndex; i >= 0 && i < this.children().size(); i += offset) {
+                Entry entry = this.children().get(i);
                 if (predicate.test(entry)) {
                     return entry;
                 }
@@ -98,14 +95,12 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
         int rowTop = this.getY() + 2 - (int) this.scrollAmount();
 
         int rowLeft = this.getRowLeft();
-        int rowWidth = this.getRowWidth();
-        int entryHeight = this.defaultEntryHeight - 4;
+        int entryHeight = this.defaultEntryHeight - (2 * 2);
         int entryWidth = GRID_ENTRY_WIDTH;
-        int spacing = (rowWidth - (getColumnCount() * entryWidth)) / (getColumnCount() - 1);
 
         for (int index = 0; index < entryCount; index++) {
             int colIndex = index % getColumnCount();
-            int leftOffset = colIndex * (entryWidth + spacing);
+            int leftOffset = colIndex * entryWidth;
 
             ScreenshotListWidget.Entry entry = this.children().get(index);
             entry.setY(rowTop);
