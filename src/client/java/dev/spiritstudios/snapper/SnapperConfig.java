@@ -26,7 +26,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                             AxolotlClient axolotlClient) {
     public static final GreenhouseConfigHolder<SnapperConfig> HOLDER = GreenhouseConfigHolder.register(
             SnapperConfig.class,
-            "snapper",
+            Snapper.MOD_ID,
             10101,
             GreenhouseConfigJsonCLang.INSTANCE,
             GreenhouseConfigSide.CLIENT,

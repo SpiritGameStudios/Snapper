@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class ScreenshotUploading {
     public static final String SNAPPER_WEB_URL = "https://snapper.spiritstudios.dev/img/%s";
-    public static final String SNAPPER_VERSION = FabricLoader.getInstance().getModContainer("snapper")
+    public static final String SNAPPER_VERSION = FabricLoader.getInstance().getModContainer(Snapper.MOD_ID)
             .orElseThrow()
             .getMetadata().getVersion().getFriendlyString();
 

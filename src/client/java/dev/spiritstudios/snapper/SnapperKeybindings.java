@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public final class SnapperKeybindings {
-    public static final KeyMapping.Category SNAPPER = KeyMapping.Category.register(Snapper.id("snapper"));
+    public static final KeyMapping.Category SNAPPER = KeyMapping.Category.register(Snapper.id(Snapper.MOD_ID));
 
     public static final KeyMapping PANORAMA_KEY = new KeyMapping(
             "key.snapper.panorama",
