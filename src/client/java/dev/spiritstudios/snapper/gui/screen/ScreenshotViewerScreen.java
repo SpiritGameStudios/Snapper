@@ -2,8 +2,8 @@ package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.PlatformHelper;
-import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
+import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.fabricmc.loader.api.FabricLoader;
@@ -80,7 +80,7 @@ public class ScreenshotViewerScreen extends Screen {
     }
 
     @Override
-    public void  onClose() {
+    public void onClose() {
         this.client.setScreen(this.parent);
     }
 
@@ -214,44 +214,38 @@ public class ScreenshotViewerScreen extends Screen {
         }
 
         // TODO: Maybe add an option to the debug menu to turn this off
-        if (FabricLoader.getInstance().isDevelopmentEnvironment()) renderDebugInfo(context);
-    }
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            context.drawCenteredString(
+                    this.font,
+                    "Image Size: %dx%d".formatted(imageWidth, imageHeight),
+                    this.width / 2,
+                    40,
+                    CommonColors.WHITE
+            );
 
-    private void renderDebugInfo(GuiGraphics context) {
-        int finalHeight = this.height - 50 - 68;
-        float scaleFactor = (float) finalHeight / imageHeight;
-        int finalWidth = (int) (imageWidth * scaleFactor);
+            context.drawCenteredString(
+                    this.font,
+                    "Screen Size: %dx%d".formatted(this.width, this.height),
+                    this.width / 2,
+                    50,
+                    CommonColors.WHITE
+            );
 
-        context.drawCenteredString(
-                this.font,
-                "Image Size: %dx%d".formatted(imageWidth, imageHeight),
-                this.width / 2,
-                40,
-                CommonColors.WHITE
-        );
+            context.drawCenteredString(this.font,
+                    "Scale Factor: %s".formatted(scaleFactor),
+                    this.width / 2,
+                    60,
+                    CommonColors.WHITE
+            );
 
-        context.drawCenteredString(
-                this.font,
-                "Screen Size: %dx%d".formatted(this.width, this.height),
-                this.width / 2,
-                50,
-                CommonColors.WHITE
-        );
-
-        context.drawCenteredString(this.font,
-                "Scale Factor: %s".formatted(scaleFactor),
-                this.width / 2,
-                60,
-                CommonColors.WHITE
-        );
-
-        context.drawCenteredString(
-                this.font,
-                "Scaled Size: %dx%d".formatted(finalWidth, finalHeight),
-                this.width / 2,
-                70,
-                CommonColors.WHITE
-        );
+            context.drawCenteredString(
+                    this.font,
+                    "Scaled Size: %dx%d".formatted(finalWidth, finalHeight),
+                    this.width / 2,
+                    70,
+                    CommonColors.WHITE
+            );
+        }
     }
 
     private void drawMenuBackground(GuiGraphics context) {

@@ -9,6 +9,8 @@ import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
@@ -57,7 +59,7 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
 
     @Override
     protected int contentHeight() {
-        return this.getRows() * (this.defaultEntryHeight - 4);
+        return this.getRows() * (this.defaultEntryHeight - 4) + 4;
     }
 
     @Override
@@ -149,7 +151,58 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
             }
 
             if (minecraft.options.touchscreen().get() || (isHovering && mouseX < getX() + getWidth()) || safeIsSelected(this)) {
-                renderMetadata(graphics, mouseX, mouseY, isHovering, partialTick);
+                graphics.blit(
+                        RenderPipelines.GUI_TEXTURED,
+                        GRID_SELECTION_BACKGROUND_TEXTURE,
+                        getContentX(), getContentY(),
+                        0, 0,
+                        getContentWidth(), getContentHeight(),
+                        16, 16
+                );
+
+
+                graphics.blitSprite(
+                        RenderPipelines.GUI_TEXTURED,
+                        clickThroughHovered && icon.loaded() ?
+                                ScreenshotsWidget.VIEW_HIGHLIGHTED_SPRITE : ScreenshotsWidget.VIEW_SPRITE,
+                        centreX - 16,
+                        centreY - 16,
+                        32, 32
+                );
+
+                graphics.enableScissor(
+                        getContentX(), getContentY(),
+                        getContentX() + getContentWidth(), getContentY() + getContentHeight()
+                );
+
+                graphics.drawString(
+                        minecraft.font,
+                        iconFileName,
+                        getContentX() + 5,
+                        getContentY() + 6,
+                        CommonColors.WHITE,
+                        true
+                );
+
+                graphics.drawString(
+                        minecraft.font,
+                        Component.translatable("text.snapper.created"),
+                        getContentX() + 5,
+                        getContentY() + getContentHeight() - 22,
+                        CommonColors.LIGHT_GRAY,
+                        true
+                );
+
+                graphics.drawString(
+                        minecraft.font,
+                        creation,
+                        getContentX() + 5,
+                        getContentY() + getContentHeight() - 12,
+                        CommonColors.LIGHT_GRAY,
+                        true
+                );
+
+                graphics.disableScissor();
             }
         }
 

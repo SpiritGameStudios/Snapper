@@ -15,7 +15,6 @@ import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
@@ -227,6 +226,8 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         public final ScreenshotTexture icon;
         public final String iconFileName;
         public final Screen screenParent;
+
+        protected final String creation;
         protected long time;
         protected boolean clickThroughHovered = false;
         protected final int index;
@@ -234,77 +235,25 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         public ScreenshotEntry(ScreenshotTexture icon) {
             this.screenParent = parent;
             this.icon = icon;
-            this.iconFileName = icon.getPath().getFileName().toString();
-            this.lastModified = SafeFiles.getLastModifiedTime(icon.getPath()).orElse(FileTime.fromMillis(0L));
             this.index = children().indexOf(this);
-        }
+            this.lastModified = SafeFiles.getLastModifiedTime(icon.getPath()).orElse(FileTime.fromMillis(0L));
 
-        public void renderMetadata(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTick) {
-            String fileName = this.iconFileName;
+            String fileName = icon.getPath().getFileName().toString();
 
-            int centreX = getX() + getWidth() / 2;
-            int centreY = getY() + getHeight() / 2;
-
-            if (StringUtil.isNullOrEmpty(fileName))
-                fileName = Component.translatable("text.snapper.generic") + " " + (this.index + 1);
+            this.iconFileName = StringUtil.isNullOrEmpty(fileName) ?
+                    Component.translatable("text.snapper.generic") + " " + (this.index + 1) :
+                    fileName;
 
             String creationString = "undefined";
             long creationTime = 0;
             try {
                 creationTime = Files.readAttributes(icon.getPath(), BasicFileAttributes.class).creationTime().toMillis();
-            } catch (IOException e) {
-                minecraft.setScreen(new ScreenshotListScreen(screenParent));
+            } catch (IOException ignored) {
             }
 
-            if (creationTime != -1L)
-                creationString = DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
+            if (creationTime != -1L) creationString = DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
 
-            context.blit(
-                    RenderPipelines.GUI_TEXTURED,
-                    GRID_SELECTION_BACKGROUND_TEXTURE,
-                    getContentX(), getContentY(),
-                    0, 0,
-                    getContentWidth(), getContentHeight(),
-                    16, 16
-            );
-
-
-            context.blitSprite(
-                    RenderPipelines.GUI_TEXTURED,
-                    clickThroughHovered && icon.loaded() ?
-                            ScreenshotsWidget.VIEW_HIGHLIGHTED_SPRITE : ScreenshotsWidget.VIEW_SPRITE,
-                    centreX - 16,
-                    centreY - 16,
-                    32,
-                    32
-            );
-
-            context.drawString(
-                    minecraft.font,
-                    truncateFileName(fileName, getContentWidth(), 24),
-                    getContentX() + 5,
-                    getContentY() + 6,
-                    CommonColors.WHITE,
-                    true
-            );
-
-            context.drawString(
-                    minecraft.font,
-                    Component.translatable("text.snapper.created"),
-                    getContentX() + 5,
-                    getContentY() + getContentHeight() - 22,
-                    CommonColors.LIGHT_GRAY,
-                    true
-            );
-
-            context.drawString(
-                    minecraft.font,
-                    creationString,
-                    getContentX() + 5,
-                    getContentY() + getContentHeight() - 12,
-                    CommonColors.LIGHT_GRAY,
-                    true
-            );
+            this.creation = truncateFileName(creationString, getContentWidth(), 24);
         }
 
         public String truncateFileName(String fileName, int maxWidth, int truncateLength) {
