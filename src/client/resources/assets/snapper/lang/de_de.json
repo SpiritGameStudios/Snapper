@@ -88,5 +88,9 @@
   "config.snapper.snapperButton": "Snapper Knopf",
   "config.snapper.general": "General",
   "config.snapper.uploading": "Uploading",
-  "config.snapper.customScreenshotFolderEnabled": "Custom Screenshot Folder"
+  "config.snapper.customScreenshotFolderEnabled": "Custom Screenshot Folder",
+  "text.snapper.image_size": "Bildgröße: %dx%d",
+  "text.snapper.screen_size": "Bildschirmgröße: %dx%d",
+  "text.snapper.scale_factor": "Skalierungsfaktor: %s",
+  "text.snapper.scale_size": "Skalierte Größe: %dx%d"
 }

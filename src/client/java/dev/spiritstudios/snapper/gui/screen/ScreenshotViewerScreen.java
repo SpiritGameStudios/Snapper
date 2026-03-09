@@ -217,7 +217,7 @@ public class ScreenshotViewerScreen extends Screen {
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
             context.drawCenteredString(
                     this.font,
-                    "Image Size: %dx%d".formatted(imageWidth, imageHeight),
+                    Component.translatable("text.snapper.image_size", imageWidth, imageHeight),
                     this.width / 2,
                     40,
                     CommonColors.WHITE
@@ -225,14 +225,14 @@ public class ScreenshotViewerScreen extends Screen {
 
             context.drawCenteredString(
                     this.font,
-                    "Screen Size: %dx%d".formatted(this.width, this.height),
+                    Component.translatable("text.snapper.screen_size", this.width, this.height),
                     this.width / 2,
                     50,
                     CommonColors.WHITE
             );
 
             context.drawCenteredString(this.font,
-                    "Scale Factor: %s".formatted(scaleFactor),
+                    Component.translatable("text.snapper.scale_factor", scaleFactor),
                     this.width / 2,
                     60,
                     CommonColors.WHITE
@@ -240,7 +240,7 @@ public class ScreenshotViewerScreen extends Screen {
 
             context.drawCenteredString(
                     this.font,
-                    "Scaled Size: %dx%d".formatted(finalWidth, finalHeight),
+                    Component.translatable("text.snapper.scale_size", finalWidth, finalHeight),
                     this.width / 2,
                     70,
                     CommonColors.WHITE
