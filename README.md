@@ -12,6 +12,8 @@ Screenshots, made simple
 
 <img alt="Featured in BlanketCon '25" height="40" src="https://raw.githubusercontent.com/ModFest/art/refs/heads/v2/badge/svg/bc25/compact.svg">
 
+<img alt="Trans rights are human rights!!!!" height="40" src="https://badger-api-staging.worldwidepixel.ca/compact?gradientStart=8c3c52&gradientEnd=003763&lineOne=Trans+Rights+are&lineTwo=Human+Rights&colourOne=FFFFFF&colourTwo=ff94d7&iconUrl=https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Transgender_Pride_flag.svg/960px-Transgender_Pride_flag.svg.png">
+
 ## 📖 About
 
 Inspired by existing screenshot mods, Snapper strives to bridge the feature-gap that most screenshot mods have, improving the overall experience.
@@ -19,7 +21,7 @@ Inspired by existing screenshot mods, Snapper strives to bridge the feature-gap 
 With Snapper, you can:
 - Access an easy-to-use screenshot management menu from the title screen or in-game
 - View your latest screenshot with just a key press
-- Rename, delete, copy,  and externally open images
+- Rename, delete, copy, and externally open images
 - Create and view panoramic screenshots
 - Share your screenshots with anyone via uploading
 - ~~Not having to install a mod from an EXE~~
@@ -41,9 +43,7 @@ With Snapper, you can:
 
 ## ➕ Details
 
-Special thanks to our quality assurance team:
-- [Blurryface](https://blurry.gay)
-- [ThinkSeal](https://github.com/thinkseal)
+Special thanks to [ThinkSeal](https://github.com/thinkseal) for helping with Snapper QA.
 
 ---
 
