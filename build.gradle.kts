@@ -132,4 +132,12 @@ publishMods {
         requires("fabric-api")
         embeds("greenhouse-config")
     }
+
+    github {
+        accessToken = providers.gradleProperty("secrets.github_token")
+        repository = githubRepository
+        commitish = "main"
+
+        tagName = modVersion
+    }
 }
