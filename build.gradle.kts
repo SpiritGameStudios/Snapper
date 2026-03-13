@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.modpublish)
 }
 
-val mappingsAttribute = Attribute.of("net.minecraft.mappings", String::class.java)!!
+val mappingsAttribute = Attribute.of("net.minecraft.mappings", String::class.java)
 
 val modVersion = "1.1.1"
 val modId = "snapper"
@@ -121,6 +121,8 @@ publishMods {
     version = modVersion
     type = STABLE
     displayName = "$modName $modVersion for Minecraft ${libs.versions.minecraft.get()}"
+
+    changelog = providers.fileContents(layout.projectDirectory.file("CHANGELOG.md")).asText
 
     modrinth {
         accessToken = providers.gradleProperty("secrets.modrinth_token")
