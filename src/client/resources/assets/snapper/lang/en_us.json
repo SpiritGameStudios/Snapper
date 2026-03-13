@@ -88,6 +88,7 @@
   "snapper.privacy_notice.accept": "Accept",
   "snapper.privacy_notice.deny": "Deny/Decide Later",
   "snapper.privacy_notice.view_terms": "View Terms",
+  "text.snapper.unknown": "Unknown",
   "config.snapper.snapperButton": "Snapper Button",
   "text.snapper.image_size": "Image Size: %dx%d",
   "text.snapper.screen_size": "Screen Size: %dx%d",

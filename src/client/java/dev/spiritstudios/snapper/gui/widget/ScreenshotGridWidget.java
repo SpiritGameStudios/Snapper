@@ -170,14 +170,9 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
                         32, 32
                 );
 
-                graphics.enableScissor(
-                        getContentX(), getContentY(),
-                        getContentX() + getContentWidth(), getContentY() + getContentHeight()
-                );
-
                 graphics.drawString(
                         minecraft.font,
-                        iconFileName,
+                        SnapperUtil.clipText(minecraft.font, fileName, getContentWidth() - 5),
                         getContentX() + 5,
                         getContentY() + 6,
                         CommonColors.WHITE,
@@ -195,14 +190,12 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
 
                 graphics.drawString(
                         minecraft.font,
-                        creation,
+                        SnapperUtil.clipText(minecraft.font, creation, getContentWidth()),
                         getContentX() + 5,
                         getContentY() + getContentHeight() - 12,
                         CommonColors.LIGHT_GRAY,
                         true
                 );
-
-                graphics.disableScissor();
             }
         }
 

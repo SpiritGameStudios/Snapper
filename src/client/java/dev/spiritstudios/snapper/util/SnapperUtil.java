@@ -6,6 +6,12 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
 import org.apache.commons.lang3.SystemProperties;
 
 import java.nio.file.Files;
@@ -32,6 +38,13 @@ public final class SnapperUtil {
 
     public static boolean inBoundingBox(int x, int y, int w, int h, double mouseX, double mouseY) {
         return mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h;
+    }
+
+    public static FormattedCharSequence clipText(Font font, Component message, int width) {
+        if (font.width(message) < width) return message.getVisualOrderText();
+
+        FormattedText formattedText = font.substrByWidth(message, width - font.width(CommonComponents.ELLIPSIS));
+        return Language.getInstance().getVisualOrder(FormattedText.composite(formattedText, CommonComponents.ELLIPSIS));
     }
 
     public static boolean isOfflineAccount() {

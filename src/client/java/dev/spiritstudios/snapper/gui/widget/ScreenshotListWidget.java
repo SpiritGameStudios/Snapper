@@ -1,6 +1,7 @@
 package dev.spiritstudios.snapper.gui.widget;
 
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -53,34 +54,17 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
 
         @Override
         public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean isHovering, float partialTick) {
-            String fileName = StringUtil.isNullOrEmpty(iconFileName) ?
-                    Component.translatable("text.snapper.generic", this.index + 1).getString() :
-                    iconFileName;
-
             graphics.drawString(
                     minecraft.font,
-                    truncateFileName(fileName, getContentWidth() - 32 - 6, 29),
+                    SnapperUtil.clipText(minecraft.font, fileName, getContentWidth() - 32 - 6),
                     getContentX() + 32 + 3, getContentY() + 1,
                     CommonColors.WHITE,
                     false
             );
 
-            String creationString = "undefined";
-
-            Instant creationTime = Instant.EPOCH;
-
-            try {
-                creationTime = Files.readAttributes(icon.getPath(), BasicFileAttributes.class).creationTime().toInstant();
-            } catch (IOException ignored) {
-            }
-
-            if (!creationTime.equals(Instant.EPOCH)) {
-                creationString = Component.translatable("text.snapper.created").getString() + " " + DATE_FORMAT.format(creationTime);
-            }
-
             graphics.drawString(
                     minecraft.font,
-                    creationString,
+                    creation,
                     getContentX() + 35, getContentY() + 12,
                     CommonColors.GRAY,
                     false

@@ -83,6 +83,16 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
             }
 
             repositionEntries();
+        }).exceptionally(ex -> {
+            clearEntries();
+            // TODO: Error Entry
+            this.addEntry(new ScreenshotsWidget.EmptyEntry(client));
+
+            repositionEntries();
+
+            Snapper.LOGGER.error("Failed to load textures", ex);
+
+            return null;
         });
 
         repositionEntries();
@@ -224,10 +234,11 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
 
         public final FileTime lastModified;
         public final ScreenshotTexture icon;
-        public final String iconFileName;
         public final Screen screenParent;
 
-        protected final String creation;
+        protected final Component fileName;
+        protected final Component creation;
+
         protected long time;
         protected boolean clickThroughHovered = false;
         protected final int index;
@@ -240,30 +251,21 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
 
             String fileName = icon.getPath().getFileName().toString();
 
-            this.iconFileName = StringUtil.isNullOrEmpty(fileName) ?
-                    Component.translatable("text.snapper.generic") + " " + (this.index + 1) :
-                    fileName;
+            this.fileName = StringUtil.isNullOrEmpty(fileName) ?
+                    Component.translatable("text.snapper.generic", this.index + 1) :
+                    Component.literal(fileName);
 
-            String creationString = "undefined";
+            Component creation = Component.translatable("text.snapper.unknown");
+
             long creationTime = 0;
             try {
                 creationTime = Files.readAttributes(icon.getPath(), BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException ignored) {
             }
 
-            if (creationTime != -1L) creationString = DATE_FORMAT.format(Instant.ofEpochMilli(creationTime));
+            if (creationTime != -1L) creation = Component.literal(DATE_FORMAT.format(Instant.ofEpochMilli(creationTime)));
 
-            this.creation = truncateFileName(creationString, getContentWidth(), 24);
-        }
-
-        public String truncateFileName(String fileName, int maxWidth, int truncateLength) {
-            String truncatedName = fileName;
-
-            if (minecraft.font.width(truncatedName) > maxWidth) {
-                truncatedName = truncatedName.substring(0, Math.min(fileName.length(), truncateLength)) + "...";
-            }
-
-            return truncatedName;
+            this.creation = creation;
         }
 
         @Override
@@ -276,7 +278,7 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
 
         @Override
         public @NonNull Component getNarration() {
-            return Component.literal(this.iconFileName);
+            return fileName;
         }
 
         public boolean click() {
