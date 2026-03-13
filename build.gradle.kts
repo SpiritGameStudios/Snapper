@@ -1,92 +1,135 @@
 plugins {
-	java
-	alias(libs.plugins.fabric.loom)
-	alias(libs.plugins.minotaur)
+    java
+
+    alias(libs.plugins.fabric.loom)
+    alias(libs.plugins.modpublish)
 }
 
-class ModInfo {
-	val id = property("mod.id").toString()
-	val group = property("mod.group").toString()
-	val version = property("mod.version").toString()
+val mappingsAttribute = Attribute.of("net.minecraft.mappings", String::class.java)!!
+
+val modVersion = "1.1.1"
+val modId = "snapper"
+val modName = "Snapper"
+
+val modrinthProject = "snapper"
+val githubRepository = "SpiritGameStudios/Snapper"
+
+group = "dev.spiritstudios"
+base.archivesName = modId
+
+version = "$modVersion+${libs.versions.minecraft.get()}"
+
+@Suppress("UnstableApiUsage")
+repositories {
+    maven("https://maven.parchmentmc.org/") {
+        name = "ParchmentMC"
+        content { includeGroupAndSubgroups("org.parchmentmc") }
+    }
+
+    maven("https://maven.terraformersmc.com/") {
+        name = "Terraformers"
+        content { includeGroupAndSubgroups("com.terraformersmc") }
+    }
+
+    maven("https://moehreag.duckdns.org/maven/releases/") {
+        name = "AxolotlClient Releases"
+        content { includeGroupAndSubgroups("io.github.axolotlclient") }
+    }
+
+    maven("https://maven.greenhouse.lgbt/releases/") {
+        name = "Greenhouse Releases"
+        content { includeGroupAndSubgroups("lgbt.greenhouse") }
+    }
+
+    maven("https://maven.greenhouse.lgbt/snapshots/") {
+        name = "Greenhouse Snapshots"
+        content { includeGroupAndSubgroups("lgbt.greenhouse") }
+    }
+
+    mavenCentral()
 }
-
-val mod = ModInfo()
-
-version = "${mod.version}+${libs.versions.minecraft.get()}"
-group = mod.group
-
-base.archivesName = mod.id
 
 loom {
-	splitEnvironmentSourceSets()
+    runtimeOnlyLog4j = true
 
-	mods.create(mod.id) {
-		sourceSet(sourceSets["main"])
-		sourceSet(sourceSets["client"])
-	}
+    splitEnvironmentSourceSets()
 
-	accessWidenerPath = file("src/main/resources/snapper.accesswidener")
-}
+    mods.create(modId) {
+        sourceSet(sourceSets["main"])
+        sourceSet(sourceSets["client"])
+    }
 
-repositories {
-	mavenCentral()
-	maven("https://maven.spiritstudios.dev/releases/")
-	maven("https://moehreag.duckdns.org/maven/releases") {
-		content {
-			includeGroup("io.github.axolotlclient.AxolotlClient")
-			includeGroup("io.github.axolotlclient.AxolotlClient-config")
-		}
-	}
+    accessWidenerPath = file("src/main/resources/snapper.classtweaker")
 }
 
 dependencies {
-	minecraft(libs.minecraft)
-	mappings(variantOf(libs.yarn) { classifier("v2") })
-	modImplementation(libs.fabric.loader)
+    minecraft(libs.minecraft)
+    @Suppress("UnstableApiUsage")
+    mappings(
+        loom.layered {
+            officialMojangMappings()
+            parchment(libs.parchment)
+        }
+    )
 
-	modImplementation(libs.fabric.api)
+    modImplementation(libs.fabric.loader)
+    modImplementation(libs.fabric.api)
 
-	include(libs.bundles.specter)
-	modImplementation(libs.bundles.specter)
+    modCompileOnlyApi(libs.greenhouse.config.api) {
+        attributes { attribute(mappingsAttribute, "intermediary") }
+    }
 
-	implementation(libs.objc.bridge)
+    modRuntimeOnly(libs.greenhouse.config)
+    include(libs.greenhouse.config)
+
+    modCompileOnly(libs.modmenu)
+
+    implementation(libs.objc.bridge)
 }
 
 tasks.processResources {
-	val map = mapOf(
-		"mod_id" to mod.id,
-		"mod_version" to mod.version,
-		"fabric_loader_version" to libs.versions.fabric.loader.get(),
-		"minecraft_version" to libs.versions.minecraft.get()
-	)
+    val map = mapOf(
+        "version" to modVersion,
+        "loader_version" to libs.versions.fabric.loader.get()
+    )
 
-	inputs.properties(map)
-	filesMatching("fabric.mod.json") { expand(map) }
+    inputs.properties(map)
+
+    filesMatching("fabric.mod.json") { expand(map) }
 }
 
 java {
-	withSourcesJar()
+    withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.withType<JavaCompile> {
-	options.encoding = "UTF-8"
-	options.release = 21
+    options.encoding = "UTF-8"
+    options.release = 21
 }
 
-tasks.jar { from("LICENSE") { rename { "${it}_${base.archivesName.get()}" } } }
+tasks.jar {
+    from("LICENSE") { rename { "${it}_$modId" } }
+}
 
-modrinth {
-	token.set(System.getenv("MODRINTH_TOKEN"))
-	projectId.set(mod.id)
-	versionNumber.set(mod.version)
-	uploadFile.set(tasks.remapJar)
-	gameVersions.addAll(libs.versions.minecraft.get(), "1.21.8")
-	loaders.addAll("fabric", "quilt")
-	syncBodyFrom.set(rootProject.file("README.md").readText())
-	dependencies {
-		required.version("fabric-api", libs.versions.fabric.api.get())
-	}
+publishMods {
+    file = tasks.remapJar.get().archiveFile
+    modLoaders.add("fabric")
+
+    version = modVersion
+    type = STABLE
+    displayName = "$modName $modVersion for Minecraft ${libs.versions.minecraft.get()}"
+
+    modrinth {
+        accessToken = providers.gradleProperty("secrets.modrinth_token")
+        projectId = modrinthProject
+        minecraftVersions.add(libs.versions.minecraft.get())
+
+        projectDescription = providers.fileContents(layout.projectDirectory.file("README.md")).asText
+
+        requires("fabric-api")
+        embeds("greenhouse-config")
+    }
 }

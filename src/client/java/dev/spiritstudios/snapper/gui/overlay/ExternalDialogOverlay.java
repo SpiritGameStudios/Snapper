@@ -1,51 +1,45 @@
 package dev.spiritstudios.snapper.gui.overlay;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Overlay;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Overlay;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
 
 public class ExternalDialogOverlay extends Overlay {
-    private final MinecraftClient client = MinecraftClient.getInstance();
+    private final Minecraft client = Minecraft.getInstance();
 
-    public static final Identifier MENU_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/menu_background.png");
-    private static final Identifier INWORLD_MENU_BACKGROUND_TEXTURE = Identifier.ofVanilla("textures/gui/inworld_menu_background.png");
-
-    @Override
-    public boolean pausesGame() {
-        return false;
-    }
+    public static final ResourceLocation MENU_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/menu_background.png");
+    private static final ResourceLocation INWORLD_MENU_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/inworld_menu_background.png");
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        if (this.client.currentScreen != null) {
-            this.client.currentScreen.renderBackground(context, mouseX, mouseY, delta);
-            this.client.currentScreen.render(context, mouseX, mouseY, delta);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        if (this.client.screen != null) {
+            this.client.screen.renderWithTooltipAndSubtitles(graphics, mouseX, mouseY, partialTick);
         }
 
-        this.client.gameRenderer.renderBlur();
+        graphics.nextStratum();
 
-        context.drawTexture(
+        graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
-                this.client.world == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE,
+                this.client.level == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE,
                 0, 0,
                 0, 0,
-                context.getScaledWindowWidth(), context.getScaledWindowHeight(),
+                graphics.guiWidth(), graphics.guiHeight(),
                 32, 32
         );
 
-        context.drawCenteredTextWithShadow(
-                client.textRenderer,
-                Text.translatable("overlay.snapper.external_dialog.folder"),
-                context.getScaledWindowWidth() / 2, context.getScaledWindowHeight() / 2,
-                Colors.WHITE
+        graphics.drawCenteredString(
+                client.font,
+                Component.translatable("overlay.snapper.external_dialog.folder"),
+                graphics.guiWidth() / 2, graphics.guiHeight() / 2,
+                CommonColors.WHITE
         );
 
-        if (InputUtil.isKeyPressed(client.getWindow().getHandle(), InputUtil.GLFW_KEY_ESCAPE)) close();
+        if (InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_ESCAPE)) close();
     }
 
     public void close() {
