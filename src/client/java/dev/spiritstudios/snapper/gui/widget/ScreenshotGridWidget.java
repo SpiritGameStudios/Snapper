@@ -190,7 +190,7 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
 
                 graphics.drawString(
                         minecraft.font,
-                        SnapperUtil.clipText(minecraft.font, creation, getContentWidth()),
+                        SnapperUtil.clipText(minecraft.font, creation, getContentWidth() - 5),
                         getContentX() + 5,
                         getContentY() + getContentHeight() - 12,
                         CommonColors.LIGHT_GRAY,
