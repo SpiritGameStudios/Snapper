@@ -7,7 +7,7 @@ import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -20,7 +20,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,8 +34,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class ScreenshotViewerScreen extends Screen {
-    private static final ResourceLocation MENU_DECOR_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/menu_list_background.png");
-    private static final ResourceLocation INWORLD_MENU_DECOR_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
+    private static final Identifier MENU_DECOR_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("textures/gui/menu_list_background.png");
+    private static final Identifier INWORLD_MENU_DECOR_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
 
     private final Minecraft client = Minecraft.getInstance();
     private final ScreenshotTexture image;
@@ -196,7 +196,7 @@ public class ScreenshotViewerScreen extends Screen {
 
         context.blit(
                 RenderPipelines.GUI_TEXTURED,
-                this.image.getTextureId(),
+                this.image.textureLocation(),
                 (this.width / 2) - (finalWidth / 2), this.height - 70 - finalHeight,
                 0, 0,
                 finalWidth, finalHeight,

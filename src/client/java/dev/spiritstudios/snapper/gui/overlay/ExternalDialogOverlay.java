@@ -6,14 +6,14 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 
 public class ExternalDialogOverlay extends Overlay {
     private final Minecraft client = Minecraft.getInstance();
 
-    public static final ResourceLocation MENU_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/menu_background.png");
-    private static final ResourceLocation INWORLD_MENU_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/inworld_menu_background.png");
+    public static final Identifier MENU_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("textures/gui/menu_background.png");
+    private static final Identifier INWORLD_MENU_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("textures/gui/inworld_menu_background.png");
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {

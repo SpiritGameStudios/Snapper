@@ -126,7 +126,7 @@ publishMods {
 
     modrinth {
         accessToken = providers.gradleProperty("secrets.modrinth_token")
-        projectId = modrinthProject
+        projectId = "MZQyESDC"
         minecraftVersions.add(libs.versions.minecraft.get())
 
         projectDescription = providers.fileContents(layout.projectDirectory.file("README.md")).asText

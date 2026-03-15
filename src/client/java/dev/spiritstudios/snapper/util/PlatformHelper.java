@@ -2,7 +2,7 @@ package dev.spiritstudios.snapper.util;
 
 import dev.spiritstudios.snapper.util.actions.GeneralPlatformActions;
 import dev.spiritstudios.snapper.util.actions.MacPlatformActions;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 
 import java.nio.file.Path;
 

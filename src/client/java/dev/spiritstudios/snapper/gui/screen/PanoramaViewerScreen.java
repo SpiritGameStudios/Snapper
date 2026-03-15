@@ -4,7 +4,7 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.util.DynamicCubemapTexture;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.CubeMap;
 import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 public class PanoramaViewerScreen extends Screen {
-    protected static final ResourceLocation ID = Snapper.id("screenshots/panorama");
+    protected static final Identifier ID = Snapper.id("screenshots/panorama");
     protected static final CubeMap PANORAMA_RENDERER = new CubeMap(ID);
 
     private final PanoramaRenderer rotatingPanoramaRenderer = new PanoramaRenderer(PANORAMA_RENDERER);

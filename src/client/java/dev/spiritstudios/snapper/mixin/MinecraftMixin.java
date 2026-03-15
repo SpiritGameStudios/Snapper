@@ -7,7 +7,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.mixin.accessor.CameraAccessor;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.main.GameConfig;

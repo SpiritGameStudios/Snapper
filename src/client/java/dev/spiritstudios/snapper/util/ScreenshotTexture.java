@@ -2,11 +2,11 @@ package dev.spiritstudios.snapper.util;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import dev.spiritstudios.snapper.Snapper;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,18 +16,18 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class ScreenshotTexture implements AutoCloseable {
-    private static final ResourceLocation UNKNOWN_SERVER = ResourceLocation.withDefaultNamespace("textures/misc/unknown_server.png");
+    private static final Identifier UNKNOWN_SERVER = Identifier.withDefaultNamespace("textures/misc/unknown_server.png");
 
     private final TextureManager textureManager;
-    private final ResourceLocation id;
+    private final Identifier textureLocation;
     private final Path path;
 
     private final NativeImage image;
     private DynamicTexture texture;
 
-    private ScreenshotTexture(TextureManager textureManager, ResourceLocation id, Path path) throws IOException {
+    private ScreenshotTexture(TextureManager textureManager, Identifier textureLocation, Path path) throws IOException {
         this.textureManager = textureManager;
-        this.id = id;
+        this.textureLocation = textureLocation;
 
         this.path = path;
 
@@ -38,8 +38,8 @@ public class ScreenshotTexture implements AutoCloseable {
 
     public CompletableFuture<Void> load() {
         return Minecraft.getInstance().submit(() -> {
-            this.texture = new DynamicTexture(this.id::toString, this.image);
-            this.textureManager.register(this.id, this.texture);
+            this.texture = new DynamicTexture(this.textureLocation::toString, this.image);
+            this.textureManager.register(this.textureLocation, this.texture);
         });
     }
 
@@ -48,7 +48,7 @@ public class ScreenshotTexture implements AutoCloseable {
             return Optional.of(new ScreenshotTexture(
                     textureManager,
 					Snapper.id(
-							"screenshots/" + Util.sanitizeName(path.getFileName().toString(), ResourceLocation::validPathChar) + "/icon"
+							"screenshots/" + Util.sanitizeName(path.getFileName().toString(), Identifier::validPathChar) + "/icon"
 					),
                     path
             ));
@@ -57,15 +57,8 @@ public class ScreenshotTexture implements AutoCloseable {
         }
     }
 
-    /*
-     * Must be called on render thread
-     */
-    public void enableFiltering() {
-        this.texture.setFilter(true, true);
-    }
-
     public void destroy() {
-        this.textureManager.release(this.id);
+        this.textureManager.release(this.textureLocation);
         this.texture.close();
     }
 
@@ -77,8 +70,8 @@ public class ScreenshotTexture implements AutoCloseable {
         return this.texture != null ? this.texture.getTexture().getHeight(0) : 64;
     }
 
-    public ResourceLocation getTextureId() {
-        return this.texture != null ? this.id : UNKNOWN_SERVER;
+    public Identifier textureLocation() {
+        return this.texture != null ? this.textureLocation : UNKNOWN_SERVER;
     }
 
     public boolean loaded() {

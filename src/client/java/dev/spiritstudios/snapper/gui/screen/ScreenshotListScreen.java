@@ -11,7 +11,6 @@ import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
-import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
@@ -23,23 +22,24 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 
 public class ScreenshotListScreen extends Screen {
-    private static final ResourceLocation PANORAMA_BUTTON_ICON = Snapper.id("screenshots/panorama");
-    private static final ResourceLocation PANORAMA_BUTTON_DISABLED_ICON = Snapper.id("screenshots/panorama_disabled");
+    private static final Identifier PANORAMA_BUTTON_ICON = Snapper.id("screenshots/panorama");
+    private static final Identifier PANORAMA_BUTTON_DISABLED_ICON = Snapper.id("screenshots/panorama_disabled");
 
-    private static final ResourceLocation SETTINGS_ICON = Snapper.id("screenshots/settings");
+    private static final Identifier SETTINGS_ICON = Snapper.id("screenshots/settings");
 
-    private static final ResourceLocation VIEW_MODE_ICON_LIST = Snapper.id("screenshots/show_list");
+    private static final Identifier VIEW_MODE_ICON_LIST = Snapper.id("screenshots/show_list");
 
-    private static final ResourceLocation VIEW_MODE_ICON_GRID = Snapper.id("screenshots/show_grid");
+    private static final Identifier VIEW_MODE_ICON_GRID = Snapper.id("screenshots/show_grid");
 
     private final Screen parent;
     private final boolean isOffline;
@@ -96,8 +96,6 @@ public class ScreenshotListScreen extends Screen {
 
     @Override
     protected void init() {
-        assert minecraft != null;
-
         recreateList();
 
         int secondRowButtonWidth = 100;
@@ -254,8 +252,6 @@ public class ScreenshotListScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        assert minecraft != null;
-
         if (super.keyPressed(input)) {
             return true;
         }

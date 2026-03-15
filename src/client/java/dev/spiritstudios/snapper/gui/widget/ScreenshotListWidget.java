@@ -2,21 +2,16 @@ package dev.spiritstudios.snapper.gui.widget;
 
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Instant;
 
 public class ScreenshotListWidget extends ScreenshotsWidget {
     public ScreenshotListWidget(
@@ -64,7 +59,10 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
 
             graphics.drawString(
                     minecraft.font,
-                    creation,
+                    FormattedCharSequence.composite(
+                            Component.translatable("text.snapper.created").getVisualOrderText(),
+                            creation.getVisualOrderText()
+                    ),
                     getContentX() + 35, getContentY() + 12,
                     CommonColors.GRAY,
                     false
@@ -73,7 +71,7 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
             if (icon.loaded()) {
                 graphics.blit(
                         RenderPipelines.GUI_TEXTURED,
-                        this.icon.getTextureId(),
+                        this.icon.textureLocation(),
                         getContentX(), getContentY(),
                         (icon.getHeight()) / 3.0f + 32, 0,
                         getContentHeight(), getContentHeight(),

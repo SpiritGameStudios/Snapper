@@ -2,14 +2,14 @@
 fabric_loom = "1.15-SNAPSHOT"
 modpublish = "1.1.0"
 
-minecraft = "1.21.10"
-parchment = "2025.10.12"
+minecraft = "1.21.11"
+parchment = "2025.12.20"
 
 fabric_loader = "0.18.1"
-fabric_api = "0.138.3+1.21.10"
+fabric_api = "0.141.3+1.21.11"
 
-greenhouse_config = "3.0.0-beta.4+1.21.10"
-modmenu = "16.0.0"
+greenhouse_config = "3.0.0-beta.4+1.21.11"
+modmenu = "17.0.0-beta.2"
 
 objc_bridge = "1.0.0"
 
@@ -19,7 +19,7 @@ modpublish = { id = "me.modmuss50.mod-publish-plugin", version.ref = "modpublish
 
 [libraries]
 minecraft = { group = "mojang", name = "minecraft", version.ref = "minecraft" }
-parchment = { group = "org.parchmentmc.data", name = "parchment-1.21.10", version.ref = "parchment" }
+parchment = { group = "org.parchmentmc.data", name = "parchment-1.21.11", version.ref = "parchment" }
 
 fabric_loader = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fabric_loader" }
 fabric_api = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.ref = "fabric_api" }

@@ -137,14 +137,14 @@ public class ConfigScreen extends Screen {
     private AbstractWidget booleanButton(String name, Consumer<Boolean> setter, boolean currentValue) {
         Tooltip tooltip = getTooltip(name);
 
-        return CycleButton.<Boolean>builder(
+        return CycleButton.builder(
                         boolean_ -> boolean_
                                 ? CommonComponents.OPTION_ON
-                                : CommonComponents.OPTION_OFF
+                                : CommonComponents.OPTION_OFF,
+                        currentValue
                 )
                 .withValues(List.of(Boolean.TRUE, Boolean.FALSE))
                 .withTooltip(b -> tooltip)
-                .withInitialValue(currentValue)
                 .create(
                         0, 0,
                         150, 20,
@@ -163,12 +163,12 @@ public class ConfigScreen extends Screen {
     ) {
         Tooltip tooltip = getTooltip(name);
 
-        return CycleButton.<T>builder(
-                        t -> Component.translatable("config.snapper." + name + "." + t.toString().toLowerCase())
+        return CycleButton.builder(
+                        t -> Component.translatable("config.snapper." + name + "." + t.toString().toLowerCase()),
+                        currentValue
                 )
                 .withValues(Arrays.asList(clazz.getEnumConstants()))
                 .withTooltip(b -> tooltip)
-                .withInitialValue(currentValue)
                 .create(
                         0, 0,
                         150, 20,

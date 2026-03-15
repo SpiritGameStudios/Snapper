@@ -8,7 +8,7 @@ import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -16,7 +16,7 @@ import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
@@ -37,9 +37,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsWidget.Entry> {
-    protected static final ResourceLocation VIEW_SPRITE = Snapper.id("screenshots/view");
-    protected static final ResourceLocation VIEW_HIGHLIGHTED_SPRITE = Snapper.id("screenshots/view_highlighted");
-    protected static final ResourceLocation GRID_SELECTION_BACKGROUND_TEXTURE = Snapper.id("textures/gui/grid_selection_background.png");
+    protected static final Identifier VIEW_SPRITE = Snapper.id("screenshots/view");
+    protected static final Identifier VIEW_HIGHLIGHTED_SPRITE = Snapper.id("screenshots/view_highlighted");
+    protected static final Identifier GRID_SELECTION_BACKGROUND_TEXTURE = Snapper.id("textures/gui/grid_selection_background.png");
 
     protected final Screen parent;
     public final CompletableFuture<List<ScreenshotTexture>> loadFuture;

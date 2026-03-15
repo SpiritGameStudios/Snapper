@@ -2,7 +2,7 @@ package dev.spiritstudios.snapper.gui.widget;
 
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
@@ -141,7 +141,7 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
             if (this.icon.loaded()) {
                 graphics.blit(
                         RenderPipelines.GUI_TEXTURED,
-                        this.icon.getTextureId(),
+                        this.icon.textureLocation(),
                         getContentX(), getContentY(),
                         0, 0,
                         getContentWidth(), getContentHeight(),
