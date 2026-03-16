@@ -2,7 +2,6 @@ package dev.spiritstudios.snapper.gui.widget;
 
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
@@ -11,6 +10,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
@@ -117,13 +117,13 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
     }
 
     @Override
-    protected ScreenshotEntry createEntry(ScreenshotTexture icon) {
-        return new GridScreenshotEntry(icon);
+    protected ScreenshotEntry createEntry(ScreenshotTexture texture) {
+        return new GridScreenshotEntry(texture);
     }
 
     private class GridScreenshotEntry extends ScreenshotEntry {
-        public GridScreenshotEntry(ScreenshotTexture icon) {
-            super(icon);
+        public GridScreenshotEntry(ScreenshotTexture texture) {
+            super(texture);
         }
 
         private boolean safeIsSelected(Entry entry) {
@@ -133,20 +133,22 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
 
         @Override
         public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+            texture.startLoading(minecraft);
+
             int centreX = getContentX() + getContentWidth() / 2;
             int centreY = getContentY() + getContentHeight() / 2;
 
             clickThroughHovered = SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY);
 
-            if (this.icon.loaded()) {
+            if (this.texture.isLoaded()) {
                 graphics.blit(
                         RenderPipelines.GUI_TEXTURED,
-                        this.icon.textureLocation(),
+                        this.texture.textureLocation(),
                         getContentX(), getContentY(),
                         0, 0,
                         getContentWidth(), getContentHeight(),
-                        icon.getWidth(), icon.getHeight(),
-                        icon.getWidth(), icon.getHeight()
+                        texture.getWidth(), texture.getHeight(),
+                        texture.getWidth(), texture.getHeight()
                 );
             }
 
@@ -163,7 +165,7 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
 
                 graphics.blitSprite(
                         RenderPipelines.GUI_TEXTURED,
-                        clickThroughHovered && icon.loaded() ?
+                        clickThroughHovered && texture.isLoaded() ?
                                 ScreenshotsWidget.VIEW_HIGHLIGHTED_SPRITE : ScreenshotsWidget.VIEW_SPRITE,
                         centreX - 16,
                         centreY - 16,

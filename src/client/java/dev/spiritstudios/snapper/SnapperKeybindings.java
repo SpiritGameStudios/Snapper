@@ -79,10 +79,8 @@ public final class SnapperKeybindings {
                         image -> {
                             client.setScreen(new ScreenshotViewerScreen(
                                     image,
-                                    latestPath,
                                     client.screen
                             ));
-                            image.load();
                         },
                         () -> SnapperToast.push(
                                 SnapperToast.Type.DENY,

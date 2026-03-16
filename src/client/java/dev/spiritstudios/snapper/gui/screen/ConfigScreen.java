@@ -249,13 +249,14 @@ public class ConfigScreen extends Screen {
 
     @Override
     public void onClose() {
-        assert minecraft != null;
+        var viewMode = SnapperConfig.HOLDER.get().viewMode();
 
-        minecraft.setScreen(lastScreen);
         config.saveAsync().thenRun(() -> {
-            if (lastScreen instanceof ScreenshotListScreen screenshotsScreen) {
-                screenshotsScreen.refresh();
+            if (lastScreen instanceof ScreenshotListScreen screenshotsScreen && config.viewMode != viewMode) {
+                screenshotsScreen.recreateList();
             }
         });
+
+        minecraft.setScreen(lastScreen);
     }
 }

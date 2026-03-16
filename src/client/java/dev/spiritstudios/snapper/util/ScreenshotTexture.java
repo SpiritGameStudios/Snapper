@@ -1,5 +1,6 @@
 package dev.spiritstudios.snapper.util;
 
+import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.platform.NativeImage;
 import dev.spiritstudios.snapper.Snapper;
 import net.minecraft.util.Util;
@@ -20,36 +21,29 @@ public class ScreenshotTexture implements AutoCloseable {
 
     private final TextureManager textureManager;
     private final Identifier textureLocation;
-    private final Path path;
+    public final Path path;
 
-    private final NativeImage image;
+    private boolean loaded;
     private DynamicTexture texture;
+    private boolean closed;
 
     private ScreenshotTexture(TextureManager textureManager, Identifier textureLocation, Path path) throws IOException {
         this.textureManager = textureManager;
         this.textureLocation = textureLocation;
 
         this.path = path;
-
-        try (InputStream stream = Files.newInputStream(path)) {
-            this.image = NativeImage.read(stream);
-        }
     }
 
-    public CompletableFuture<Void> load() {
-        return Minecraft.getInstance().submit(() -> {
-            this.texture = new DynamicTexture(this.textureLocation::toString, this.image);
-            this.textureManager.register(this.textureLocation, this.texture);
-        });
-    }
-
+    @SuppressWarnings("deprecation") // Vanilla uses sha1 for this, copying it
     public static Optional<ScreenshotTexture> createScreenshot(TextureManager textureManager, Path path) {
+        String name = path.getFileName().toString();
+
         try {
             return Optional.of(new ScreenshotTexture(
                     textureManager,
-					Snapper.id(
-							"screenshots/" + Util.sanitizeName(path.getFileName().toString(), Identifier::validPathChar) + "/icon"
-					),
+                    Snapper.id(
+                            "screenshots/" + Util.sanitizeName(name, Identifier::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(name)
+                    ),
                     path
             ));
         } catch (IOException e) {
@@ -57,9 +51,69 @@ public class ScreenshotTexture implements AutoCloseable {
         }
     }
 
-    public void destroy() {
-        this.textureManager.release(this.textureLocation);
-        this.texture.close();
+    public NativeImage load() {
+        try (InputStream stream = Files.newInputStream(path)) {
+            return NativeImage.read(stream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void startLoading(Minecraft minecraft) {
+        if (!isLoaded()) {
+            CompletableFuture
+                    .supplyAsync(this::load, Util.nonCriticalIoPool())
+                    .thenAcceptAsync(this::upload, minecraft);
+        }
+    }
+
+    public void upload(NativeImage image) {
+        try {
+            this.checkOpen();
+            if (this.texture == null) {
+                this.texture = new DynamicTexture(() -> "Screenshot " + this.textureLocation, image);
+            } else {
+                this.texture.setPixels(image);
+                this.texture.upload();
+            }
+
+            this.textureManager.register(this.textureLocation, this.texture);
+            loaded = true;
+        } catch (Throwable throwable) {
+            image.close();
+            this.clear();
+            throw throwable;
+        }
+    }
+
+
+    public void clear() {
+        this.checkOpen();
+        if (this.texture != null) {
+            this.textureManager.release(this.textureLocation);
+            this.texture.close();
+            this.texture = null;
+            this.loaded = false;
+        }
+    }
+
+    public void close() {
+        this.clear();
+        this.closed = true;
+    }
+
+    public boolean isLoaded() {
+        return this.loaded;
+    }
+
+    public boolean isClosed() {
+        return this.closed;
+    }
+
+    private void checkOpen() {
+        if (this.closed) {
+            throw new IllegalStateException("ScreenshotTexture already closed");
+        }
     }
 
     public int getWidth() {
@@ -72,17 +126,5 @@ public class ScreenshotTexture implements AutoCloseable {
 
     public Identifier textureLocation() {
         return this.texture != null ? this.textureLocation : UNKNOWN_SERVER;
-    }
-
-    public boolean loaded() {
-        return texture != null;
-    }
-
-    public Path getPath() {
-        return path;
-    }
-
-    public void close() {
-        this.destroy();
     }
 }

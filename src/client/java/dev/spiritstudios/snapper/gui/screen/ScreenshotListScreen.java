@@ -5,25 +5,24 @@ import com.mojang.serialization.Codec;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
+import dev.spiritstudios.snapper.gui.widget.DeadSpaceElement;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotsWidget;
+import dev.spiritstudios.snapper.gui.widget.ViewModeButton;
 import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.layouts.EqualSpacingLayout;
-import net.minecraft.client.gui.layouts.FrameLayout;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.CommonColors;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
@@ -37,10 +36,6 @@ public class ScreenshotListScreen extends Screen {
 
     private static final Identifier SETTINGS_ICON = Snapper.id("screenshots/settings");
 
-    private static final Identifier VIEW_MODE_ICON_LIST = Snapper.id("screenshots/show_list");
-
-    private static final Identifier VIEW_MODE_ICON_GRID = Snapper.id("screenshots/show_grid");
-
     private final Screen parent;
     private final boolean isOffline;
 
@@ -52,21 +47,19 @@ public class ScreenshotListScreen extends Screen {
     private Button copyButton;
     private Button openButton;
     private Button uploadButton;
-    private SpriteIconButton viewModeButton;
+
     private @Nullable ScreenshotListWidget.ScreenshotEntry selectedScreenshot = null;
+
+    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 33, 60);
 
     public ScreenshotListScreen(Screen parent) {
         super(Component.translatable("menu.snapper.screenshot_menu"));
         this.parent = parent;
         this.isOffline = SnapperUtil.isOfflineAccount();
+        this.recreateList();
     }
 
-    public synchronized void refresh() {
-        recreateList();
-        recreateViewModeButton();
-    }
-
-    private void recreateList() {
+    public synchronized void recreateList() {
         if (screenshots != null) {
             this.removeWidget(screenshots);
         }
@@ -79,158 +72,132 @@ public class ScreenshotListScreen extends Screen {
                 screenshots,
                 this
         ));
+
+        repositionElements();
     }
 
-    private void recreateViewModeButton() {
-        if (viewModeButton != null) {
-            removeWidget(this.viewModeButton);
-        }
-
-        this.viewModeButton = addRenderableWidget(SpriteIconButton.builder(
-                Component.translatable("config.snapper.viewMode"),
-                button -> this.toggleGrid(),
-                true
-        ).width(20).sprite(SnapperConfig.HOLDER.get().viewMode() == ViewMode.LIST ? VIEW_MODE_ICON_LIST : VIEW_MODE_ICON_GRID, 15, 15).build());
-        viewModeButton.setPosition(width / 2 - 178, height - 56);
+    @Override
+    protected void repositionElements() {
+        this.layout.arrangeElements();
+        screenshots.updateSize(
+                width,
+                layout
+        );
     }
 
     @Override
     protected void init() {
-        recreateList();
+        this.layout.addTitleHeader(this.title, this.font);
 
-        int secondRowButtonWidth = 100;
+        final int hSpacing = 4;
 
-        Button folderButton = addRenderableWidget(Button.builder(
-                Component.translatable("button.snapper.folder"),
-                button -> Util.getPlatform().openPath(SnapperUtil.getConfiguredScreenshotDirectory())
-        ).width(secondRowButtonWidth).build());
+        final int buttonWidth = 74;
+        final int bottomButtonWidth = 100;
 
+        LinearLayout vertical = this.layout.addToFooter(LinearLayout.vertical().spacing(4));
+        vertical.defaultCellSetting().alignHorizontallyCenter();
 
-        this.openButton = addRenderableWidget(Button.builder(
-                Component.translatable("button.snapper.open"),
-                button -> {
-                    if (selectedScreenshot != null) {
-                        Util.getPlatform().openPath(selectedScreenshot.icon.getPath());
-                    }
-                }
-        ).width(secondRowButtonWidth).build());
+        LinearLayout topRow = vertical.addChild(LinearLayout.horizontal().spacing(hSpacing));
+        LinearLayout bottomRow = vertical.addChild(LinearLayout.horizontal().spacing(hSpacing));
 
-        Button doneButton = addRenderableWidget(Button.builder(
-                CommonComponents.GUI_DONE,
-                button -> this.onClose()
-        ).width(secondRowButtonWidth).build());
-
-        int firstRowButtonWidth = 58;
-
-        this.deleteButton = addRenderableWidget(Button.builder(
-                Component.translatable("button.snapper.delete"),
-                button -> {
-                    if (selectedScreenshot != null) {
-                        ScreenshotActions.deleteScreenshot(selectedScreenshot.icon.getPath(), this);
-                    }
-                }
-        ).width(firstRowButtonWidth).build());
-
-        this.renameButton = addRenderableWidget(Button.builder(
-                Component.translatable("button.snapper.rename"),
-                button -> {
-                    if (this.selectedScreenshot != null) {
-                        minecraft.setScreen(new ScreenshotRenameScreen(this.selectedScreenshot.icon.getPath(), this));
-                    }
-                }
-        ).width(firstRowButtonWidth).build());
-
-        this.copyButton = addRenderableWidget(Button.builder(
-                Component.translatable("button.snapper.copy"),
-                button -> {
-                    if (selectedScreenshot != null) {
-                        PlatformHelper.INSTANCE.copyScreenshot(selectedScreenshot.icon.getPath());
-                    }
-                }
-        ).width(firstRowButtonWidth).build());
-
-        this.viewButton = addRenderableWidget(Button.builder(
-                Component.translatable("button.snapper.view"),
-                button -> {
-                    if (selectedScreenshot != null) {
-                        this.minecraft.setScreen(new ScreenshotViewerScreen(
-                                selectedScreenshot.icon,
-                                selectedScreenshot.icon.getPath(),
-                                selectedScreenshot.screenParent
-                        ));
-                    }
-                }
-        ).width(firstRowButtonWidth).build());
-
-        this.uploadButton = addRenderableWidget(Button.builder(Component.translatable("button.snapper.upload"), button -> {
-            if (selectedScreenshot == null) return;
-
-            button.active = false;
-            ScreenshotUploading.upload(selectedScreenshot.icon.getPath())
-                    .thenRun(() -> button.active = true);
-        }).width(firstRowButtonWidth).build());
-
-        if (isOffline) {
-            this.uploadButton.setTooltip(Tooltip.create(Component.translatable("button.snapper.upload.tooltip")));
-        }
-
-        LinearLayout verticalButtonLayout = LinearLayout.vertical()
-                .spacing(4);
-
-        EqualSpacingLayout firstRowWidget = verticalButtonLayout.addChild(new EqualSpacingLayout(
-                308,
-                20,
-                EqualSpacingLayout.Orientation.HORIZONTAL
-        ));
-
-        firstRowWidget.addChild(this.deleteButton);
-        firstRowWidget.addChild(this.renameButton);
-        firstRowWidget.addChild(this.copyButton);
-        firstRowWidget.addChild(this.viewButton);
-        firstRowWidget.addChild(this.uploadButton);
-
-        EqualSpacingLayout secondRowWidget = verticalButtonLayout.addChild(new EqualSpacingLayout(
-                308,
-                20,
-                EqualSpacingLayout.Orientation.HORIZONTAL
-        ));
-
-        secondRowWidget.addChild(folderButton);
-        secondRowWidget.addChild(openButton);
-        secondRowWidget.addChild(doneButton);
-
-        verticalButtonLayout.arrangeElements();
-        FrameLayout.centerInRectangle(verticalButtonLayout, 0, this.height - 66, this.width, 64);
-
-        SpriteIconButton settingsButton = addRenderableWidget(SpriteIconButton.builder(
+        bottomRow.addChild(SpriteIconButton.builder(
                 Component.translatable("config.snapper.title"),
                 button -> this.minecraft.setScreen(
-                        new ConfigScreen(new ScreenshotListScreen(this.parent))),
+                        new ConfigScreen(this)),
                 true
         ).width(20).sprite(SETTINGS_ICON, 15, 15).build());
 
-        settingsButton.setPosition(width / 2 - 178, height - 32);
+        bottomRow.addChild(Button.builder(
+                Component.translatable("button.snapper.folder"),
+                button -> Util.getPlatform().openPath(SnapperUtil.getConfiguredScreenshotDirectory())
+        ).width(bottomButtonWidth).build());
 
-        recreateViewModeButton();
+        this.openButton = bottomRow.addChild(Button.builder(
+                Component.translatable("button.snapper.open"),
+                button -> {
+                    if (selectedScreenshot != null) {
+                        Util.getPlatform().openPath(selectedScreenshot.texture.path);
+                    }
+                }
+        ).width(bottomButtonWidth).build());
 
+        bottomRow.addChild(Button.builder(
+                CommonComponents.GUI_DONE,
+                button -> this.onClose()
+        ).width(bottomButtonWidth).build());
         Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
         boolean hasPanorama = SnapperUtil.panoramaPresent(panoramaDir);
 
-        SpriteIconButton panoramaButton = addRenderableWidget(SpriteIconButton.builder(
-                Component.translatable("button.snapper.screenshots"),
-                button -> this.minecraft.setScreen(new PanoramaViewerScreen(Component.translatable("menu.snapper.panorama").getString(), this)),
-                true
-        ).width(20).sprite(hasPanorama ? PANORAMA_BUTTON_ICON : PANORAMA_BUTTON_DISABLED_ICON, 15, 15).build());
+        SpriteIconButton panoramaButton = bottomRow.addChild(
+                SpriteIconButton.builder(
+                        Component.translatable("button.snapper.screenshots"),
+                        button -> this.minecraft.setScreen(new PanoramaViewerScreen(Component.translatable("menu.snapper.panorama").getString(), this)),
+                        true
+                ).width(20).sprite(hasPanorama ? PANORAMA_BUTTON_ICON : PANORAMA_BUTTON_DISABLED_ICON, 15, 15).build());
 
         panoramaButton.active = hasPanorama;
-        panoramaButton.setPosition(width / 2 + 158, height - 32);
 
         panoramaButton.setTooltip(Tooltip.create(Component.translatable(hasPanorama ?
                 "button.snapper.panorama.tooltip" :
                 "text.snapper.panorama_encourage")));
 
+        topRow.addChild(new ViewModeButton(
+                button -> this.toggleGrid(),
+                null
+        ));
+
+        this.deleteButton = topRow.addChild(Button.builder(
+                Component.translatable("button.snapper.delete"),
+                button -> {
+                    if (selectedScreenshot != null) {
+                        ScreenshotActions.deleteScreenshot(selectedScreenshot.texture.path, this);
+                    }
+                }
+        ).width(buttonWidth).build());
+
+        this.renameButton = topRow.addChild(Button.builder(
+                Component.translatable("button.snapper.rename"),
+                button -> {
+                    if (this.selectedScreenshot != null) {
+                        minecraft.setScreen(new ScreenshotRenameScreen(this.selectedScreenshot.texture.path, this));
+                    }
+                }
+        ).width(buttonWidth).build());
+
+        this.copyButton = topRow.addChild(Button.builder(
+                Component.translatable("button.snapper.copy"),
+                button -> {
+                    if (selectedScreenshot != null) {
+                        PlatformHelper.INSTANCE.copyScreenshot(selectedScreenshot.texture.path);
+                    }
+                }
+        ).width(buttonWidth).build());
+
+        this.uploadButton = topRow.addChild(Button.builder(Component.translatable("button.snapper.upload"), button -> {
+            if (selectedScreenshot == null) return;
+
+            button.active = false;
+            ScreenshotUploading.upload(selectedScreenshot.texture.path)
+                    .thenRun(() -> button.active = true);
+        }).width(buttonWidth).build());
+
+        if (isOffline) {
+            this.uploadButton.setTooltip(Tooltip.create(Component.translatable("button.snapper.upload.tooltip")));
+        }
+
+        topRow.addChild(new DeadSpaceElement(20, 20));
 
         this.imageSelected(selectedScreenshot);
+
+        this.layout.visitWidgets(this::addRenderableWidget);
+
+        this.repositionElements();
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        screenshots.clearEntries();
     }
 
     public void imageSelected(@Nullable ScreenshotListWidget.ScreenshotEntry screenshot) {
@@ -239,7 +206,7 @@ public class ScreenshotListScreen extends Screen {
         this.deleteButton.active = hasScreenshot;
         this.openButton.active = hasScreenshot;
         this.renameButton.active = hasScreenshot;
-        this.viewButton.active = hasScreenshot;
+//        this.viewButton.active = hasScreenshot;
         this.selectedScreenshot = screenshot;
         this.uploadButton.active = !isOffline && hasScreenshot;
     }
@@ -247,7 +214,7 @@ public class ScreenshotListScreen extends Screen {
     public void toggleGrid() {
         SnapperConfig.edit(m -> m.viewMode = SnapperConfig.HOLDER.get().viewMode() == ViewMode.GRID ? ViewMode.LIST : ViewMode.GRID);
 
-        refresh();
+        recreateList();
     }
 
     @Override
@@ -264,23 +231,17 @@ public class ScreenshotListScreen extends Screen {
         if (selectedScreenshot == null) return false;
 
         if ((input.modifiers() & InputConstants.MOD_CONTROL) != 0 && input.key() == InputConstants.KEY_C) {
-            PlatformHelper.INSTANCE.copyScreenshot(selectedScreenshot.icon.getPath());
+            PlatformHelper.INSTANCE.copyScreenshot(selectedScreenshot.texture.path);
             SnapperToast.push(SnapperToast.Type.SCREENSHOT, Component.translatable("toast.snapper.screenshot.copy"), null);
             return true;
         }
 
         if (input.key() == InputConstants.KEY_RETURN) {
-            minecraft.setScreen(new ScreenshotViewerScreen(selectedScreenshot.icon, selectedScreenshot.icon.getPath(), this));
+            minecraft.setScreen(new ScreenshotViewerScreen(selectedScreenshot.texture, this));
             return true;
         }
 
         return false;
-    }
-
-    @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 20, CommonColors.WHITE);
     }
 
     public enum ViewMode implements StringRepresentable {
@@ -300,4 +261,5 @@ public class ScreenshotListScreen extends Screen {
             return name;
         }
     }
+
 }

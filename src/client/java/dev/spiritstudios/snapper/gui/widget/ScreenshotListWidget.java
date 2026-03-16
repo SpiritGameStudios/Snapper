@@ -2,15 +2,15 @@ package dev.spiritstudios.snapper.gui.widget;
 
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 public class ScreenshotListWidget extends ScreenshotsWidget {
@@ -38,17 +38,19 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
     }
 
     @Override
-    protected ScreenshotEntry createEntry(ScreenshotTexture icon) {
-        return new ListScreenshotEntry(icon);
+    protected ScreenshotEntry createEntry(ScreenshotTexture texture) {
+        return new ListScreenshotEntry(texture);
     }
 
     private class ListScreenshotEntry extends ScreenshotEntry {
-        public ListScreenshotEntry(ScreenshotTexture icon) {
-            super(icon);
+        public ListScreenshotEntry(ScreenshotTexture texture) {
+            super(texture);
         }
 
         @Override
         public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+            texture.startLoading(minecraft);
+
             graphics.drawString(
                     minecraft.font,
                     SnapperUtil.clipText(minecraft.font, fileName, getContentWidth() - 32 - 6),
@@ -59,24 +61,23 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
 
             graphics.drawString(
                     minecraft.font,
-                    FormattedCharSequence.composite(
-                            Component.translatable("text.snapper.created").getVisualOrderText(),
-                            creation.getVisualOrderText()
-                    ),
+                    Component.translatable("text.snapper.created")
+                            .append(CommonComponents.space())
+                            .append(creation),
                     getContentX() + 35, getContentY() + 12,
                     CommonColors.GRAY,
                     false
             );
 
-            if (icon.loaded()) {
+            if (texture.isLoaded()) {
                 graphics.blit(
                         RenderPipelines.GUI_TEXTURED,
-                        this.icon.textureLocation(),
+                        this.texture.textureLocation(),
                         getContentX(), getContentY(),
-                        (icon.getHeight()) / 3.0f + 32, 0,
+                        (texture.getHeight()) / 3.0f + 32, 0,
                         getContentHeight(), getContentHeight(),
-                        icon.getHeight(), icon.getHeight(),
-                        icon.getWidth(), icon.getHeight()
+                        texture.getHeight(), texture.getHeight(),
+                        texture.getWidth(), texture.getHeight()
                 );
             }
 
@@ -84,7 +85,7 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
                 graphics.fill(getContentX(), getContentY(), getContentX() + 32, getContentY() + 32, 0xA0909090);
                 graphics.blitSprite(
                         RenderPipelines.GUI_TEXTURED,
-                        mouseX - getContentX() < 32 && this.icon.loaded() ?
+                        mouseX - getContentX() < 32 && this.texture.isLoaded() ?
                                 ScreenshotsWidget.VIEW_HIGHLIGHTED_SPRITE :
                                 ScreenshotsWidget.VIEW_SPRITE,
                         getContentX(), getContentY(),
