@@ -40,7 +40,12 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
     protected static final Identifier GRID_SELECTION_BACKGROUND_TEXTURE = Snapper.id("textures/gui/grid_selection_background.png");
 
     protected final Screen parent;
-    protected final List<ScreenshotTexture> textures;
+    protected List<ScreenshotTexture> textures;
+
+    @Override
+    public void removeEntry(Entry entry) {
+        super.removeEntry(entry);
+    }
 
     public static ScreenshotsWidget create(
             Minecraft client,
@@ -70,9 +75,7 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         if (previous == null) {
             this.textures = new ArrayList<>();
 
-            List<Path> screenshots = ScreenshotActions.getScreenshots();
-
-            for (Path screenshot : screenshots) {
+            for (Path screenshot : ScreenshotActions.getScreenshots()) {
                 textures.add(ScreenshotTexture.createScreenshot(
                         this.minecraft.getTextureManager(),
                         screenshot
@@ -80,11 +83,26 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
             }
         } else {
             this.textures = previous.textures;
-
         }
 
-        clearEntries();
+        super.clearEntries();
+        addEntries();
+    }
 
+    @Override
+    public void clearEntries() {
+        for (ScreenshotTexture texture : this.textures) {
+            if (!texture.isClosed()) {
+                texture.close();
+            }
+        }
+
+        textures.clear();
+
+        super.clearEntries();
+    }
+
+    protected void addEntries() {
         if (textures.isEmpty()) {
             addEntry(new EmptyEntry(minecraft));
         } else {
@@ -96,10 +114,17 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         repositionEntries();
     }
 
-    @Override
-    public void clearEntries() {
-        this.children().forEach(Entry::close);
-        super.clearEntries();
+    public void reload() {
+        clearEntries();
+
+        for (Path screenshot : ScreenshotActions.getScreenshots()) {
+            textures.add(ScreenshotTexture.createScreenshot(
+                    this.minecraft.getTextureManager(),
+                    screenshot
+            ).orElseThrow());
+        }
+
+        addEntries();
     }
 
     protected void setEntrySelected(@Nullable ScreenshotEntry entry) {
@@ -261,11 +286,6 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
             playButtonClickSound(minecraft.getSoundManager());
             minecraft.setScreen(new ScreenshotViewerScreen(texture, parent, null));
             return true;
-        }
-
-        @Override
-        public void close() {
-            this.texture.close();
         }
     }
 }

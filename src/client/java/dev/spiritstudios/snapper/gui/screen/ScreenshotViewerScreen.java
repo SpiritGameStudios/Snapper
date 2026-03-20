@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.Path;
 import java.util.List;
 
-public class ScreenshotViewerScreen extends Screen {
+public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
     private static final Identifier MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_list_background.png");
     private static final Identifier INWORLD_MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
 
@@ -35,6 +35,8 @@ public class ScreenshotViewerScreen extends Screen {
     private final @Nullable List<Path> screenshots;
     private final int screenshotIndex;
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 33, 60);
+
+    public boolean shouldReloadParent = false;
 
     public ScreenshotViewerScreen(ScreenshotTexture texture, Screen parent) {
         this(texture, parent, null);
@@ -54,8 +56,10 @@ public class ScreenshotViewerScreen extends Screen {
 
     @Override
     public void onClose() {
-        if (!(parent instanceof ScreenshotListScreen)) {
+        if (!(parent instanceof ScreenshotListScreen listScreen)) {
             this.texture.close();
+        } else if (shouldReloadParent) {
+            listScreen.getScreenshots().reload();
         }
 
         this.client.setScreen(this.parent);
@@ -234,5 +238,10 @@ public class ScreenshotViewerScreen extends Screen {
                 width, 2,
                 32, 2
         );
+    }
+
+    @Override
+    public void reload() {
+        this.shouldReloadParent = true;
     }
 }

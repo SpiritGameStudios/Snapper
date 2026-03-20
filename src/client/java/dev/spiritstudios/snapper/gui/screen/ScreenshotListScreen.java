@@ -30,11 +30,12 @@ import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 
-public class ScreenshotListScreen extends Screen {
+public class ScreenshotListScreen extends Screen implements ReloadableScreen {
     private static final Identifier PANORAMA_BUTTON_ICON = Snapper.id("screenshots/panorama");
     private static final Identifier PANORAMA_BUTTON_DISABLED_ICON = Snapper.id("screenshots/panorama_disabled");
 
     private static final Identifier SETTINGS_ICON = Snapper.id("screenshots/settings");
+    private static final Identifier RELOAD_ICON = Snapper.id("screenshots/reset");
 
     private final Screen parent;
     private final boolean isOffline;
@@ -185,13 +186,22 @@ public class ScreenshotListScreen extends Screen {
             this.uploadButton.setTooltip(Tooltip.create(Component.translatable("button.snapper.upload.tooltip")));
         }
 
-        topRow.addChild(new DeadSpaceElement(20, 20));
+        topRow.addChild(
+                SpriteIconButton.builder(
+                        Component.translatable("button.snapper.reload"),
+                        button -> this.reload(),
+                        true
+                ).width(20).sprite(RELOAD_ICON, 15, 15).build());
 
         this.imageSelected(selectedScreenshot);
 
         this.layout.visitWidgets(this::addRenderableWidget);
 
         this.repositionElements();
+    }
+
+    public ScreenshotsWidget getScreenshots() {
+        return screenshots;
     }
 
     @Override
@@ -242,6 +252,11 @@ public class ScreenshotListScreen extends Screen {
         }
 
         return false;
+    }
+
+    @Override
+    public void reload() {
+        screenshots.reload();
     }
 
     public enum ViewMode implements StringRepresentable {

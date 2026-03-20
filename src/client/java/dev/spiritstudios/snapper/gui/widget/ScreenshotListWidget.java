@@ -33,11 +33,6 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
     }
 
     @Override
-    protected void renderSelection(GuiGraphics context, Entry entry, int color) {
-        // let elements handle it
-    }
-
-    @Override
     protected ScreenshotEntry createEntry(ScreenshotTexture texture) {
         return new ListScreenshotEntry(texture);
     }

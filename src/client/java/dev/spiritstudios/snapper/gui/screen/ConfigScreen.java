@@ -252,6 +252,10 @@ public class ConfigScreen extends Screen {
         var viewMode = SnapperConfig.HOLDER.get().viewMode();
 
         config.saveAsync().thenRun(() -> {
+            if (lastScreen instanceof ReloadableScreen reloadableScreen) {
+                reloadableScreen.reload();
+            }
+
             if (lastScreen instanceof ScreenshotListScreen screenshotsScreen && config.viewMode != viewMode) {
                 screenshotsScreen.recreateList();
             }

@@ -51,6 +51,11 @@ public class ScreenshotRenameScreen extends Screen {
         if (newName == null || !newName.endsWith(".png")) return;
 
         ScreenshotActions.renameScreenshot(screenshot, newName);
+
+        if (this.parent instanceof ReloadableScreen reloadableScreen) {
+            reloadableScreen.reload();
+        }
+
         client.setScreen(this.parent);
     }
 
