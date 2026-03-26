@@ -5,7 +5,6 @@ import com.mojang.serialization.Codec;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
-import dev.spiritstudios.snapper.gui.widget.DeadSpaceElement;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotsWidget;
 import dev.spiritstudios.snapper.gui.widget.ViewModeButton;
