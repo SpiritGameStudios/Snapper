@@ -4,6 +4,7 @@ import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -73,6 +74,17 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
                         getContentHeight(), getContentHeight(),
                         texture.getHeight(), texture.getHeight(),
                         texture.getWidth(), texture.getHeight()
+                );
+            } else {
+                String loadString = LoadingDotsText.get(Util.getMillis());
+
+                graphics.drawString(
+                        minecraft.font,
+                        loadString,
+                        getContentX() + (16 - minecraft.font.width(loadString) / 2),
+                        (getContentY() + getContentHeight() / 2) - minecraft.font.lineHeight / 2,
+                        CommonColors.GRAY,
+                        false
                 );
             }
 

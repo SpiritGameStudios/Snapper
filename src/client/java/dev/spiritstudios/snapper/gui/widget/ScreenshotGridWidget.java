@@ -5,6 +5,7 @@ import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
+import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -149,6 +150,16 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
                         getContentWidth(), getContentHeight(),
                         texture.getWidth(), texture.getHeight(),
                         texture.getWidth(), texture.getHeight()
+                );
+            } else {
+                String loadString = LoadingDotsText.get(Util.getMillis());
+
+                graphics.drawString(
+                        minecraft.font,
+                        loadString,
+                        getContentX() + (getContentWidth() - minecraft.font.width(loadString)) / 2, getContentY() + getContentHeight() / 2,
+                        CommonColors.GRAY,
+                        false
                 );
             }
 

@@ -44,7 +44,6 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
 
     private Button deleteButton;
     private Button renameButton;
-    private Button viewButton;
     private Button copyButton;
     private Button openButton;
     private Button uploadButton;
@@ -216,7 +215,6 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
         this.deleteButton.active = hasScreenshot;
         this.openButton.active = hasScreenshot;
         this.renameButton.active = hasScreenshot;
-//        this.viewButton.active = hasScreenshot;
         this.selectedScreenshot = screenshot;
         this.uploadButton.active = !isOffline && hasScreenshot;
     }
@@ -276,5 +274,4 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
             return name;
         }
     }
-
 }

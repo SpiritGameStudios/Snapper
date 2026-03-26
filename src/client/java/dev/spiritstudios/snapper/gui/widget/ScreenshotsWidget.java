@@ -90,6 +90,17 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
     }
 
     @Override
+    protected void renderListItems(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        for (Entry entry : this.children()) {
+            if (entry.getY() + entry.getHeight() >= this.getY() && entry.getY() <= this.getBottom()) {
+                this.renderItem(guiGraphics, mouseX, mouseY, partialTick, entry);
+            } else if (entry instanceof ScreenshotEntry sEntry) {
+                sEntry.clear();
+            }
+        }
+    }
+
+    @Override
     public void clearEntries() {
         for (ScreenshotTexture texture : this.textures) {
             if (!texture.isClosed()) {
@@ -114,7 +125,7 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         repositionEntries();
     }
 
-    public void reload() {
+    public synchronized void reload() {
         clearEntries();
 
         for (Path screenshot : ScreenshotActions.getScreenshots()) {
@@ -267,6 +278,10 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
                 creation = Component.literal(DATE_FORMAT.format(Instant.ofEpochMilli(creationTime)));
 
             this.creation = creation;
+        }
+
+        public void clear() {
+            texture.clear();
         }
 
         @Override

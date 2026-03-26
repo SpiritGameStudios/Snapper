@@ -59,7 +59,7 @@ public class ScreenshotTexture implements AutoCloseable {
         }
     }
 
-    public void startLoading(Minecraft minecraft) {
+    public synchronized void startLoading(Minecraft minecraft) {
         if (!isLoaded()) {
             CompletableFuture
                     .supplyAsync(this::load, Util.nonCriticalIoPool())
@@ -67,7 +67,7 @@ public class ScreenshotTexture implements AutoCloseable {
         }
     }
 
-    public void upload(NativeImage image) {
+    public synchronized void upload(NativeImage image) {
         try {
             this.checkOpen();
             if (this.texture == null) {
