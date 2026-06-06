@@ -5,7 +5,6 @@ import dev.spiritstudios.snapper.util.DynamicCubemapTexture;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.gui.PanoramaRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
@@ -27,7 +26,7 @@ import java.util.stream.Stream;
 public class PanoramaViewerScreen extends Screen {
     public static final RenderStateDataKey<PanoramaRenderState> SNAPPER_PANORAMA = RenderStateDataKey.create(() -> "Snapper Panorama");
 
-    protected static final Identifier ID = Snapper.id("screenshots/panorama");
+    public static final Identifier TEXTURE_ID = Snapper.id("screenshots/panorama");
 
     private final DynamicCubemapTexture texture;
 
@@ -44,7 +43,7 @@ public class PanoramaViewerScreen extends Screen {
 
         if (texture != null) {
             // TODO: May be worth doing texture loading here off-thread as not to cause a freeze
-            Minecraft.getInstance().getTextureManager().registerAndLoad(ID, texture);
+            Minecraft.getInstance().getTextureManager().registerAndLoad(TEXTURE_ID, texture);
         }
     }
 
@@ -58,7 +57,7 @@ public class PanoramaViewerScreen extends Screen {
                 if (Files.isDirectory(path)) return false;
 
                 return SafeFiles.isContentType(path, "image/png", ".png");
-            }) ? DynamicCubemapTexture.createPanorama(ID, panoramaDir).orElse(null) : null;
+            }) ? DynamicCubemapTexture.createPanorama(TEXTURE_ID, panoramaDir).orElse(null) : null;
         } catch (IOException | NullPointerException e) {
             Snapper.LOGGER.error("Failed to list the contents of directory", e);
             return null;
@@ -68,7 +67,7 @@ public class PanoramaViewerScreen extends Screen {
     @Override
     public void onClose() {
         if (texture != null) {
-            Minecraft.getInstance().getTextureManager().release(ID);
+            Minecraft.getInstance().getTextureManager().release(TEXTURE_ID);
             texture.close();
         }
 

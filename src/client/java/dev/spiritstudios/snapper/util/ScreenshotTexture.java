@@ -94,7 +94,6 @@ public class ScreenshotTexture implements AutoCloseable {
         }
     }
 
-
     public void clear() {
         this.checkOpen();
         if (this.texture != null) {

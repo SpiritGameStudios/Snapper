@@ -11,6 +11,8 @@ public final class Snapper implements ClientModInitializer {
     public static final String MOD_ID = "snapper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+    public static final ScopedValue<Identifier> CUBEMAP_TEXTURE = ScopedValue.newInstance();
+
     @Override
     public void onInitializeClient() {
         SnapperConfig.init();
