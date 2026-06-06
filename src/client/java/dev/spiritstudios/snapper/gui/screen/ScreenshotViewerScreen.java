@@ -47,7 +47,7 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
         this.parent = parent;
 
         this.texture = texture;
-        texture.startLoading(Minecraft.getInstance());
+        texture.startLoading(Minecraft.getInstance(), true);
 
         this.screenshots = screenshots;
 

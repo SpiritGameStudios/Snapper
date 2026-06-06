@@ -122,7 +122,7 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
 
         bottomRow.addChild(Button.builder(
                 CommonComponents.GUI_DONE,
-                button -> this.onClose()
+                _ -> this.onClose()
         ).width(bottomButtonWidth).build());
         Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
         boolean hasPanorama = SnapperUtil.panoramaPresent(panoramaDir);
@@ -156,7 +156,7 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
 
         this.renameButton = topRow.addChild(Button.builder(
                 Component.translatable("button.snapper.rename"),
-                button -> {
+                _ -> {
                     if (this.selectedScreenshot != null) {
                         minecraft.setScreen(new ScreenshotRenameScreen(this.selectedScreenshot.texture.path, this));
                     }

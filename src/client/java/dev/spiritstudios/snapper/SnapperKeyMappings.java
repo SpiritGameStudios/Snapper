@@ -88,6 +88,5 @@ public final class SnapperKeyMappings {
                                 Component.translatable("toast.snapper.screenshot.recent.failure.generic")
                         )
                 );
-
     }
 }

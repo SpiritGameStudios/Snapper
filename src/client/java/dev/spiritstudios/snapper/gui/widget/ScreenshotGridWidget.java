@@ -134,7 +134,7 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
 
         @Override
         public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean isHovering, float partialTick) {
-            texture.startLoading(minecraft);
+            texture.startLoading(minecraft, false);
 
             int centreX = getContentX() + getContentWidth() / 2;
             int centreY = getContentY() + getContentHeight() / 2;

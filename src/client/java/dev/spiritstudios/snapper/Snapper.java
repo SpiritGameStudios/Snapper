@@ -15,7 +15,7 @@ public final class Snapper implements ClientModInitializer {
     public void onInitializeClient() {
         SnapperConfig.init();
         SnapperKeyMappings.init();
-        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> ScreenshotUploading.close());
+        ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> ScreenshotUploading.close());
     }
 
     public static Identifier id(String path) {

@@ -15,9 +15,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ScreenshotTexture implements AutoCloseable {
     private static final Identifier UNKNOWN_SERVER = Identifier.withDefaultNamespace("textures/misc/unknown_server.png");
+
+    private static final AtomicInteger CURRENTLY_LOADING = new AtomicInteger();
 
     private final TextureManager textureManager;
     private final Identifier textureLocation;
@@ -59,8 +62,12 @@ public class ScreenshotTexture implements AutoCloseable {
         }
     }
 
-    public synchronized void startLoading(Minecraft minecraft) {
-        if (!isLoaded()) {
+    private static final int MAX_LOADING = 10;
+
+    public synchronized void startLoading(Minecraft minecraft, boolean force) {
+        if (!isLoaded() && (CURRENTLY_LOADING.get() < MAX_LOADING || force)) {
+            CURRENTLY_LOADING.incrementAndGet();
+
             CompletableFuture
                     .supplyAsync(this::load, Util.nonCriticalIoPool())
                     .thenAcceptAsync(this::upload, minecraft);
@@ -79,6 +86,7 @@ public class ScreenshotTexture implements AutoCloseable {
 
             this.textureManager.register(this.textureLocation, this.texture);
             loaded = true;
+            CURRENTLY_LOADING.decrementAndGet();
         } catch (Throwable throwable) {
             image.close();
             this.clear();
