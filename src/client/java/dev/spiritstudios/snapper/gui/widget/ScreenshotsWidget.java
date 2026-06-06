@@ -9,7 +9,7 @@ import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
@@ -90,12 +90,14 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
     }
 
     @Override
-    protected void renderListItems(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void extractListItems(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         for (Entry entry : this.children()) {
             if (entry.getY() + entry.getHeight() >= this.getY() && entry.getY() <= this.getBottom()) {
-                this.renderItem(guiGraphics, mouseX, mouseY, partialTick, entry);
+                this.extractItem(graphics, mouseX, mouseY, partialTick, entry);
             } else if (entry instanceof ScreenshotEntry sEntry) {
-                sEntry.clear();
+                if (sEntry.texture.isLoaded()) {
+                    sEntry.clear();
+                }
             }
         }
     }
@@ -176,10 +178,10 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         }
 
         @Override
-        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+        public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
             if (this.client.screen == null) throw new IllegalStateException();
 
-            context.drawString(
+            context.text(
                     this.client.font,
                     LOADING_LIST_TEXT,
                     (this.client.screen.width - this.client.font.width(LOADING_LIST_TEXT)) / 2,
@@ -190,7 +192,7 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
 
             String loadString = LoadingDotsText.get(Util.getMillis());
 
-            context.drawString(
+            context.text(
                     this.client.font,
                     loadString,
                     (this.client.screen.width - this.client.font.width(loadString)) / 2,
@@ -216,10 +218,10 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         }
 
         @Override
-        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+        public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
             if (this.minecraft.screen == null) throw new IllegalStateException();
 
-            context.drawString(
+            context.text(
                     this.minecraft.font,
                     EMPTY_LIST_TEXT,
                     (this.minecraft.screen.width - this.minecraft.font.width(EMPTY_LIST_TEXT)) / 2,
@@ -228,7 +230,7 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
                     false
             );
 
-            context.drawString(
+            context.text(
                     this.minecraft.font,
                     EMPTY_CUSTOM_LIST_TEXT,
                     (this.minecraft.screen.width - this.minecraft.font.width(EMPTY_CUSTOM_LIST_TEXT)) / 2,

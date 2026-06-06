@@ -3,7 +3,7 @@ package dev.spiritstudios.snapper.gui.widget;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -44,10 +44,10 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean isHovering, float partialTick) {
             texture.startLoading(minecraft);
 
-            graphics.drawString(
+            graphics.text(
                     minecraft.font,
                     SnapperUtil.clipText(minecraft.font, fileName, getContentWidth() - 32 - 6),
                     getContentX() + 32 + 3, getContentY() + 1,
@@ -55,7 +55,7 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
                     false
             );
 
-            graphics.drawString(
+            graphics.text(
                     minecraft.font,
                     Component.translatable("text.snapper.created")
                             .append(CommonComponents.space())
@@ -78,7 +78,7 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
             } else {
                 String loadString = LoadingDotsText.get(Util.getMillis());
 
-                graphics.drawString(
+                graphics.text(
                         minecraft.font,
                         loadString,
                         getContentX() + (16 - minecraft.font.width(loadString) / 2),

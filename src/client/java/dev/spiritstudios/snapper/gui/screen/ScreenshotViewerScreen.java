@@ -7,7 +7,7 @@ import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
@@ -140,8 +140,8 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractRenderState(graphics, mouseX, mouseY, a);
 
         this.drawMenuBackground(graphics);
         this.drawHeaderAndFooterSeparators(graphics);
@@ -162,7 +162,7 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
         }
 
         if (screenshotIndex != -1 && screenshots != null) {
-            graphics.drawCenteredString(
+            graphics.centeredText(
                     this.font,
                     "Screenshot %d/%d".formatted(screenshotIndex + 1, screenshots.size()),
                     this.width / 2,
@@ -173,7 +173,7 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
 
         // TODO: Maybe add an option to the debug menu to turn this off
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
-            graphics.drawCenteredString(
+            graphics.centeredText(
                     this.font,
                     Component.translatable("text.snapper.image_size", texture.getWidth(), texture.getHeight()),
                     this.width / 2,
@@ -181,7 +181,7 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
                     CommonColors.WHITE
             );
 
-            graphics.drawCenteredString(
+            graphics.centeredText(
                     this.font,
                     Component.translatable("text.snapper.screen_size", this.width, this.height),
                     this.width / 2,
@@ -189,14 +189,14 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
                     CommonColors.WHITE
             );
 
-            graphics.drawCenteredString(this.font,
+            graphics.centeredText(this.font,
                     Component.translatable("text.snapper.scale_factor", scaleFactor),
                     this.width / 2,
                     60,
                     CommonColors.WHITE
             );
 
-            graphics.drawCenteredString(
+            graphics.centeredText(
                     this.font,
                     Component.translatable("text.snapper.scale_size", finalWidth, finalHeight),
                     this.width / 2,
@@ -206,7 +206,7 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
         }
     }
 
-    private void drawMenuBackground(GuiGraphics graphics) {
+    private void drawMenuBackground(GuiGraphicsExtractor graphics) {
         graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
                 this.minecraft.level == null ? MENU_LIST_BACKGROUND : INWORLD_MENU_LIST_BACKGROUND,
@@ -220,7 +220,7 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
         );
     }
 
-    private void drawHeaderAndFooterSeparators(GuiGraphics graphics) {
+    private void drawHeaderAndFooterSeparators(GuiGraphicsExtractor graphics) {
         graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
                 this.minecraft.level == null ? Screen.HEADER_SEPARATOR : Screen.INWORLD_HEADER_SEPARATOR,

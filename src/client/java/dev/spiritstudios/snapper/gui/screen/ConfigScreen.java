@@ -6,6 +6,7 @@ import dev.spiritstudios.snapper.gui.widget.ConfigSliderWidget;
 import dev.spiritstudios.snapper.gui.widget.FolderSelectWidget;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.screens.Screen;
@@ -253,7 +254,7 @@ public class ConfigScreen extends Screen {
 
         config.saveAsync().thenRun(() -> {
             if (lastScreen instanceof ReloadableScreen reloadableScreen) {
-                reloadableScreen.reload();
+                Minecraft.getInstance().submit(reloadableScreen::reload);
             }
 
             if (lastScreen instanceof ScreenshotListScreen screenshotsScreen && config.viewMode != viewMode) {

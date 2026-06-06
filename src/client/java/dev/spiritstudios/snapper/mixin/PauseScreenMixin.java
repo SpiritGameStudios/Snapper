@@ -33,9 +33,7 @@ public abstract class PauseScreenMixin extends Screen {
             this.addRenderableWidget(
                     SpriteIconButton.builder(
                             Component.translatable("button.snapper.screenshots"),
-                            button -> {
-                                Minecraft.getInstance().setScreen(new ScreenshotListScreen(new PauseScreen(true)));
-                            },
+                            _ -> Minecraft.getInstance().setScreen(new ScreenshotListScreen(new PauseScreen(true))),
                             true
                     ).width(20).sprite(SNAPPER_BUTTON_ICON, 15, 15).build()
             ).setPosition(this.width / 2 - 130, height / 4 + 32);

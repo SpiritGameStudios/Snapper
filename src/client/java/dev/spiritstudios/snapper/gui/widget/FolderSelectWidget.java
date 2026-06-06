@@ -5,7 +5,7 @@ import dev.spiritstudios.snapper.gui.overlay.ExternalDialogOverlay;
 import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -36,7 +36,7 @@ public class FolderSelectWidget extends AbstractContainerWidget implements Conta
     private final SpriteIconButton resetButton;
 
     public FolderSelectWidget(int x, int y, int width, int height, PathFunctions pathFunctions, String placeholderKey) {
-        super(x, y, width, height, CommonComponents.EMPTY);
+        super(x, y, width, height, CommonComponents.EMPTY, AbstractScrollArea.defaultSettings(0));
         this.value = pathFunctions;
         this.active = false;
 
@@ -185,9 +185,9 @@ public class FolderSelectWidget extends AbstractContainerWidget implements Conta
     }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         for (Renderable drawable : this.children()) {
-            drawable.render(context, mouseX, mouseY, deltaTicks);
+            drawable.extractRenderState(graphics, mouseX, mouseY, a);
         }
     }
 

@@ -3,7 +3,7 @@ package dev.spiritstudios.snapper.gui.toast;
 import dev.spiritstudios.snapper.Snapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastManager;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -66,14 +66,14 @@ public class SnapperToast implements Toast {
     }
 
     @Override
-    public void render(GuiGraphics context, Font font, long startTime) {
-        context.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURE, 0, 0, this.width(), this.height());
-        context.blitSprite(RenderPipelines.GUI_TEXTURED, getCurrentComponenture(), PADDING, PADDING, 16, 16);
+    public void extractRenderState(GuiGraphicsExtractor graphics, Font font, long startTime) {
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURE, 0, 0, this.width(), this.height());
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, getCurrentComponenture(), PADDING, PADDING, 16, 16);
 
-        context.drawString(font, title, PADDING * 2 + 12, this.lines.isEmpty() ? 12 : 7, CommonColors.YELLOW, false);
+        graphics.text(font, title, PADDING * 2 + 12, this.lines.isEmpty() ? 12 : 7, CommonColors.YELLOW, false);
 
         for (int i = 0; i < this.lines.size(); ++i) {
-            context.drawString(font, this.lines.get(i), PADDING * 2 + 12, 18 + i * 12, CommonColors.WHITE, false);
+            graphics.text(font, this.lines.get(i), PADDING * 2 + 12, 18 + i * 12, CommonColors.WHITE, false);
         }
     }
 

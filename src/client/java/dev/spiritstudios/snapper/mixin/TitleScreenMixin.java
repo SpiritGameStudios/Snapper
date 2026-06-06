@@ -39,7 +39,7 @@ public abstract class TitleScreenMixin extends Screen {
             this.addRenderableWidget(
                     SpriteIconButton.builder(
                             Component.translatable("button.snapper.screenshots"),
-                            button -> this.minecraft.setScreen(new ScreenshotListScreen((TitleScreen) ((Object) this))),
+                            _ -> this.minecraft.setScreen(new ScreenshotListScreen((TitleScreen) ((Object) this))),
                             true
                     ).width(20).sprite(SNAPPER_BUTTON_ICON, 15, 15).build()
             ).setPosition(this.width / 2 - 124, y + spacingY);

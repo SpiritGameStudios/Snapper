@@ -3,7 +3,7 @@ package dev.spiritstudios.snapper.gui.widget;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
@@ -133,7 +133,7 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
         }
 
         @Override
-        public void renderContent(GuiGraphics graphics, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean isHovering, float partialTick) {
             texture.startLoading(minecraft);
 
             int centreX = getContentX() + getContentWidth() / 2;
@@ -154,7 +154,7 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
             } else {
                 String loadString = LoadingDotsText.get(Util.getMillis());
 
-                graphics.drawString(
+                graphics.text(
                         minecraft.font,
                         loadString,
                         getContentX() + (getContentWidth() - minecraft.font.width(loadString)) / 2, getContentY() + getContentHeight() / 2,
@@ -183,7 +183,7 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
                         32, 32
                 );
 
-                graphics.drawString(
+                graphics.text(
                         minecraft.font,
                         SnapperUtil.clipText(minecraft.font, fileName, getContentWidth() - 5),
                         getContentX() + 5,
@@ -192,7 +192,7 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
                         true
                 );
 
-                graphics.drawString(
+                graphics.text(
                         minecraft.font,
                         Component.translatable("text.snapper.created"),
                         getContentX() + 5,
@@ -201,7 +201,7 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
                         true
                 );
 
-                graphics.drawString(
+                graphics.text(
                         minecraft.font,
                         SnapperUtil.clipText(minecraft.font, creation, getContentWidth() - 5),
                         getContentX() + 5,

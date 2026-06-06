@@ -2,7 +2,7 @@ package dev.spiritstudios.snapper.gui.widget;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -20,8 +20,8 @@ public class ViewModeButton extends Button {
     }
 
     @Override
-    protected void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        this.renderDefaultSprite(graphics);
+    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        this.extractDefaultSprite(graphics);
         int x = this.getX() + this.getWidth() / 2 - SPRITE_SIZE / 2;
         int y = this.getY() + this.getHeight() / 2 - SPRITE_SIZE / 2;
 

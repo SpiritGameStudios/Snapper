@@ -42,16 +42,16 @@ public abstract class MinecraftMixin {
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/Screenshot;grab(Ljava/io/File;Ljava/lang/String;Lcom/mojang/blaze3d/pipeline/RenderTarget;ILjava/util/function/Consumer;)V")
     )
-    private void saveScreenshot(File gameDirectory, String fileName, RenderTarget renderTarget, int downscaleFactor, Consumer<Component> messageReceiver, Operation<Void> original) {
-        fileName = "panorama/" + fileName;
-        original.call(gameDirectory, fileName, renderTarget, downscaleFactor, messageReceiver);
+    private void saveScreenshot(File workDir, String forceName, RenderTarget target, int downscaleFactor, Consumer<Component> callback, Operation<Void> original) {
+        forceName = "panorama/" + forceName;
+        original.call(workDir, forceName, target, downscaleFactor, callback);
     }
 
     @Inject(
             method = "<init>",
             at = @At("TAIL")
     )
-    private void init(GameConfig args, CallbackInfo ci) {
+    private void init(GameConfig gameConfig, CallbackInfo ci) {
         if (Util.getPlatform() != Util.OS.OSX) System.setProperty("java.awt.headless", "false");
     }
 

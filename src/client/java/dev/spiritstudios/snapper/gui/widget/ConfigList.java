@@ -2,7 +2,7 @@ package dev.spiritstudios.snapper.gui.widget;
 
 import dev.spiritstudios.snapper.gui.screen.ConfigScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.StringWidget;
@@ -83,13 +83,13 @@ public class ConfigList extends ContainerObjectSelectionList<ConfigList.Abstract
         }
 
         @Override
-        public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float a) {
             int xOffset = 0;
             int x = this.screen.width / 2 - 155;
 
             for (AbstractWidget abstractWidget : this.children) {
                 abstractWidget.setPosition(x + xOffset, this.getContentY());
-                abstractWidget.render(guiGraphics, mouseX, mouseY, partialTick);
+                abstractWidget.extractRenderState(graphics, mouseX, mouseY, a);
                 xOffset += X_OFFSET;
             }
         }
@@ -122,9 +122,9 @@ public class ConfigList extends ContainerObjectSelectionList<ConfigList.Abstract
         }
 
         @Override
-        public void renderContent(final GuiGraphics graphics, final int mouseX, final int mouseY, final boolean hovered, final float a) {
+        public void extractContent(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final boolean hovered, final float a) {
             this.widget.setPosition(this.screen.width / 2 - 155, this.getContentY() + this.paddingTop);
-            this.widget.render(graphics, mouseX, mouseY, a);
+            this.widget.extractRenderState(graphics, mouseX, mouseY, a);
         }
 
         public @NonNull List<? extends GuiEventListener> children() {

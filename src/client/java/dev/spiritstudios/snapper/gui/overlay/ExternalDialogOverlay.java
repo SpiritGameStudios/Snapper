@@ -2,7 +2,7 @@ package dev.spiritstudios.snapper.gui.overlay;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -16,9 +16,9 @@ public class ExternalDialogOverlay extends Overlay {
     private static final Identifier INWORLD_MENU_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("textures/gui/inworld_menu_background.png");
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         if (this.client.screen != null) {
-            this.client.screen.renderWithTooltipAndSubtitles(graphics, mouseX, mouseY, partialTick);
+            this.client.screen.extractRenderStateWithTooltipAndSubtitles(graphics, mouseX, mouseY, a);
         }
 
         graphics.nextStratum();
@@ -32,7 +32,7 @@ public class ExternalDialogOverlay extends Overlay {
                 32, 32
         );
 
-        graphics.drawCenteredString(
+        graphics.centeredText(
                 client.font,
                 Component.translatable("overlay.snapper.external_dialog.folder"),
                 graphics.guiWidth() / 2, graphics.guiHeight() / 2,

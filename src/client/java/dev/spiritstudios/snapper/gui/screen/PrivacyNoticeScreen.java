@@ -33,7 +33,7 @@ import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
@@ -60,9 +60,9 @@ public class PrivacyNoticeScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, getTitleY(), CommonColors.WHITE);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractRenderState(graphics, mouseX, mouseY, a);
+        graphics.centeredText(this.font, this.title, this.width / 2, getTitleY(), CommonColors.WHITE);
 
         message.visitLines(
                 TextAlignment.CENTER,
