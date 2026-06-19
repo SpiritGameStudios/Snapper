@@ -42,7 +42,7 @@ repositories {
     mavenCentral()
 }
 
-val debugArgs = arrayOf(
+val debugArgs = listOf(
     "-enableassertions",
 
     // Mixin debugging, should make failures happen quicker
@@ -70,7 +70,7 @@ loom {
 
     accessWidenerPath = file("src/main/resources/snapper.classtweaker")
 
-    runs.configureEach { vmArgs.addAll(debugArgs) }
+    runs.configureEach { jvmArguments.addAll(debugArgs) }
 }
 
 dependencies {
@@ -81,8 +81,8 @@ dependencies {
 
     compileOnlyApi(libs.greenhouse.config.api)
 
-    runtimeOnly(libs.greenhouse.config)
-    include(libs.greenhouse.config)
+    runtimeOnly(libs.greenhouse.config.fabric)
+    include(libs.greenhouse.config.fabric)
 
     compileOnly(libs.modmenu)
 

@@ -1,14 +1,14 @@
 [versions]
-fabric_loom = "1.16-SNAPSHOT"
-modpublish = "1.1.0"
+fabric_loom = "1.17-SNAPSHOT"
+modpublish = "2.0.0"
 
 minecraft = "26.1.2"
 
 fabric_loader = "0.18.4"
-fabric_api = "0.147.0+26.1.2"
+fabric_api = "0.151.0+26.1.2"
 
 greenhouse_config = "3.0.0-beta.5+26.1.x"
-modmenu = "18.0.0-alpha.8"
+modmenu = "18.0.0-beta.1"
 
 objc_bridge = "1.0.0"
 
@@ -23,7 +23,7 @@ fabric_loader = { group = "net.fabricmc", name = "fabric-loader", version.ref = 
 fabric_api = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.ref = "fabric_api" }
 
 greenhouse_config_api = { group = "lgbt.greenhouse.config", name = "greenhouse-config-api", version.ref = "greenhouse_config" }
-greenhouse_config = { group = "lgbt.greenhouse.config", name = "greenhouse-config-fabric", version.ref = "greenhouse_config" }
+greenhouse_config_fabric = { group = "lgbt.greenhouse.config", name = "greenhouse-config-fabric", version.ref = "greenhouse_config" }
 
 modmenu = { group = "com.terraformersmc", name = "modmenu", version.ref = "modmenu" }
 
