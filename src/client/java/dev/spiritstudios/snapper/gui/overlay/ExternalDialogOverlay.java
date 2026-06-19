@@ -10,22 +10,22 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 
 public class ExternalDialogOverlay extends Overlay {
-    private final Minecraft client = Minecraft.getInstance();
+    private final Minecraft minecraft = Minecraft.getInstance();
 
     public static final Identifier MENU_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("textures/gui/menu_background.png");
     private static final Identifier INWORLD_MENU_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("textures/gui/inworld_menu_background.png");
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        if (this.client.screen != null) {
-            this.client.screen.extractRenderStateWithTooltipAndSubtitles(graphics, mouseX, mouseY, a);
+        if (this.minecraft.screen != null) {
+            this.minecraft.screen.extractRenderStateWithTooltipAndSubtitles(graphics, mouseX, mouseY, a);
         }
 
         graphics.nextStratum();
 
         graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
-                this.client.level == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE,
+                this.minecraft.level == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE,
                 0, 0,
                 0, 0,
                 graphics.guiWidth(), graphics.guiHeight(),
@@ -33,16 +33,16 @@ public class ExternalDialogOverlay extends Overlay {
         );
 
         graphics.centeredText(
-                client.font,
+                minecraft.font,
                 Component.translatable("overlay.snapper.external_dialog.folder"),
                 graphics.guiWidth() / 2, graphics.guiHeight() / 2,
                 CommonColors.WHITE
         );
 
-        if (InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_ESCAPE)) close();
+        if (InputConstants.isKeyDown(minecraft.getWindow(), InputConstants.KEY_ESCAPE)) close();
     }
 
     public void close() {
-        this.client.setOverlay(null);
+        this.minecraft.setOverlay(null);
     }
 }

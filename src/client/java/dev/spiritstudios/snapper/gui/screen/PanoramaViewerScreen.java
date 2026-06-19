@@ -35,7 +35,7 @@ public class PanoramaViewerScreen extends Screen {
 
     private float spin = 0.0F;
 
-    protected PanoramaViewerScreen(String title, Screen parent) {
+    public PanoramaViewerScreen(String title, Screen parent) {
         super(Component.translatable("menu.snapper.viewer_menu"));
         this.title = title;
         this.parent = parent;
@@ -57,7 +57,7 @@ public class PanoramaViewerScreen extends Screen {
                 if (Files.isDirectory(path)) return false;
 
                 return SafeFiles.isContentType(path, "image/png", ".png");
-            }) ? DynamicCubemapTexture.createPanorama(TEXTURE_ID, panoramaDir).orElse(null) : null;
+            }) ? new DynamicCubemapTexture(TEXTURE_ID, panoramaDir) : null;
         } catch (IOException | NullPointerException e) {
             Snapper.LOGGER.error("Failed to list the contents of directory", e);
             return null;

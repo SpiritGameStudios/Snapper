@@ -55,11 +55,4 @@ public class DynamicCubemapTexture extends CubeMapTexture {
         }
         return contents;
     }
-
-    public static Optional<DynamicCubemapTexture> createPanorama(Identifier id, Path path) {
-        return Optional.of(new DynamicCubemapTexture(
-                id,
-                path
-        ));
-    }
 }

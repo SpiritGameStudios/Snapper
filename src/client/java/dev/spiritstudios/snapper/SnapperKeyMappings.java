@@ -16,24 +16,24 @@ import java.nio.file.Path;
 import java.util.List;
 
 public final class SnapperKeyMappings {
-    public static final KeyMapping.Category SNAPPER = KeyMapping.Category.register(Snapper.id(Snapper.MOD_ID));
+    public static final KeyMapping.Category SNAPPER_CATEGORY = KeyMapping.Category.register(Snapper.id(Snapper.MOD_ID));
 
     public static final KeyMapping PANORAMA_KEY = new KeyMapping(
             "key.snapper.panorama",
             GLFW.GLFW_KEY_F8,
-            SNAPPER
+            SNAPPER_CATEGORY
     );
 
     public static final KeyMapping RECENT_SCREENSHOT_KEY = new KeyMapping(
             "key.snapper.recent",
             GLFW.GLFW_KEY_O,
-            SNAPPER
+            SNAPPER_CATEGORY
     );
 
     public static final KeyMapping SCREENSHOT_MENU_KEY = new KeyMapping(
             "key.snapper.screenshot_menu",
             GLFW.GLFW_KEY_V,
-            SNAPPER
+            SNAPPER_CATEGORY
     );
 
     public static void init() {

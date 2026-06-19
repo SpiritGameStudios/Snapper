@@ -20,7 +20,7 @@ public class ScreenshotRenameScreen extends Screen {
     private final Font textRenderer = client.font;
     private final Screen parent;
 
-    protected ScreenshotRenameScreen(Path screenshot, Screen parent) {
+    public ScreenshotRenameScreen(Path screenshot, Screen parent) {
         super(Component.translatable("text.snapper.rename"));
         this.screenshot = screenshot;
         this.renameInput = new EditBox(textRenderer, 200, 20, RENAME_INPUT_TEXT);

@@ -255,10 +255,9 @@ public class ConfigScreen extends Screen {
         config.saveAsync().thenRun(() -> {
             if (lastScreen instanceof ReloadableScreen reloadableScreen) {
                 Minecraft.getInstance().submit(reloadableScreen::reload);
-            }
-
-            if (lastScreen instanceof ScreenshotListScreen screenshotsScreen && config.viewMode != viewMode) {
-                screenshotsScreen.recreateList();
+                if (config.viewMode != viewMode) {
+                    reloadableScreen.recreateList();
+                }
             }
         });
 

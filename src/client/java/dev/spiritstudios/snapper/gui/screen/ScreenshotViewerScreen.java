@@ -1,5 +1,6 @@
 package dev.spiritstudios.snapper.gui.screen;
 
+import dev.spiritstudios.snapper.gui.SnapperButtonBar;
 import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
@@ -37,6 +38,7 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 33, 60);
 
     public boolean shouldReloadParent = false;
+    public boolean shouldRecreateParent = false;
 
     public ScreenshotViewerScreen(ScreenshotTexture texture, Screen parent) {
         this(texture, parent, null);
@@ -58,8 +60,11 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
     public void onClose() {
         if (!(parent instanceof ScreenshotListScreen listScreen)) {
             this.texture.close();
-        } else if (shouldReloadParent) {
-            listScreen.getScreenshots().reload();
+        }
+
+        if (parent instanceof ReloadableScreen reloadable) {
+            if (shouldReloadParent) reloadable.reload();
+            if (shouldRecreateParent) reloadable.recreateList();
         }
 
         this.client.setScreen(this.parent);
@@ -72,68 +77,16 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
 
     @Override
     protected void init() {
-        // TODO: Dedupe code from here and ScreenshotListScreen
         this.layout.addTitleHeader(this.title, this.font);
 
-        final int hSpacing = 4;
-
-        final int buttonWidth = 74;
-        final int bottomButtonWidth = 100;
-
-        LinearLayout vertical = this.layout.addToFooter(LinearLayout.vertical().spacing(4));
-        vertical.defaultCellSetting().alignHorizontallyCenter();
-
-        LinearLayout topRow = vertical.addChild(LinearLayout.horizontal().spacing(hSpacing));
-        LinearLayout bottomRow = vertical.addChild(LinearLayout.horizontal().spacing(hSpacing));
-
-        bottomRow.addChild(Button.builder(
-                Component.translatable("button.snapper.folder"),
-                button -> Util.getPlatform().openPath(SnapperUtil.getConfiguredScreenshotDirectory())
-        ).width(bottomButtonWidth).build());
-
-        bottomRow.addChild(Button.builder(
-                Component.translatable("button.snapper.open"),
-                button -> {
-                    Util.getPlatform().openPath(this.texture.path);
-                }
-        ).width(bottomButtonWidth).build());
-
-        bottomRow.addChild(Button.builder(
-                CommonComponents.GUI_DONE,
-                button -> this.onClose()
-        ).width(bottomButtonWidth).build());
-
-        topRow.addChild(Button.builder(
-                Component.translatable("button.snapper.delete"),
-                button -> {
-                    ScreenshotActions.deleteScreenshot(this.texture.path, parent);
-                }
-        ).width(buttonWidth).build());
-
-        topRow.addChild(Button.builder(
-                Component.translatable("button.snapper.rename"),
-                button -> {
-                    minecraft.setScreen(new ScreenshotRenameScreen(this.texture.path, this));
-                }
-        ).width(buttonWidth).build());
-
-        topRow.addChild(Button.builder(
-                Component.translatable("button.snapper.copy"),
-                button -> {
-                    PlatformHelper.INSTANCE.copyScreenshot(this.texture.path);
-                }
-        ).width(buttonWidth).build());
-
-        var uploadButton = topRow.addChild(Button.builder(Component.translatable("button.snapper.upload"), button -> {
-            button.active = false;
-            ScreenshotUploading.upload(this.texture.path)
-                    .thenRun(() -> button.active = true);
-        }).width(buttonWidth).build());
-
-        if (SnapperUtil.isOfflineAccount()) {
-            uploadButton.active = false;
-            uploadButton.setTooltip(Tooltip.create(Component.translatable("button.snapper.upload.tooltip")));
-        }
+        new SnapperButtonBar(
+                this,
+                this.layout,
+                () -> this.texture,
+                false,
+                null,
+                null
+        );
 
         this.layout.visitWidgets(this::addRenderableWidget);
         this.repositionElements();
@@ -243,5 +196,10 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
     @Override
     public void reload() {
         this.shouldReloadParent = true;
+    }
+
+    @Override
+    public void recreateList() {
+        this.shouldRecreateParent = true;
     }
 }
