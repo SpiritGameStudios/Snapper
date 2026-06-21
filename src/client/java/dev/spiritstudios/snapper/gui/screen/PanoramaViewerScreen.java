@@ -84,7 +84,7 @@ public class PanoramaViewerScreen extends Screen {
         }
 
         Path panoramaPath = Path.of(Minecraft.getInstance().gameDirectory.getPath(), "screenshots", "panorama");
-        addRenderableWidget(Button.builder(Component.translatable("button.snapper.folder"), button -> {
+        addRenderableWidget(Button.builder(Component.translatable("button.snapper.folder"), _ -> {
             Util.getPlatform().openPath(panoramaPath);
         }).bounds(width / 2 - 150 - 4, height - 32, 150, 20).build());
 
