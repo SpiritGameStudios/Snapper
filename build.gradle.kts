@@ -5,9 +5,7 @@ plugins {
     alias(libs.plugins.modpublish)
 }
 
-val mappingsAttribute = Attribute.of("net.minecraft.mappings", String::class.java)
-
-val modVersion = "1.1.1"
+val modVersion = "1.1.2"
 val modId = "snapper"
 val modName = "Snapper"
 
@@ -21,11 +19,6 @@ version = "$modVersion+${libs.versions.minecraft.get()}"
 
 @Suppress("UnstableApiUsage")
 repositories {
-    maven("https://maven.parchmentmc.org/") {
-        name = "ParchmentMC"
-        content { includeGroupAndSubgroups("org.parchmentmc") }
-    }
-
     maven("https://maven.terraformersmc.com/") {
         name = "Terraformers"
         content { includeGroupAndSubgroups("com.terraformersmc") }
@@ -49,6 +42,22 @@ repositories {
     mavenCentral()
 }
 
+val debugArgs = listOf(
+    "-enableassertions",
+
+    // Mixin debugging, should make failures happen quicker
+    "-Dmixin.debug.verify=true",
+    "-Dmixin.debug.strict=true",
+    "-Dmixin.debug.countInjections=true",
+
+    // Memory Usage Optimization
+    "-XX:+UseZGC",
+    "-XX:+UseCompactObjectHeaders",
+    "-XX:+UseStringDeduplication",
+
+    "-XX:+AlwaysPreTouch" // Apparently makes startup faster
+)
+
 loom {
     runtimeOnlyLog4j = true
 
@@ -60,29 +69,22 @@ loom {
     }
 
     accessWidenerPath = file("src/main/resources/snapper.classtweaker")
+
+    runs.configureEach { jvmArguments.addAll(debugArgs) }
 }
 
 dependencies {
     minecraft(libs.minecraft)
-    @Suppress("UnstableApiUsage")
-    mappings(
-        loom.layered {
-            officialMojangMappings()
-            parchment(libs.parchment)
-        }
-    )
 
-    modImplementation(libs.fabric.loader)
-    modImplementation(libs.fabric.api)
+    implementation(libs.fabric.loader)
+    implementation(libs.fabric.api)
 
-    modCompileOnlyApi(libs.greenhouse.config.api) {
-        attributes { attribute(mappingsAttribute, "intermediary") }
-    }
+    compileOnlyApi(libs.greenhouse.config.api)
 
-    modRuntimeOnly(libs.greenhouse.config)
-    include(libs.greenhouse.config)
+    runtimeOnly(libs.greenhouse.config.fabric)
+    include(libs.greenhouse.config.fabric)
 
-    modCompileOnly(libs.modmenu)
+    compileOnly(libs.modmenu)
 
     implementation(libs.objc.bridge)
 }
@@ -101,13 +103,13 @@ tasks.processResources {
 java {
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    options.release = 21
+    options.release = 25
 }
 
 tasks.jar {
@@ -115,7 +117,7 @@ tasks.jar {
 }
 
 publishMods {
-    file = tasks.remapJar.get().archiveFile
+    file = tasks.jar.get().archiveFile
     modLoaders.add("fabric")
 
     version = modVersion
@@ -126,7 +128,7 @@ publishMods {
 
     modrinth {
         accessToken = providers.gradleProperty("secrets.modrinth_token")
-        projectId = modrinthProject
+        projectId = "MZQyESDC"
         minecraftVersions.add(libs.versions.minecraft.get())
 
         projectDescription = providers.fileContents(layout.projectDirectory.file("README.md")).asText

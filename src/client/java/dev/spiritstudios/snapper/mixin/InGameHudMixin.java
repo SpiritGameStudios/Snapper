@@ -22,7 +22,7 @@ public class InGameHudMixin {
     @Definition(id = "minecraft", field = "Lnet/minecraft/client/gui/Gui;minecraft:Lnet/minecraft/client/Minecraft;")
     @Definition(id = "screen", field = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;")
     @Expression("(this.minecraft.screen instanceof LevelLoadingScreen)")
-    @ModifyExpressionValue(method = "render", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+    @ModifyExpressionValue(method = "extractRenderState", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
     private boolean cancelRenderingHudInPanoramaScreen(boolean original) {
         return original || minecraft.screen instanceof PanoramaViewerScreen;
     }

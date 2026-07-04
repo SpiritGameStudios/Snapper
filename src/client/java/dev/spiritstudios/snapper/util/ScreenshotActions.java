@@ -1,6 +1,7 @@
 package dev.spiritstudios.snapper.util;
 
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.ProgressScreen;
@@ -31,7 +32,12 @@ public class ScreenshotActions {
                                 } catch (IOException e) {
                                     Snapper.LOGGER.error("Failed to delete file", e);
                                 }
+
+                                if (screen instanceof ScreenshotListScreen listScreen) {
+                                    listScreen.getScreenshots().reload();
+                                }
                             }
+
                             client.setScreen(screen);
                         },
                         Component.translatable("text.snapper.delete_question"),

@@ -30,9 +30,10 @@ package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
-import net.minecraft.Util;
+import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
@@ -59,10 +60,16 @@ public class PrivacyNoticeScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredString(this.font, this.title, this.width / 2, getTitleY(), CommonColors.WHITE);
-        message.render(context, MultiLineLabel.Align.CENTER, width / 2, getMessageY(), 10, true, CommonColors.WHITE);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractRenderState(graphics, mouseX, mouseY, a);
+        graphics.centeredText(this.font, this.title, this.width / 2, getTitleY(), CommonColors.WHITE);
+
+        message.visitLines(
+                TextAlignment.CENTER,
+                width / 2, getMessageY(),
+                10,
+                graphics.textRenderer()
+        );
     }
 
     @Override
@@ -84,16 +91,16 @@ public class PrivacyNoticeScreen extends Screen {
     private void addButtons(int y) {
         int buttonWidth = 120;
 
-        addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.view_terms"), buttonWidget ->
+        addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.view_terms"), _ ->
                 Util.getPlatform().openUri(TERMS_URI)).bounds(width / 2 - (buttonWidth / 2) - buttonWidth - 5, y, buttonWidth, 20).build());
 
-        addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.accept"), buttonWidget -> {
+        addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.accept"), _ -> {
             Minecraft.getInstance().setScreen(parent);
             SnapperConfig.editAsync(m -> m.termsAccepted = AxolotlClientApi.TermsAcceptance.ACCEPTED);
             accepted.accept(true);
         }).bounds(width / 2 - (buttonWidth / 2), y, buttonWidth, 20).build());
 
-        addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.deny"), buttonWidget -> {
+        addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.deny"), _ -> {
             Minecraft.getInstance().setScreen(parent);
             SnapperConfig.editAsync(m -> m.termsAccepted = AxolotlClientApi.TermsAcceptance.DENIED);
             accepted.accept(false);

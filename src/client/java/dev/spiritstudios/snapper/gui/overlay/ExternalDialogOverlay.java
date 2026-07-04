@@ -2,47 +2,47 @@ package dev.spiritstudios.snapper.gui.overlay;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 
 public class ExternalDialogOverlay extends Overlay {
-    private final Minecraft client = Minecraft.getInstance();
+    private final Minecraft minecraft = Minecraft.getInstance();
 
-    public static final ResourceLocation MENU_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/menu_background.png");
-    private static final ResourceLocation INWORLD_MENU_BACKGROUND_TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/inworld_menu_background.png");
+    public static final Identifier MENU_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("textures/gui/menu_background.png");
+    private static final Identifier INWORLD_MENU_BACKGROUND_TEXTURE = Identifier.withDefaultNamespace("textures/gui/inworld_menu_background.png");
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        if (this.client.screen != null) {
-            this.client.screen.renderWithTooltipAndSubtitles(graphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        if (this.minecraft.screen != null) {
+            this.minecraft.screen.extractRenderStateWithTooltipAndSubtitles(graphics, mouseX, mouseY, a);
         }
 
         graphics.nextStratum();
 
         graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
-                this.client.level == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE,
+                this.minecraft.level == null ? MENU_BACKGROUND_TEXTURE : INWORLD_MENU_BACKGROUND_TEXTURE,
                 0, 0,
                 0, 0,
                 graphics.guiWidth(), graphics.guiHeight(),
                 32, 32
         );
 
-        graphics.drawCenteredString(
-                client.font,
+        graphics.centeredText(
+                minecraft.font,
                 Component.translatable("overlay.snapper.external_dialog.folder"),
                 graphics.guiWidth() / 2, graphics.guiHeight() / 2,
                 CommonColors.WHITE
         );
 
-        if (InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_ESCAPE)) close();
+        if (InputConstants.isKeyDown(minecraft.getWindow(), InputConstants.KEY_ESCAPE)) close();
     }
 
     public void close() {
-        this.client.setOverlay(null);
+        this.minecraft.setOverlay(null);
     }
 }

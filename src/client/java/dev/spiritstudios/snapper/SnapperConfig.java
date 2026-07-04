@@ -12,7 +12,7 @@ import lgbt.greenhouse.config.api.v3.dfu.builder.schema.TypeTemplateBuilder;
 import lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigRelocateFieldsFix;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonCLang;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;

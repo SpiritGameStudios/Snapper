@@ -8,17 +8,17 @@ import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.util.SafeFiles;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.StringUtil;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
@@ -31,18 +31,21 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsWidget.Entry> {
-    protected static final ResourceLocation VIEW_SPRITE = Snapper.id("screenshots/view");
-    protected static final ResourceLocation VIEW_HIGHLIGHTED_SPRITE = Snapper.id("screenshots/view_highlighted");
-    protected static final ResourceLocation GRID_SELECTION_BACKGROUND_TEXTURE = Snapper.id("textures/gui/grid_selection_background.png");
+    protected static final Identifier VIEW_SPRITE = Snapper.id("screenshots/view");
+    protected static final Identifier VIEW_HIGHLIGHTED_SPRITE = Snapper.id("screenshots/view_highlighted");
+    protected static final Identifier GRID_SELECTION_BACKGROUND_TEXTURE = Snapper.id("textures/gui/grid_selection_background.png");
 
     protected final Screen parent;
-    public final CompletableFuture<List<ScreenshotTexture>> loadFuture;
+    protected List<ScreenshotTexture> textures;
+
+    @Override
+    public void removeEntry(Entry entry) {
+        super.removeEntry(entry);
+    }
 
     public static ScreenshotsWidget create(
             Minecraft client,
@@ -58,50 +61,83 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
     }
 
     public ScreenshotsWidget(
-            Minecraft client,
+            Minecraft minecraft,
             int width, int height,
             int y, int itemHeight,
             @Nullable ScreenshotsWidget previous,
             Screen parent
     ) {
-        super(client, width, height, y, itemHeight);
+        super(minecraft, width, height, y, itemHeight);
 
         this.parent = parent;
-        this.addEntry(new ScreenshotsWidget.LoadingEntry(client));
+        this.addEntry(new ScreenshotsWidget.LoadingEntry(minecraft));
 
-        this.loadFuture = previous != null ? previous.loadFuture : load(client);
+        if (previous == null) {
+            this.textures = new ArrayList<>();
 
-        this.loadFuture.thenAccept(textures -> {
-            this.clearEntries();
+            for (Path screenshot : ScreenshotActions.getScreenshots()) {
+                textures.add(ScreenshotTexture.createScreenshot(
+                        this.minecraft.getTextureManager(),
+                        screenshot
+                ).orElseThrow());
+            }
+        } else {
+            this.textures = previous.textures;
+        }
 
-            if (textures.isEmpty()) {
-                this.addEntry(new ScreenshotsWidget.EmptyEntry(client));
-            } else {
-                for (ScreenshotTexture texture : textures) {
-                    addEntry(createEntry(texture));
+        super.clearEntries();
+        addEntries();
+    }
+
+    @Override
+    protected void extractListItems(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        for (Entry entry : this.children()) {
+            if (entry.getY() + entry.getHeight() >= this.getY() && entry.getY() <= this.getBottom()) {
+                this.extractItem(graphics, mouseX, mouseY, partialTick, entry);
+            } else if (entry instanceof ScreenshotEntry sEntry) {
+                if (sEntry.texture.isLoaded()) {
+                    sEntry.clear();
                 }
             }
+        }
+    }
 
-            repositionEntries();
-        }).exceptionally(ex -> {
-            clearEntries();
-            // TODO: Error Entry
-            this.addEntry(new ScreenshotsWidget.EmptyEntry(client));
+    @Override
+    public void clearEntries() {
+        for (ScreenshotTexture texture : this.textures) {
+            if (!texture.isClosed()) {
+                texture.close();
+            }
+        }
 
-            repositionEntries();
+        textures.clear();
 
-            Snapper.LOGGER.error("Failed to load textures", ex);
+        super.clearEntries();
+    }
 
-            return null;
-        });
+    protected void addEntries() {
+        if (textures.isEmpty()) {
+            addEntry(new EmptyEntry(minecraft));
+        } else {
+            for (ScreenshotTexture texture : textures) {
+                addEntry(createEntry(texture));
+            }
+        }
 
         repositionEntries();
     }
 
-    @Override
-    protected void clearEntries() {
-        this.children().forEach(Entry::close);
-        super.clearEntries();
+    public synchronized void reload() {
+        clearEntries();
+
+        for (Path screenshot : ScreenshotActions.getScreenshots()) {
+            textures.add(ScreenshotTexture.createScreenshot(
+                    this.minecraft.getTextureManager(),
+                    screenshot
+            ).orElseThrow());
+        }
+
+        addEntries();
     }
 
     protected void setEntrySelected(@Nullable ScreenshotEntry entry) {
@@ -121,29 +157,7 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         return super.keyPressed(input);
     }
 
-
-    protected abstract ScreenshotEntry createEntry(ScreenshotTexture icon);
-
-    public CompletableFuture<List<ScreenshotTexture>> load(Minecraft client) {
-        return CompletableFuture.supplyAsync(() -> {
-                    List<Path> screenshots = ScreenshotActions.getScreenshots();
-
-                    return screenshots.parallelStream()
-                            .flatMap(path -> ScreenshotTexture.createScreenshot(client.getTextureManager(), path).stream())
-                            .peek(screenshotImage -> screenshotImage.load()
-                                    .exceptionally(throwable -> {
-                                        Snapper.LOGGER.error("An error occurred while loading the screenshot list", throwable);
-                                        return null;
-                                    }))
-                            .sorted(Comparator.<ScreenshotTexture, FileTime>comparing(texture ->
-                                    SafeFiles.getLastModifiedTime(texture.getPath()).orElse(FileTime.fromMillis(0L))).reversed())
-                            .toList();
-                })
-                .exceptionally(throwable -> {
-                    Snapper.LOGGER.error("An error occurred while loading the screenshot list", throwable);
-                    return Collections.emptyList();
-                });
-    }
+    protected abstract ScreenshotEntry createEntry(ScreenshotTexture texture);
 
     public abstract static class Entry extends ObjectSelectionList.Entry<Entry> implements AutoCloseable {
         public void close() {
@@ -164,10 +178,10 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         }
 
         @Override
-        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+        public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
             if (this.client.screen == null) throw new IllegalStateException();
 
-            context.drawString(
+            context.text(
                     this.client.font,
                     LOADING_LIST_TEXT,
                     (this.client.screen.width - this.client.font.width(LOADING_LIST_TEXT)) / 2,
@@ -178,7 +192,7 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
 
             String loadString = LoadingDotsText.get(Util.getMillis());
 
-            context.drawString(
+            context.text(
                     this.client.font,
                     loadString,
                     (this.client.screen.width - this.client.font.width(loadString)) / 2,
@@ -204,10 +218,10 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         }
 
         @Override
-        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+        public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
             if (this.minecraft.screen == null) throw new IllegalStateException();
 
-            context.drawString(
+            context.text(
                     this.minecraft.font,
                     EMPTY_LIST_TEXT,
                     (this.minecraft.screen.width - this.minecraft.font.width(EMPTY_LIST_TEXT)) / 2,
@@ -216,7 +230,7 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
                     false
             );
 
-            context.drawString(
+            context.text(
                     this.minecraft.font,
                     EMPTY_CUSTOM_LIST_TEXT,
                     (this.minecraft.screen.width - this.minecraft.font.width(EMPTY_CUSTOM_LIST_TEXT)) / 2,
@@ -232,9 +246,8 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
                 .ofLocalizedDateTime(FormatStyle.SHORT)
                 .withZone(ZoneId.systemDefault());
 
+        public final ScreenshotTexture texture;
         public final FileTime lastModified;
-        public final ScreenshotTexture icon;
-        public final Screen screenParent;
 
         protected final Component fileName;
         protected final Component creation;
@@ -243,13 +256,13 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         protected boolean clickThroughHovered = false;
         protected final int index;
 
-        public ScreenshotEntry(ScreenshotTexture icon) {
-            this.screenParent = parent;
-            this.icon = icon;
-            this.index = children().indexOf(this);
-            this.lastModified = SafeFiles.getLastModifiedTime(icon.getPath()).orElse(FileTime.fromMillis(0L));
+        public ScreenshotEntry(ScreenshotTexture texture) {
+            this.texture = texture;
 
-            String fileName = icon.getPath().getFileName().toString();
+            this.index = children().indexOf(this);
+            this.lastModified = SafeFiles.getLastModifiedTime(texture.path).orElse(FileTime.fromMillis(0L));
+
+            String fileName = texture.path.getFileName().toString();
 
             this.fileName = StringUtil.isNullOrEmpty(fileName) ?
                     Component.translatable("text.snapper.generic", this.index + 1) :
@@ -259,13 +272,18 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
 
             long creationTime = 0;
             try {
-                creationTime = Files.readAttributes(icon.getPath(), BasicFileAttributes.class).creationTime().toMillis();
+                creationTime = Files.readAttributes(texture.path, BasicFileAttributes.class).creationTime().toMillis();
             } catch (IOException ignored) {
             }
 
-            if (creationTime != -1L) creation = Component.literal(DATE_FORMAT.format(Instant.ofEpochMilli(creationTime)));
+            if (creationTime != -1L)
+                creation = Component.literal(DATE_FORMAT.format(Instant.ofEpochMilli(creationTime)));
 
             this.creation = creation;
+        }
+
+        public void clear() {
+            texture.clear();
         }
 
         @Override
@@ -282,19 +300,9 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         }
 
         public boolean click() {
-            if (this.icon == null) return false;
             playButtonClickSound(minecraft.getSoundManager());
-            minecraft.setScreen(new ScreenshotViewerScreen(this.icon, icon.getPath(), this.screenParent, null));
+            minecraft.setScreen(new ScreenshotViewerScreen(texture, parent, null));
             return true;
-        }
-
-        @Override
-        public void close() {
-            this.icon.close();
-        }
-
-        public long lastModified() {
-            return lastModified.toMillis();
         }
     }
 }

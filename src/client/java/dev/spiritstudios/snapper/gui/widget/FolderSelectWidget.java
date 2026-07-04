@@ -5,14 +5,14 @@ import dev.spiritstudios.snapper.gui.overlay.ExternalDialogOverlay;
 import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class FolderSelectWidget extends AbstractContainerWidget implements ContainerEventHandler {
-    private static final ResourceLocation FOLDER_ICON = Snapper.id("screenshots/folder");
-    private static final ResourceLocation RESET_ICON = Snapper.id("screenshots/reset");
+    private static final Identifier FOLDER_ICON = Snapper.id("screenshots/folder");
+    private static final Identifier RESET_ICON = Snapper.id("screenshots/reset");
 
     private static final int BUTTON_WIDTH = 25; // Includes padding
 
@@ -36,7 +36,7 @@ public class FolderSelectWidget extends AbstractContainerWidget implements Conta
     private final SpriteIconButton resetButton;
 
     public FolderSelectWidget(int x, int y, int width, int height, PathFunctions pathFunctions, String placeholderKey) {
-        super(x, y, width, height, CommonComponents.EMPTY);
+        super(x, y, width, height, CommonComponents.EMPTY, AbstractScrollArea.defaultSettings(0));
         this.value = pathFunctions;
         this.active = false;
 
@@ -185,9 +185,9 @@ public class FolderSelectWidget extends AbstractContainerWidget implements Conta
     }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         for (Renderable drawable : this.children()) {
-            drawable.render(context, mouseX, mouseY, deltaTicks);
+            drawable.extractRenderState(graphics, mouseX, mouseY, a);
         }
     }
 

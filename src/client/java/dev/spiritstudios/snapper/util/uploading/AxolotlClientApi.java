@@ -8,7 +8,7 @@ import com.mojang.serialization.JsonOps;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.User;
 import net.minecraft.network.chat.Component;
@@ -157,7 +157,6 @@ public class AxolotlClientApi implements Closeable {
         );
 
         return this.client.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofString());
-
     }
 
     @Override

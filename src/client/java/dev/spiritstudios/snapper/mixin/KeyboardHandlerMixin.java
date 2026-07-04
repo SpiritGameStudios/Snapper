@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.SnapperKeybindings;
+import dev.spiritstudios.snapper.SnapperKeyMappings;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
@@ -24,10 +24,10 @@ public abstract class KeyboardHandlerMixin {
     private Minecraft minecraft;
 
     @WrapOperation(method = "keyPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Screenshot;grab(Ljava/io/File;Lcom/mojang/blaze3d/pipeline/RenderTarget;Ljava/util/function/Consumer;)V"))
-    private void showDebugChat(File gameDirectory, RenderTarget renderTarget, Consumer<Component> messageConsumer, Operation<Void> original) {
+    private void showDebugChat(File workDir, RenderTarget target, Consumer<Component> callback, Operation<Void> original) {
         original.call(
-                gameDirectory,
-                renderTarget,
+                workDir,
+                target,
                 (Consumer<Component>) message -> {
                     // Execute on the render thread.
                     Minecraft.getInstance().execute(() -> {
@@ -40,7 +40,7 @@ public abstract class KeyboardHandlerMixin {
                         SnapperToast.push(
                                 SnapperToast.Type.SCREENSHOT,
                                 Component.translatable("toast.snapper.screenshot.created"),
-                                Component.translatable(copyDeterminedDescription, message, SnapperKeybindings.RECENT_SCREENSHOT_KEY.getTranslatedKeyMessage())
+                                Component.translatable(copyDeterminedDescription, message, SnapperKeyMappings.RECENT_SCREENSHOT_KEY.getTranslatedKeyMessage())
                         );
                     });
                 }

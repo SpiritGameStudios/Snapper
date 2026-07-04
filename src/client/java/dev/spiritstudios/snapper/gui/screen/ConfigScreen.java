@@ -6,6 +6,7 @@ import dev.spiritstudios.snapper.gui.widget.ConfigSliderWidget;
 import dev.spiritstudios.snapper.gui.widget.FolderSelectWidget;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.screens.Screen;
@@ -137,14 +138,14 @@ public class ConfigScreen extends Screen {
     private AbstractWidget booleanButton(String name, Consumer<Boolean> setter, boolean currentValue) {
         Tooltip tooltip = getTooltip(name);
 
-        return CycleButton.<Boolean>builder(
+        return CycleButton.builder(
                         boolean_ -> boolean_
                                 ? CommonComponents.OPTION_ON
-                                : CommonComponents.OPTION_OFF
+                                : CommonComponents.OPTION_OFF,
+                        currentValue
                 )
                 .withValues(List.of(Boolean.TRUE, Boolean.FALSE))
                 .withTooltip(b -> tooltip)
-                .withInitialValue(currentValue)
                 .create(
                         0, 0,
                         150, 20,
@@ -163,12 +164,12 @@ public class ConfigScreen extends Screen {
     ) {
         Tooltip tooltip = getTooltip(name);
 
-        return CycleButton.<T>builder(
-                        t -> Component.translatable("config.snapper." + name + "." + t.toString().toLowerCase())
+        return CycleButton.builder(
+                        t -> Component.translatable("config.snapper." + name + "." + t.toString().toLowerCase()),
+                        currentValue
                 )
                 .withValues(Arrays.asList(clazz.getEnumConstants()))
                 .withTooltip(b -> tooltip)
-                .withInitialValue(currentValue)
                 .create(
                         0, 0,
                         150, 20,
@@ -249,13 +250,17 @@ public class ConfigScreen extends Screen {
 
     @Override
     public void onClose() {
-        assert minecraft != null;
+        var viewMode = SnapperConfig.HOLDER.get().viewMode();
 
-        minecraft.setScreen(lastScreen);
         config.saveAsync().thenRun(() -> {
-            if (lastScreen instanceof ScreenshotListScreen screenshotsScreen) {
-                screenshotsScreen.refresh();
+            if (lastScreen instanceof ReloadableScreen reloadableScreen) {
+                Minecraft.getInstance().submit(reloadableScreen::reload);
+                if (config.viewMode != viewMode) {
+                    reloadableScreen.recreateList();
+                }
             }
         });
+
+        minecraft.setScreen(lastScreen);
     }
 }

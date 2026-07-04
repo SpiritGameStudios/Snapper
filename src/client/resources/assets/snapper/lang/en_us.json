@@ -93,5 +93,6 @@
   "text.snapper.image_size": "Image Size: %dx%d",
   "text.snapper.screen_size": "Screen Size: %dx%d",
   "text.snapper.scale_factor": "Scale Factor: %s",
-  "text.snapper.scale_size": "Scaled Size: %dx%d"
+  "text.snapper.scale_size": "Scaled Size: %dx%d",
+  "button.snapper.reload": "Reload"
 }

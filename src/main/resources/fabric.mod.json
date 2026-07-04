@@ -39,10 +39,9 @@
 	],
 	"depends": {
 		"fabricloader": ">=${loader_version}",
-		"minecraft": "1.21.10",
+		"minecraft": "~26.1.2",
 		"fabric-api": "*",
-		"java": ">=21",
-		"greenhouseconfig": ">=3.0.0-"
+		"java": ">=25"
 	},
 	"custom": {
 		"modmenu": {

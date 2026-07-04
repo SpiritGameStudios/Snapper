@@ -8,7 +8,7 @@ import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +22,7 @@ public abstract class PauseScreenMixin extends Screen {
     }
 
     @Unique
-    private static final ResourceLocation SNAPPER_BUTTON_ICON = Snapper.id("screenshots/screenshot");
+    private static final Identifier SNAPPER_BUTTON_ICON = Snapper.id("screenshots/screenshot");
 
     @Inject(
             method = "init",
@@ -33,9 +33,7 @@ public abstract class PauseScreenMixin extends Screen {
             this.addRenderableWidget(
                     SpriteIconButton.builder(
                             Component.translatable("button.snapper.screenshots"),
-                            button -> {
-                                Minecraft.getInstance().setScreen(new ScreenshotListScreen(new PauseScreen(true)));
-                            },
+                            _ -> Minecraft.getInstance().setScreen(new ScreenshotListScreen(new PauseScreen(true))),
                             true
                     ).width(20).sprite(SNAPPER_BUTTON_ICON, 15, 15).build()
             ).setPosition(this.width / 2 - 130, height / 4 + 32);

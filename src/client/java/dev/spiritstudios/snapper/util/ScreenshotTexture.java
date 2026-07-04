@@ -1,12 +1,13 @@
 package dev.spiritstudios.snapper.util;
 
+import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.platform.NativeImage;
 import dev.spiritstudios.snapper.Snapper;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,42 +15,36 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ScreenshotTexture implements AutoCloseable {
-    private static final ResourceLocation UNKNOWN_SERVER = ResourceLocation.withDefaultNamespace("textures/misc/unknown_server.png");
+    private static final Identifier UNKNOWN_SERVER = Identifier.withDefaultNamespace("textures/misc/unknown_server.png");
 
     private final TextureManager textureManager;
-    private final ResourceLocation id;
-    private final Path path;
+    private final Identifier textureLocation;
+    public final Path path;
 
-    private final NativeImage image;
+    private boolean loaded;
     private DynamicTexture texture;
+    private boolean closed;
 
-    private ScreenshotTexture(TextureManager textureManager, ResourceLocation id, Path path) throws IOException {
+    private ScreenshotTexture(TextureManager textureManager, Identifier textureLocation, Path path) throws IOException {
         this.textureManager = textureManager;
-        this.id = id;
+        this.textureLocation = textureLocation;
 
         this.path = path;
-
-        try (InputStream stream = Files.newInputStream(path)) {
-            this.image = NativeImage.read(stream);
-        }
     }
 
-    public CompletableFuture<Void> load() {
-        return Minecraft.getInstance().submit(() -> {
-            this.texture = new DynamicTexture(this.id::toString, this.image);
-            this.textureManager.register(this.id, this.texture);
-        });
-    }
-
+    @SuppressWarnings("deprecation") // Vanilla uses sha1 for this, copying it
     public static Optional<ScreenshotTexture> createScreenshot(TextureManager textureManager, Path path) {
+        String name = path.getFileName().toString();
+
         try {
             return Optional.of(new ScreenshotTexture(
                     textureManager,
-					Snapper.id(
-							"screenshots/" + Util.sanitizeName(path.getFileName().toString(), ResourceLocation::validPathChar) + "/icon"
-					),
+                    Snapper.id(
+                            "screenshots/" + Util.sanitizeName(name, Identifier::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(name)
+                    ),
                     path
             ));
         } catch (IOException e) {
@@ -57,16 +52,76 @@ public class ScreenshotTexture implements AutoCloseable {
         }
     }
 
-    /*
-     * Must be called on render thread
-     */
-    public void enableFiltering() {
-        this.texture.setFilter(true, true);
+    public NativeImage load() {
+        try (InputStream stream = Files.newInputStream(path)) {
+            return NativeImage.read(stream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void destroy() {
-        this.textureManager.release(this.id);
-        this.texture.close();
+    private static final int MAX_LOADING = 10;
+    private static final AtomicInteger CURRENTLY_LOADING = new AtomicInteger();
+
+    public synchronized void startLoading(Minecraft minecraft, boolean force) {
+        if (!isLoaded() && (CURRENTLY_LOADING.get() < MAX_LOADING || force)) {
+            CURRENTLY_LOADING.incrementAndGet();
+
+            CompletableFuture
+                    .supplyAsync(this::load, Util.nonCriticalIoPool())
+                    .thenAcceptAsync(this::upload, minecraft)
+                    .whenComplete((_, _) -> {
+                        CURRENTLY_LOADING.decrementAndGet();
+                    });
+        }
+    }
+
+    public synchronized void upload(NativeImage image) {
+        try {
+            this.checkOpen();
+            if (this.texture == null) {
+                this.texture = new DynamicTexture(() -> "Screenshot " + this.textureLocation, image);
+            } else {
+                this.texture.setPixels(image);
+                this.texture.upload();
+            }
+
+            this.textureManager.register(this.textureLocation, this.texture);
+            loaded = true;
+        } catch (Throwable throwable) {
+            image.close();
+            this.clear();
+            throw throwable;
+        }
+    }
+
+    public void clear() {
+        this.checkOpen();
+        if (this.texture != null) {
+            this.textureManager.release(this.textureLocation);
+            this.texture.close();
+            this.texture = null;
+            this.loaded = false;
+        }
+    }
+
+    public void close() {
+        this.clear();
+        this.closed = true;
+    }
+
+    public boolean isLoaded() {
+        return this.loaded;
+    }
+
+    public boolean isClosed() {
+        return this.closed;
+    }
+
+    private void checkOpen() {
+        if (this.closed) {
+            throw new IllegalStateException("ScreenshotTexture already closed");
+        }
     }
 
     public int getWidth() {
@@ -77,19 +132,7 @@ public class ScreenshotTexture implements AutoCloseable {
         return this.texture != null ? this.texture.getTexture().getHeight(0) : 64;
     }
 
-    public ResourceLocation getTextureId() {
-        return this.texture != null ? this.id : UNKNOWN_SERVER;
-    }
-
-    public boolean loaded() {
-        return texture != null;
-    }
-
-    public Path getPath() {
-        return path;
-    }
-
-    public void close() {
-        this.destroy();
+    public Identifier textureLocation() {
+        return this.texture != null ? this.textureLocation : UNKNOWN_SERVER;
     }
 }

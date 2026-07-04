@@ -1,16 +1,12 @@
 package dev.spiritstudios.snapper.gui.widget;
 
-import dev.spiritstudios.snapper.mixin.accessor.AbstractSliderButtonAccessor;
-import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;

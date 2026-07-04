@@ -6,7 +6,7 @@ import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -15,35 +15,35 @@ import org.lwjgl.glfw.GLFW;
 import java.nio.file.Path;
 import java.util.List;
 
-public final class SnapperKeybindings {
-    public static final KeyMapping.Category SNAPPER = KeyMapping.Category.register(Snapper.id(Snapper.MOD_ID));
+public final class SnapperKeyMappings {
+    public static final KeyMapping.Category SNAPPER_CATEGORY = KeyMapping.Category.register(Snapper.id(Snapper.MOD_ID));
 
     public static final KeyMapping PANORAMA_KEY = new KeyMapping(
             "key.snapper.panorama",
             GLFW.GLFW_KEY_F8,
-            SNAPPER
+            SNAPPER_CATEGORY
     );
 
     public static final KeyMapping RECENT_SCREENSHOT_KEY = new KeyMapping(
             "key.snapper.recent",
             GLFW.GLFW_KEY_O,
-            SNAPPER
+            SNAPPER_CATEGORY
     );
 
     public static final KeyMapping SCREENSHOT_MENU_KEY = new KeyMapping(
             "key.snapper.screenshot_menu",
             GLFW.GLFW_KEY_V,
-            SNAPPER
+            SNAPPER_CATEGORY
     );
 
     public static void init() {
-        KeyBindingHelper.registerKeyBinding(PANORAMA_KEY);
-        KeyBindingHelper.registerKeyBinding(RECENT_SCREENSHOT_KEY);
-        KeyBindingHelper.registerKeyBinding(SCREENSHOT_MENU_KEY);
+        KeyMappingHelper.registerKeyMapping(PANORAMA_KEY);
+        KeyMappingHelper.registerKeyMapping(RECENT_SCREENSHOT_KEY);
+        KeyMappingHelper.registerKeyMapping(SCREENSHOT_MENU_KEY);
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (PANORAMA_KEY.consumeClick()) SnapperKeybindings.takePanorama(client);
-            while (RECENT_SCREENSHOT_KEY.consumeClick()) SnapperKeybindings.openRecentScreenshot(client);
+            while (PANORAMA_KEY.consumeClick()) SnapperKeyMappings.takePanorama(client);
+            while (RECENT_SCREENSHOT_KEY.consumeClick()) SnapperKeyMappings.openRecentScreenshot(client);
             while (SCREENSHOT_MENU_KEY.consumeClick()) client.setScreen(new ScreenshotListScreen(client.screen));
         });
     }
@@ -79,10 +79,8 @@ public final class SnapperKeybindings {
                         image -> {
                             client.setScreen(new ScreenshotViewerScreen(
                                     image,
-                                    latestPath,
                                     client.screen
                             ));
-                            image.load();
                         },
                         () -> SnapperToast.push(
                                 SnapperToast.Type.DENY,
@@ -90,6 +88,5 @@ public final class SnapperKeybindings {
                                 Component.translatable("toast.snapper.screenshot.recent.failure.generic")
                         )
                 );
-
     }
 }

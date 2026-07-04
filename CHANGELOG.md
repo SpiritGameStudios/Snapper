@@ -1,13 +1,9 @@
-## Snapper 1.1.1
+## Snapper 1.1.2
 
 ### Features
-- 1.21.10 support
-- Switch to Greenhouse Config
-- Add German translations
-- Replaced last of the overlays with toasts
+- 26.1 support
+- Parallel image loading (much faster!)
+- Reload Button
 
 ### Bug Fixes
-- Scrollbar math is now correct
-- Fixed hell mode
-- Fixed a few weird things with platform detection
-- We fixed so many bugs that I cannot list them all
+- Many many bugfixes related to reloading
