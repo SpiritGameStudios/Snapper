@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.modpublish)
 }
 
-val modVersion = "1.1.1"
+val modVersion = "1.1.2"
 val modId = "snapper"
 val modName = "Snapper"
 

@@ -157,7 +157,6 @@ public class AxolotlClientApi implements Closeable {
         );
 
         return this.client.sendAsync(builder.build(), HttpResponse.BodyHandlers.ofString());
-
     }
 
     @Override
