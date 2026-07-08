@@ -1,25 +1,16 @@
 package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.gui.SnapperButtonBar;
-import dev.spiritstudios.snapper.util.PlatformHelper;
-import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
-import dev.spiritstudios.snapper.util.SnapperUtil;
-import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
-import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
@@ -80,6 +71,7 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
 
         new SnapperButtonBar(
                 this,
+                this.parent,
                 this.layout,
                 () -> this.texture,
                 false,

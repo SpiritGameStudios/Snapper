@@ -2,33 +2,20 @@ package dev.spiritstudios.snapper.gui.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.serialization.Codec;
-import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.SnapperButtonBar;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
 import dev.spiritstudios.snapper.gui.widget.ScreenshotsWidget;
-import dev.spiritstudios.snapper.gui.widget.ViewModeButton;
 import dev.spiritstudios.snapper.util.PlatformHelper;
-import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.SpriteIconButton;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
-import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
-
-import java.nio.file.Path;
 
 public class ScreenshotListScreen extends Screen implements ReloadableScreen {
     private final Screen parent;
@@ -79,6 +66,7 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
         this.layout.addTitleHeader(this.title, this.font);
 
         this.bar = new SnapperButtonBar(
+                this,
                 this,
                 this.layout,
                 () -> this.selectedScreenshot != null ? this.selectedScreenshot.texture : null,

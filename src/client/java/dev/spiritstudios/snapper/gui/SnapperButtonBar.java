@@ -1,12 +1,9 @@
 package dev.spiritstudios.snapper.gui;
 
-import com.ibm.icu.impl.coll.BOCSU;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.screen.ConfigScreen;
 import dev.spiritstudios.snapper.gui.screen.PanoramaViewerScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotRenameScreen;
-import dev.spiritstudios.snapper.gui.widget.ScreenshotListWidget;
-import dev.spiritstudios.snapper.gui.widget.ScreenshotsWidget;
 import dev.spiritstudios.snapper.gui.widget.ViewModeButton;
 import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
@@ -44,6 +41,7 @@ public class SnapperButtonBar {
 
     public SnapperButtonBar(
             Screen screen,
+            Screen deleteFlowScreen,
             HeaderAndFooterLayout layout,
             Supplier<@Nullable ScreenshotTexture> getTexture,
             boolean enablePanoramaButton,
@@ -124,7 +122,7 @@ public class SnapperButtonBar {
                     ScreenshotTexture selected = getTexture.get();
 
                     if (selected != null) {
-                        ScreenshotActions.deleteScreenshot(selected.path, screen);
+                        ScreenshotActions.deleteScreenshot(selected.path, deleteFlowScreen);
                     }
                 }
         ).width(buttonWidth).build());
