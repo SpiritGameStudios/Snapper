@@ -252,15 +252,15 @@ public class ConfigScreen extends Screen {
     public void onClose() {
         var viewMode = SnapperConfig.HOLDER.get().viewMode();
 
-        config.saveAsync().thenRun(() -> {
-            if (lastScreen instanceof ReloadableScreen reloadableScreen) {
-                Minecraft.getInstance().submit(reloadableScreen::reload);
-                if (config.viewMode != viewMode) {
-                    reloadableScreen.recreateList();
-                }
-            }
-        });
+        config.saveAsync();
 
-        minecraft.setScreen(lastScreen);
+        if (lastScreen instanceof ReloadableScreen reloadableScreen) {
+            Minecraft.getInstance().submit(reloadableScreen::reload);
+            if (config.viewMode != viewMode) {
+                reloadableScreen.recreateList();
+            }
+        }
+
+        minecraft.gui.setScreen(lastScreen);
     }
 }

@@ -17,8 +17,10 @@ public class ExternalDialogOverlay extends Overlay {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        if (this.minecraft.screen != null) {
-            this.minecraft.screen.extractRenderStateWithTooltipAndSubtitles(graphics, mouseX, mouseY, a);
+        if (this.minecraft.gui.screen() != null) {
+            this.minecraft.gui.screen().extractRenderStateWithTooltipAndSubtitles(graphics, 0, 0, a);
+        } else {
+            this.minecraft.gui.hud.extractDeferredSubtitles();
         }
 
         graphics.nextStratum();
@@ -43,6 +45,6 @@ public class ExternalDialogOverlay extends Overlay {
     }
 
     public void close() {
-        this.minecraft.setOverlay(null);
+        this.minecraft.gui.setOverlay(null);
     }
 }

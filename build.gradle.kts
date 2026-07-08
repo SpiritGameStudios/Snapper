@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.modpublish)
 }
 
-val modVersion = "1.1.2"
+val modVersion = "1.1.3"
 val modId = "snapper"
 val modName = "Snapper"
 
@@ -31,11 +31,6 @@ repositories {
 
     maven("https://maven.greenhouse.lgbt/releases/") {
         name = "Greenhouse Releases"
-        content { includeGroupAndSubgroups("lgbt.greenhouse") }
-    }
-
-    maven("https://maven.greenhouse.lgbt/snapshots/") {
-        name = "Greenhouse Snapshots"
         content { includeGroupAndSubgroups("lgbt.greenhouse") }
     }
 
@@ -73,16 +68,23 @@ loom {
     runs.configureEach { jvmArguments.addAll(debugArgs) }
 }
 
+val greenhouseModdingApiAttribute = Attribute.of("lgbt.greenhouse.modding.api", String::class.java)
+val greenhouseModdingPlatformAttribute = Attribute.of("lgbt.greenhouse.modding.platform", String::class.java)
+
 dependencies {
     minecraft(libs.minecraft)
 
     implementation(libs.fabric.loader)
     implementation(libs.fabric.api)
 
-    compileOnlyApi(libs.greenhouse.config.api)
+    compileOnly(libs.greenhouse.config) {
+        attributes {
+            attribute(greenhouseModdingApiAttribute, "") // The value of the attribute must remain an empty string.
+        }
+    }
 
-    runtimeOnly(libs.greenhouse.config.fabric)
-    include(libs.greenhouse.config.fabric)
+    runtimeOnly(libs.greenhouse.config)
+    include(libs.greenhouse.config)
 
     compileOnly(libs.modmenu)
 

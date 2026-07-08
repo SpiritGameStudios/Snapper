@@ -76,7 +76,7 @@ public class FolderSelectWidget extends AbstractContainerWidget implements Conta
                         Component.translatable("config.snapper.customScreenshotFolder.select"),
                         button -> {
                             ExternalDialogOverlay overlay = new ExternalDialogOverlay();
-                            client.setOverlay(overlay);
+                            client.gui.setOverlay(overlay);
 
                             DirectoryConfigUtil.openFolderSelect(
                                             Component.translatable("prompt.snapper.folder_select")

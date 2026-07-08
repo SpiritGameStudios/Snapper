@@ -1,48 +1,70 @@
 package dev.spiritstudios.snapper.mixin;
 
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
+import net.minecraft.client.gui.components.CommonButtons;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.options.AccessibilityOptionsScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Objects;
-
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen {
-    @Unique
-    private static final Identifier SNAPPER_BUTTON_ICON = Snapper.id("screenshots/screenshot");
+    @Shadow
+    protected abstract int getHorizontalPosition(int currentButton, int numberOfButtons, int buttonWidth);
 
     protected TitleScreenMixin(Component title) {
         super(title);
     }
 
-    @Inject(
-            method = "init",
-            at = @At("HEAD")
-    )
-    protected void init(CallbackInfo ci) {
+    @Definition(id = "numberOfButtons", local = @Local(type = int.class, name = "numberOfButtons"))
+    @Expression("numberOfButtons = ?")
+    @Inject(method = "init", at = @At(value = "MIXINEXTRAS:EXPRESSION", shift = At.Shift.AFTER))
+    private void increaseNumberOfButtons(CallbackInfo ci, @Local(name = "numberOfButtons") LocalIntRef numberOfButtons) {
         if (SnapperConfig.HOLDER.get().snapperButton().showOnTitleScreen()) {
-			Objects.requireNonNull(minecraft);
+            numberOfButtons.set(numberOfButtons.get() + 1);
+        }
+    }
 
-			int y = this.height / 4 + 48;
-			int spacingY = 24;
+    @WrapOperation(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/TitleScreen;getHorizontalPosition(III)I"))
+    private int unInlineNumberOfButtons(TitleScreen instance, int currentButton, int ignored, int buttonWidth, Operation<Integer> original, @Local(name = "numberOfButtons") int numberOfButtons) {
+        return original.call(instance, currentButton, numberOfButtons, buttonWidth);
+    }
 
-            this.addRenderableWidget(
-                    SpriteIconButton.builder(
-                            Component.translatable("button.snapper.screenshots"),
-                            _ -> this.minecraft.setScreen(new ScreenshotListScreen((TitleScreen) ((Object) this))),
-                            true
-                    ).width(20).sprite(SNAPPER_BUTTON_ICON, 15, 15).build()
-            ).setPosition(this.width / 2 - 124, y + spacingY);
+    @Definition(id = "accessibility", local = @Local(type = SpriteIconButton.class, name = "accessibility"))
+    @Definition(id = "setPosition", method = "Lnet/minecraft/client/gui/components/SpriteIconButton;setPosition(II)V")
+    @Expression("accessibility.setPosition(?, ?)")
+    @Inject(method = "init", at = @At(value = "MIXINEXTRAS:EXPRESSION", shift = At.Shift.AFTER))
+    private void addButton(
+            CallbackInfo ci,
+            @Local(name = "currentButton") LocalIntRef currentButton,
+            @Local(name = "numberOfButtons") int numberOfButtons,
+            @Local(name = "topPos") int topPos
+    ) {
+        if (SnapperConfig.HOLDER.get().snapperButton().showOnTitleScreen()) {
+            SpriteIconButton snapperButton = this.addRenderableWidget(Snapper.createSnapperButton(20, _ -> {
+                this.minecraft.gui.setScreen(new ScreenshotListScreen(this));
+            }));
+
+            var buttonIndex = currentButton.get() + 1;
+            currentButton.set(buttonIndex);
+
+            snapperButton.setPosition(this.getHorizontalPosition(buttonIndex, numberOfButtons, 20), topPos);
         }
     }
 }

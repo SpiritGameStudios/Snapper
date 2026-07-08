@@ -1,16 +1,17 @@
 package dev.spiritstudios.snapper.mixin;
 
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.sugar.Local;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -21,22 +22,19 @@ public abstract class PauseScreenMixin extends Screen {
         super(title);
     }
 
-    @Unique
-    private static final Identifier SNAPPER_BUTTON_ICON = Snapper.id("screenshots/screenshot");
-
+    @Definition(id = "iconButtonRow", local = @Local(type = LinearLayout.class, name = "iconButtonRow"))
+    @Definition(id = "addChild", method = "Lnet/minecraft/client/gui/layouts/LinearLayout;addChild(Lnet/minecraft/client/gui/layouts/LayoutElement;)Lnet/minecraft/client/gui/layouts/LayoutElement;")
+    @Definition(id = "playerReportingButton", local = @Local(type = SpriteIconButton.class, name = "playerReportingButton"))
+    @Expression("iconButtonRow.addChild(playerReportingButton)")
     @Inject(
-            method = "init",
-            at = @At("TAIL")
+            method = "createPauseMenu",
+            at = @At(value = "MIXINEXTRAS:EXPRESSION", shift = At.Shift.AFTER)
     )
-    protected void initWidgets(CallbackInfo ci) {
+    protected void addSnapperButton(CallbackInfo ci, @Local(name = "iconButtonRow") LinearLayout iconButtonRow) {
         if (SnapperConfig.HOLDER.get().snapperButton().showInGameMenu()) {
-            this.addRenderableWidget(
-                    SpriteIconButton.builder(
-                            Component.translatable("button.snapper.screenshots"),
-                            _ -> Minecraft.getInstance().setScreen(new ScreenshotListScreen(new PauseScreen(true))),
-                            true
-                    ).width(20).sprite(SNAPPER_BUTTON_ICON, 15, 15).build()
-            ).setPosition(this.width / 2 - 130, height / 4 + 32);
+            iconButtonRow.addChild(Snapper.createSnapperButton(20, _ -> {
+                this.minecraft.gui.setScreen(new ScreenshotListScreen(this));
+            }));
         }
     }
 }

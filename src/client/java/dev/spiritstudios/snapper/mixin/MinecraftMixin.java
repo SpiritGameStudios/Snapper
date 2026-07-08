@@ -70,7 +70,7 @@ public abstract class MinecraftMixin {
     )
     private void applyThirdPersonCameraRotation(LocalPlayer player, float value, Operation<Void> op, @Share("yaw") LocalFloatRef yaw) {
         if (!this.options.getCameraType().isFirstPerson())
-            ((CameraAccessor) this.gameRenderer.getMainCamera()).invokeSetRotation(yaw.get(), value);
+            ((CameraAccessor) this.gameRenderer.mainCamera()).invokeSetRotation(yaw.get(), value);
         else op.call(player, value);
     }
 

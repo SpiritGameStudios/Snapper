@@ -1,6 +1,5 @@
 package dev.spiritstudios.snapper.mixin;
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.screen.PanoramaViewerScreen;
 import net.minecraft.client.gui.render.GuiRenderer;
@@ -24,8 +23,8 @@ public class GuiRendererMixin {
     @Final
     private CubeMap cubeMap;
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", ordinal = 0))
-    private void renderSnapperPanorama(GpuBufferSlice fogBuffer, CallbackInfo ci) {
+    @Inject(method = "render", at = @At("HEAD"))
+    private void renderSnapperPanorama(CallbackInfo ci) {
         PanoramaRenderState pano = renderState.getData(PanoramaViewerScreen.SNAPPER_PANORAMA);
 
         if (pano != null) {

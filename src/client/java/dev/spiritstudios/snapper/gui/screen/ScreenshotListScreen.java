@@ -100,7 +100,7 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
 
     @Override
     public void onClose() {
-        super.onClose();
+        this.minecraft.gui.setScreen(this.parent);
         screenshots.clearEntries();
     }
 
@@ -116,7 +116,7 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
     }
 
     public void toggleGrid() {
-        SnapperConfig.edit(m -> m.viewMode = SnapperConfig.HOLDER.get().viewMode() == ViewMode.GRID ? ViewMode.LIST : ViewMode.GRID);
+        SnapperConfig.editAsync(m -> m.viewMode = SnapperConfig.HOLDER.get().viewMode() == ViewMode.GRID ? ViewMode.LIST : ViewMode.GRID);
 
         recreateList();
     }
@@ -128,7 +128,7 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
         }
 
         if (input.key() == InputConstants.KEY_F5) {
-            minecraft.setScreen(new ScreenshotListScreen(this.parent));
+            minecraft.gui.setScreen(new ScreenshotListScreen(this.parent));
             return true;
         }
 
@@ -141,7 +141,7 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
         }
 
         if (input.key() == InputConstants.KEY_RETURN) {
-            minecraft.setScreen(new ScreenshotViewerScreen(selectedScreenshot.texture, this));
+            minecraft.gui.setScreen(new ScreenshotViewerScreen(selectedScreenshot.texture, this));
             return true;
         }
 

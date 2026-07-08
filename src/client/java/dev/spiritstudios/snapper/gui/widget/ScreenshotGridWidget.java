@@ -30,8 +30,9 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
     }
 
     private int getColumnCount() {
-        if (minecraft.screen != null) {
-            int width = minecraft.screen.width;
+        Screen screen = minecraft.gui.screen();
+        if (screen != null) {
+            int width = screen.width;
 
             if (width < 480) {
                 return 2;
@@ -163,7 +164,7 @@ public class ScreenshotGridWidget extends ScreenshotsWidget {
                 );
             }
 
-            if (minecraft.options.touchscreen().get() || (isHovering && mouseX < getX() + getWidth()) || safeIsSelected(this)) {
+            if ((isHovering && mouseX < getX() + getWidth()) || safeIsSelected(this)) {
                 graphics.blit(
                         RenderPipelines.GUI_TEXTURED,
                         GRID_SELECTION_BACKGROUND_TEXTURE,

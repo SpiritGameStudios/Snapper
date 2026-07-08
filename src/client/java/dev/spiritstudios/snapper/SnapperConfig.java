@@ -2,6 +2,7 @@ package dev.spiritstudios.snapper;
 
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
+import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
@@ -12,6 +13,8 @@ import lgbt.greenhouse.config.api.v3.dfu.builder.schema.TypeTemplateBuilder;
 import lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigRelocateFieldsFix;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonCLang;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 
 import java.nio.file.Path;
@@ -175,15 +178,10 @@ public record SnapperConfig(boolean copyTakenScreenshot,
         return new Mutable();
     }
 
-    public static void edit(Consumer<Mutable> editor) {
-        var mutable = mutable();
-        editor.accept(mutable);
-        mutable.save();
-    }
-
     public static CompletableFuture<Void> editAsync(Consumer<Mutable> editor) {
-        var mutable = mutable();
+        Mutable mutable = mutable();
         editor.accept(mutable);
+
         return mutable.saveAsync();
     }
 
@@ -219,12 +217,27 @@ public record SnapperConfig(boolean copyTakenScreenshot,
             termsAccepted = config.axolotlClient.termsStatus;
         }
 
-        public void save() {
-            HOLDER.save(build(), null);
-        }
 
         public CompletableFuture<Void> saveAsync() {
-            return CompletableFuture.runAsync(this::save, Util.ioPool());
+            SnapperConfig newValue = this.build();
+
+            var oldValue = HOLDER.get();
+            HOLDER.set(newValue, null);
+
+            return CompletableFuture.runAsync(
+                    () -> HOLDER.save(newValue, null),
+                    Util.ioPool()
+            ).exceptionallyCompose(error -> Minecraft.getInstance().submit(() -> {
+                Snapper.LOGGER.error("Failed to save configuration file.", error);
+
+                HOLDER.set(oldValue, null);
+
+                SnapperToast.push(
+                        SnapperToast.Type.DENY,
+                        Component.translatable("toast.snapper.config.failure.title"),
+                        Component.translatable("toast.snapper.config.failure.description")
+                );
+            }));
         }
 
         private SnapperConfig build() {
