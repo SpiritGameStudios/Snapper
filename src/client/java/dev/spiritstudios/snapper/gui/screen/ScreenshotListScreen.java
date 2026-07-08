@@ -100,7 +100,7 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
 
     @Override
     public void onClose() {
-        super.onClose();
+        this.minecraft.gui.setScreen(this.parent);
         screenshots.clearEntries();
     }
 

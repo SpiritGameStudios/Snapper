@@ -56,13 +56,15 @@ public abstract class TitleScreenMixin extends Screen {
             @Local(name = "numberOfButtons") int numberOfButtons,
             @Local(name = "topPos") int topPos
     ) {
-        SpriteIconButton snapperButton = this.addRenderableWidget(Snapper.createSnapperButton(20, _ -> {
-            this.minecraft.gui.setScreen(new ScreenshotListScreen(this));
-        }));
+        if (SnapperConfig.HOLDER.get().snapperButton().showOnTitleScreen()) {
+            SpriteIconButton snapperButton = this.addRenderableWidget(Snapper.createSnapperButton(20, _ -> {
+                this.minecraft.gui.setScreen(new ScreenshotListScreen(this));
+            }));
 
-        var buttonIndex = currentButton.get() + 1;
-        currentButton.set(buttonIndex);
+            var buttonIndex = currentButton.get() + 1;
+            currentButton.set(buttonIndex);
 
-        snapperButton.setPosition(this.getHorizontalPosition(buttonIndex, numberOfButtons, 20), topPos);
+            snapperButton.setPosition(this.getHorizontalPosition(buttonIndex, numberOfButtons, 20), topPos);
+        }
     }
 }
