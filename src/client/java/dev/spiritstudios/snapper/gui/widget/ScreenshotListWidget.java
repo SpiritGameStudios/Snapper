@@ -88,7 +88,7 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
                 );
             }
 
-            if (minecraft.options.touchscreen().get() || isHovering) {
+            if (isHovering) {
                 graphics.fill(getContentX(), getContentY(), getContentX() + 32, getContentY() + 32, 0xA0909090);
                 graphics.blitSprite(
                         RenderPipelines.GUI_TEXTURED,

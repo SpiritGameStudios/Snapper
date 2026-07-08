@@ -16,8 +16,7 @@ public class ScreenshotRenameScreen extends Screen {
     private final Path screenshot;
     private final EditBox renameInput;
     private final Component RENAME_INPUT_TEXT = Component.translatable("text.snapper.rename_input");
-    private final Minecraft client = Minecraft.getInstance();
-    private final Font textRenderer = client.font;
+    private final Font textRenderer = minecraft.font;
     private final Screen parent;
 
     public ScreenshotRenameScreen(Path screenshot, Screen parent) {
@@ -56,11 +55,11 @@ public class ScreenshotRenameScreen extends Screen {
             reloadableScreen.reload();
         }
 
-        client.setScreen(this.parent);
+        minecraft.gui.setScreen(this.parent);
     }
 
     @Override
     public void onClose() {
-        this.client.setScreen(this.parent);
+        this.minecraft.gui.setScreen(this.parent);
     }
 }

@@ -21,12 +21,12 @@ public class ScreenshotActions {
     public static void deleteScreenshot(Path path, Screen screen) {
         if (!Files.exists(path)) return;
 
-        Minecraft client = Minecraft.getInstance();
-        client.setScreen(
+        Minecraft minecraft = Minecraft.getInstance();
+        minecraft.gui.setScreen(
                 new ConfirmScreen(
                         confirmed -> {
                             if (confirmed) {
-                                client.setScreen(new ProgressScreen(true));
+                                minecraft.gui.setScreen(new ProgressScreen(true));
                                 try {
                                     Files.deleteIfExists(path);
                                 } catch (IOException e) {
@@ -38,7 +38,7 @@ public class ScreenshotActions {
                                 }
                             }
 
-                            client.setScreen(screen);
+                            minecraft.gui.setScreen(screen);
                         },
                         Component.translatable("text.snapper.delete_question"),
                         Component.translatable("text.snapper.delete_warning", path.getFileName()),

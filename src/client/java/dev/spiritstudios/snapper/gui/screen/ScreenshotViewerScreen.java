@@ -29,7 +29,6 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
     private static final Identifier MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_list_background.png");
     private static final Identifier INWORLD_MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
 
-    private final Minecraft client = Minecraft.getInstance();
     private final ScreenshotTexture texture;
 
     private final Screen parent;
@@ -67,7 +66,7 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
             if (shouldRecreateParent) reloadable.recreateList();
         }
 
-        this.client.setScreen(this.parent);
+        this.minecraft.gui.setScreen(this.parent);
     }
 
     @Override

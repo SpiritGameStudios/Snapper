@@ -71,7 +71,7 @@ public class PanoramaViewerScreen extends Screen {
             texture.close();
         }
 
-        Minecraft.getInstance().setScreen(this.parent);
+        this.minecraft.gui.setScreen(this.parent);
     }
 
     @Override
@@ -97,10 +97,10 @@ public class PanoramaViewerScreen extends Screen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         Minecraft minecraft = Minecraft.getInstance();
-        float delta = (float) ((double) a * minecraft.gameRenderer.getGameRenderState().optionsRenderState.panoramaSpeed);
+        float delta = (float) ((double) a * minecraft.gameRenderer.gameRenderState().optionsRenderState.panoramaSpeed);
         this.spin = Mth.wrapDegrees(this.spin + delta * 0.1F);
 
-        minecraft.gameRenderer.getGameRenderState().guiRenderState.setData(SNAPPER_PANORAMA, new PanoramaRenderState(-this.spin));
+        minecraft.gameRenderer.gameRenderState().guiRenderState.setData(SNAPPER_PANORAMA, new PanoramaRenderState(-this.spin));
 
         graphics.centeredText(
                 this.font,

@@ -65,7 +65,7 @@ public class SnapperButtonBar {
 
         bottomRow.addChild(SpriteIconButton.builder(
                 Component.translatable("config.snapper.title"),
-                _ -> minecraft.setScreen(new ConfigScreen(screen)),
+                _ -> minecraft.gui.setScreen(new ConfigScreen(screen)),
                 true
         ).width(20).sprite(SETTINGS_ICON, 15, 15).build());
 
@@ -95,7 +95,7 @@ public class SnapperButtonBar {
         SpriteIconButton panoramaButton = bottomRow.addChild(
                 SpriteIconButton.builder(
                         Component.translatable("button.snapper.screenshots"),
-                        _ -> minecraft.setScreen(new PanoramaViewerScreen(Component.translatable("menu.snapper.panorama").getString(), screen)),
+                        _ -> minecraft.gui.setScreen(new PanoramaViewerScreen(Component.translatable("menu.snapper.panorama").getString(), screen)),
                         true
                 ).width(20).sprite(hasPanorama ? PANORAMA_BUTTON_ICON : PANORAMA_BUTTON_DISABLED_ICON, 15, 15).build());
 
@@ -135,7 +135,7 @@ public class SnapperButtonBar {
                     ScreenshotTexture selected = getTexture.get();
 
                     if (selected != null) {
-                        minecraft.setScreen(new ScreenshotRenameScreen(selected.path, screen));
+                        minecraft.gui.setScreen(new ScreenshotRenameScreen(selected.path, screen));
                     }
                 }
         ).width(buttonWidth).build());

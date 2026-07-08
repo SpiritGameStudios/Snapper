@@ -3,8 +3,7 @@
   "package": "dev.spiritstudios.snapper.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "InGameHudMixin",
-    "KeyboardHandlerMixin",
+    "HudMixin",
     "MinecraftMixin",
     "PauseScreenMixin",
     "ScreenshotMixin",

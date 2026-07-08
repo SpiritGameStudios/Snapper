@@ -166,10 +166,10 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
 
     public static class LoadingEntry extends Entry implements AutoCloseable {
         private static final Component LOADING_LIST_TEXT = Component.translatable("text.snapper.loading");
-        private final Minecraft client;
+        private final Minecraft minecraft;
 
         public LoadingEntry(Minecraft client) {
-            this.client = client;
+            this.minecraft = client;
         }
 
         @Override
@@ -179,12 +179,13 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
 
         @Override
         public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
-            if (this.client.screen == null) throw new IllegalStateException();
+            Screen screen = this.minecraft.gui.screen();
+            if (screen == null) throw new IllegalStateException();
 
             context.text(
-                    this.client.font,
+                    this.minecraft.font,
                     LOADING_LIST_TEXT,
-                    (this.client.screen.width - this.client.font.width(LOADING_LIST_TEXT)) / 2,
+                    (screen.width - this.minecraft.font.width(LOADING_LIST_TEXT)) / 2,
                     getY() + (getHeight() - 9) / 2,
                     CommonColors.WHITE,
                     false
@@ -193,9 +194,9 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
             String loadString = LoadingDotsText.get(Util.getMillis());
 
             context.text(
-                    this.client.font,
+                    this.minecraft.font,
                     loadString,
-                    (this.client.screen.width - this.client.font.width(loadString)) / 2,
+                    (screen.width - this.minecraft.font.width(loadString)) / 2,
                     getY() + (getHeight() - 9) / 2 + 9,
                     CommonColors.GRAY,
                     false
@@ -219,12 +220,13 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
 
         @Override
         public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean isHovering, float partialTick) {
-            if (this.minecraft.screen == null) throw new IllegalStateException();
+            Screen screen = this.minecraft.gui.screen();
+            if (screen == null) throw new IllegalStateException();
 
             context.text(
                     this.minecraft.font,
                     EMPTY_LIST_TEXT,
-                    (this.minecraft.screen.width - this.minecraft.font.width(EMPTY_LIST_TEXT)) / 2,
+                    (screen.width - this.minecraft.font.width(EMPTY_LIST_TEXT)) / 2,
                     getY() + getHeight() / 2,
                     CommonColors.WHITE,
                     false
@@ -233,7 +235,7 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
             context.text(
                     this.minecraft.font,
                     EMPTY_CUSTOM_LIST_TEXT,
-                    (this.minecraft.screen.width - this.minecraft.font.width(EMPTY_CUSTOM_LIST_TEXT)) / 2,
+                    (screen.width - this.minecraft.font.width(EMPTY_CUSTOM_LIST_TEXT)) / 2,
                     getY() + getHeight() / 2 + 10,
                     CommonColors.WHITE,
                     false
@@ -301,7 +303,7 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
 
         public boolean click() {
             playButtonClickSound(minecraft.getSoundManager());
-            minecraft.setScreen(new ScreenshotViewerScreen(texture, parent, null));
+            minecraft.gui.setScreen(new ScreenshotViewerScreen(texture, parent, null));
             return true;
         }
     }

@@ -42,7 +42,7 @@ public class SnapperToast implements Toast {
     }
 
     public static void push(Type type, Component title, Component description) {
-        Minecraft.getInstance().getToastManager().addToast(
+        Minecraft.getInstance().gui.toastManager().addToast(
                 new SnapperToast(
                         type,
                         title,

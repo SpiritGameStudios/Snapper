@@ -26,7 +26,7 @@ public final class SnapperKeyMappings {
 
     public static final KeyMapping RECENT_SCREENSHOT_KEY = new KeyMapping(
             "key.snapper.recent",
-            GLFW.GLFW_KEY_O,
+            GLFW.GLFW_KEY_B,
             SNAPPER_CATEGORY
     );
 
@@ -41,10 +41,10 @@ public final class SnapperKeyMappings {
         KeyMappingHelper.registerKeyMapping(RECENT_SCREENSHOT_KEY);
         KeyMappingHelper.registerKeyMapping(SCREENSHOT_MENU_KEY);
 
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (PANORAMA_KEY.consumeClick()) SnapperKeyMappings.takePanorama(client);
-            while (RECENT_SCREENSHOT_KEY.consumeClick()) SnapperKeyMappings.openRecentScreenshot(client);
-            while (SCREENSHOT_MENU_KEY.consumeClick()) client.setScreen(new ScreenshotListScreen(client.screen));
+        ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
+            while (PANORAMA_KEY.consumeClick()) SnapperKeyMappings.takePanorama(minecraft);
+            while (RECENT_SCREENSHOT_KEY.consumeClick()) SnapperKeyMappings.openRecentScreenshot(minecraft);
+            while (SCREENSHOT_MENU_KEY.consumeClick()) minecraft.gui.setScreen(new ScreenshotListScreen(minecraft.gui.screen()));
         });
     }
 
@@ -62,7 +62,7 @@ public final class SnapperKeyMappings {
         );
     }
 
-    private static void openRecentScreenshot(Minecraft client) {
+    private static void openRecentScreenshot(Minecraft minecraft) {
         List<Path> screenshots = ScreenshotActions.getScreenshots();
         if (screenshots.isEmpty()) {
             SnapperToast.push(
@@ -74,12 +74,12 @@ public final class SnapperKeyMappings {
         }
 
         Path latestPath = screenshots.getFirst();
-        ScreenshotTexture.createScreenshot(client.getTextureManager(), latestPath)
+        ScreenshotTexture.createScreenshot(minecraft.getTextureManager(), latestPath)
                 .ifPresentOrElse(
                         image -> {
-                            client.setScreen(new ScreenshotViewerScreen(
+                            minecraft.gui.setScreen(new ScreenshotViewerScreen(
                                     image,
-                                    client.screen
+                                    minecraft.gui.screen()
                             ));
                         },
                         () -> SnapperToast.push(

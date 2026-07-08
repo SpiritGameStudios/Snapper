@@ -2,10 +2,15 @@ package dev.spiritstudios.snapper.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.NativeImage;
 import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.SnapperKeyMappings;
+import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.util.PlatformHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +32,7 @@ public abstract class ScreenshotMixin {
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Inject(
-            method = "lambda$grab$1",
+            method = "lambda$grab$3",
             at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/NativeImage;writeToFile(Ljava/io/File;)V")
     )
     private static void lookBeforeYouLeap(NativeImage image, File file, Consumer<Component> callback, CallbackInfo ci) throws IOException {
@@ -36,7 +41,7 @@ public abstract class ScreenshotMixin {
     }
 
     @Inject(
-            method = "lambda$grab$1",
+            method = "lambda$grab$3",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Component;literal(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;", shift = At.Shift.AFTER)
     )
     private static void saveWrittenFileToClipboard(NativeImage image, File file, Consumer<Component> callback, CallbackInfo ci) {
@@ -49,8 +54,8 @@ public abstract class ScreenshotMixin {
      * @author WorldWidePixel
      * @reason Okay, I know this is weird but it's so we can use our own wrapper text for the push.
      */
-    @ModifyArg(method = "lambda$grab$1",
-    at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = 0))
+    @ModifyArg(method = "lambda$grab$3",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Component;translatable(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = 0))
     private static String changeSuccessTranslation(String existing) {
         return "toast.snapper.screenshot.created.success";
     }
@@ -65,6 +70,36 @@ public abstract class ScreenshotMixin {
                 target,
                 downscaleFactor,
                 callback
+        );
+    }
+
+    @WrapOperation(method = "grab(Lnet/minecraft/client/Minecraft;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Screenshot;grab(Ljava/io/File;Lcom/mojang/blaze3d/pipeline/RenderTarget;Ljava/util/function/Consumer;)V"))
+    private static void showDebugChat(
+            File workDir,
+            RenderTarget target,
+            Consumer<Component> callback,
+            Operation<Void> original,
+            @Local(argsOnly = true, name = "minecraft") Minecraft minecraft
+    ) {
+        original.call(
+                workDir,
+                target,
+                (Consumer<Component>) message -> {
+                    // Execute on the render thread.
+                    Minecraft.getInstance().execute(() -> {
+                        // Lovely tree of decisions to decide what instructions make sense. <3 Lynn
+                        String inGameDeterminedDescription = minecraft.gui.screen() == null ? "toast.snapper.screenshot.created.description"
+                                : "toast.snapper.screenshot.created.description_in_menu";
+                        String copyDeterminedDescription = SnapperConfig.HOLDER.get().copyTakenScreenshot() ?
+                                "toast.snapper.screenshot.created.description_copy" : inGameDeterminedDescription;
+
+                        SnapperToast.push(
+                                SnapperToast.Type.SCREENSHOT,
+                                Component.translatable("toast.snapper.screenshot.created"),
+                                Component.translatable(copyDeterminedDescription, message, SnapperKeyMappings.RECENT_SCREENSHOT_KEY.getTranslatedKeyMessage())
+                        );
+                    });
+                }
         );
     }
 }

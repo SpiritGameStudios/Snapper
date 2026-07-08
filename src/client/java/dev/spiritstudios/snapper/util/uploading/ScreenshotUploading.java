@@ -31,10 +31,10 @@ public class ScreenshotUploading {
         }
 
         if (SnapperConfig.HOLDER.get().axolotlClient().termsStatus() == AxolotlClientApi.TermsAcceptance.UNSET) {
-            Minecraft client = Minecraft.getInstance();
+            Minecraft minecraft = Minecraft.getInstance();
             CompletableFuture<Void> success = new CompletableFuture<>();
 
-            client.setScreen(new PrivacyNoticeScreen(client.screen, v -> {
+            minecraft.gui.setScreen(new PrivacyNoticeScreen(minecraft.gui.screen(), v -> {
                 if (v) upload(image).thenAccept(success::complete);
             }));
 
