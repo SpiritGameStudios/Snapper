@@ -83,7 +83,7 @@ public class PanoramaViewerScreen extends Screen {
             return;
         }
 
-        Path panoramaPath = SnapperUtil.getConfiguredScreenshotDirectory().resolve("screenshots", "panorama");
+        Path panoramaPath = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
         addRenderableWidget(Button.builder(Component.translatable("button.snapper.folder"), _ -> {
             Util.getPlatform().openPath(panoramaPath);
         }).bounds(width / 2 - 150 - 4, height - 32, 150, 20).build());
