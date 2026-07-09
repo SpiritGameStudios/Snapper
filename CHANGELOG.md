@@ -5,3 +5,4 @@
 - Fix several unintended behaviours relating to the Terms of Service screen and upload button.
 - Fix the "Open Folder" button in the panorama viewer screen.
 - Fix screenshots staying selected in the screenshot list after it has been reloaded.
+- Fix being able to open a screenshot while it is loading, breaking the viewer screen.

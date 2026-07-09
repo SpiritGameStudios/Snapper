@@ -302,6 +302,8 @@ public abstract class ScreenshotsWidget extends ObjectSelectionList<ScreenshotsW
         }
 
         public boolean click() {
+            if (!texture.isLoaded()) return false;
+
             playButtonClickSound(minecraft.getSoundManager());
             minecraft.gui.setScreen(new ScreenshotViewerScreen(texture, parent, null));
             return true;
