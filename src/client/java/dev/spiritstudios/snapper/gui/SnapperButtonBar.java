@@ -41,7 +41,7 @@ public class SnapperButtonBar {
 
     public SnapperButtonBar(
             Screen screen,
-            Screen deleteFlowScreen,
+            Screen postFlowScreen,
             HeaderAndFooterLayout layout,
             Supplier<@Nullable ScreenshotTexture> getTexture,
             boolean enablePanoramaButton,
@@ -122,7 +122,7 @@ public class SnapperButtonBar {
                     ScreenshotTexture selected = getTexture.get();
 
                     if (selected != null) {
-                        ScreenshotActions.deleteScreenshot(selected.path, deleteFlowScreen);
+                        ScreenshotActions.deleteScreenshot(selected.path, postFlowScreen);
                     }
                 }
         ).width(buttonWidth).build());
@@ -133,7 +133,7 @@ public class SnapperButtonBar {
                     ScreenshotTexture selected = getTexture.get();
 
                     if (selected != null) {
-                        minecraft.gui.setScreen(new ScreenshotRenameScreen(selected.path, screen));
+                        minecraft.gui.setScreen(new ScreenshotRenameScreen(selected.path, postFlowScreen));
                     }
                 }
         ).width(buttonWidth).build());
