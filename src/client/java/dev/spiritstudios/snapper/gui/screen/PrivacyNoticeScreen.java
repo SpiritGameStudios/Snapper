@@ -31,6 +31,7 @@ package dev.spiritstudios.snapper.gui.screen;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -50,13 +51,13 @@ public class PrivacyNoticeScreen extends Screen {
     private static final URI TERMS_URI = URI.create("https://axolotlclient.com/terms");
 
     private final Screen parent;
-    private final Consumer<Boolean> accepted;
+    private final Runnable callback;
     private MultiLineLabel message;
 
-    public PrivacyNoticeScreen(Screen parent, Consumer<Boolean> accepted) {
+    public PrivacyNoticeScreen(Screen parent, Runnable callback) {
         super(Component.translatable("snapper.privacy_notice"));
         this.parent = parent;
-        this.accepted = accepted;
+        this.callback = callback;
     }
 
     @Override
@@ -95,16 +96,21 @@ public class PrivacyNoticeScreen extends Screen {
                 Util.getPlatform().openUri(TERMS_URI)).bounds(width / 2 - (buttonWidth / 2) - buttonWidth - 5, y, buttonWidth, 20).build());
 
         addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.accept"), _ -> {
-            minecraft.gui.setScreen(parent);
             SnapperConfig.editAsync(m -> m.termsAccepted = AxolotlClientApi.TermsAcceptance.ACCEPTED);
-            accepted.accept(true);
+            this.onClose();
         }).bounds(width / 2 - (buttonWidth / 2), y, buttonWidth, 20).build());
 
         addRenderableWidget(Button.builder(Component.translatable("snapper.privacy_notice.deny"), _ -> {
-            minecraft.gui.setScreen(parent);
             SnapperConfig.editAsync(m -> m.termsAccepted = AxolotlClientApi.TermsAcceptance.DENIED);
-            accepted.accept(false);
+            this.onClose();
         }).bounds(width / 2 - (buttonWidth / 2) + buttonWidth + 5, y, buttonWidth, 20).build());
+    }
+
+
+    @Override
+    public void onClose() {
+        callback.run();
+        this.minecraft.gui.setScreen(parent);
     }
 
     private int getTitleY() {

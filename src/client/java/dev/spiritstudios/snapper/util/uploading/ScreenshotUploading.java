@@ -20,34 +20,49 @@ public class ScreenshotUploading {
 
     private static final AxolotlClientApi API = new AxolotlClientApi();
 
-    public static CompletableFuture<Void> upload(Path image) {
+    private static CompletableFuture<Void> requestTerms() {
+        Minecraft minecraft = Minecraft.getInstance();
+        CompletableFuture<Void> done = new CompletableFuture<>();
+
+        minecraft.gui.setScreen(new PrivacyNoticeScreen(minecraft.gui.screen(), () -> {
+            done.complete(null);
+        }));
+
+        return done;
+    }
+
+    private static void apiDisabledToast() {
+        SnapperToast.push(
+                SnapperToast.Type.DENY,
+                Component.translatable("toast.snapper.upload.failure"),
+                Component.translatable("toast.snapper.upload.axolotlclient.api_disabled")
+        );
+    }
+
+    public static CompletableFuture<Void> upload(Path image, boolean promptAcceptTerms) {
         if (SnapperUtil.isOfflineAccount()) {
             SnapperToast.push(
                     SnapperToast.Type.DENY,
-                    Component.translatable("toast.snapper.upload.axolotlclient.api_disabled"),
+                    Component.translatable("toast.snapper.upload.failure"),
                     Component.translatable("toast.snapper.upload.offline")
             );
             return CompletableFuture.failedFuture(new IllegalStateException("Minecraft is currently running in offline mode."));
         }
 
-        if (SnapperConfig.HOLDER.get().axolotlClient().termsStatus() == AxolotlClientApi.TermsAcceptance.UNSET) {
-            Minecraft minecraft = Minecraft.getInstance();
-            CompletableFuture<Void> success = new CompletableFuture<>();
+        AxolotlClientApi.TermsAcceptance termsStatus = SnapperConfig.HOLDER.get().axolotlClient().termsStatus();
 
-            minecraft.gui.setScreen(new PrivacyNoticeScreen(minecraft.gui.screen(), v -> {
-                if (v) upload(image).thenAccept(success::complete);
-            }));
-
-            return success;
+        if (termsStatus == AxolotlClientApi.TermsAcceptance.DENIED) {
+            apiDisabledToast();
+            return CompletableFuture.failedFuture(new IllegalStateException("AxolotlClient API is disabled."));
         }
 
-        if (SnapperConfig.HOLDER.get().axolotlClient().termsStatus() != AxolotlClientApi.TermsAcceptance.ACCEPTED) {
-            SnapperToast.push(
-                    SnapperToast.Type.UPLOAD,
-                    Component.translatable("toast.snapper.upload.failure"),
-                    Component.translatable("toast.snapper.upload.axolotlclient.api_disabled")
-            );
-            return CompletableFuture.failedFuture(new IllegalStateException("AxolotlClient API is disabled."));
+        if (termsStatus == AxolotlClientApi.TermsAcceptance.UNSET) {
+            if (promptAcceptTerms) {
+                return requestTerms().thenCompose(_ -> upload(image, false));
+            } else {
+                apiDisabledToast();
+                return CompletableFuture.failedFuture(new IllegalStateException("AxolotlClient API was not accepted."));
+            }
         }
 
         return API

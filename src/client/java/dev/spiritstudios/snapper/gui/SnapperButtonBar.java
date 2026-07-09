@@ -1,6 +1,7 @@
 package dev.spiritstudios.snapper.gui;
 
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ConfigScreen;
 import dev.spiritstudios.snapper.gui.screen.PanoramaViewerScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotRenameScreen;
@@ -9,6 +10,7 @@ import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
+import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -154,15 +156,11 @@ public class SnapperButtonBar {
 
             if (selected == null) return;
 
-            button.active = false;
-            ScreenshotUploading.upload(selected.path)
-                    .thenRun(() -> button.active = true);
+            setUploadButtonActive(false);
+            ScreenshotUploading.upload(selected.path, true).thenRun(() -> setUploadButtonActive(true));
         }).width(buttonWidth).build());
 
-        if (SnapperUtil.isOfflineAccount()) {
-            this.uploadButton.active = false;
-            this.uploadButton.setTooltip(Tooltip.create(Component.translatable("button.snapper.upload.tooltip")));
-        }
+        this.setUploadButtonActive(true);
 
         var reloadButton = SpriteIconButton.builder(
                 Component.translatable("button.snapper.reload"),
@@ -175,5 +173,23 @@ public class SnapperButtonBar {
         reloadButton.active = reload != null;
 
         topRow.addChild(reloadButton);
+    }
+
+    public void setUploadButtonActive(boolean value) {
+        if (value) {
+            if (SnapperUtil.isOfflineAccount()) {
+                this.uploadButton.active = false;
+                this.uploadButton.setTooltip(Tooltip.create(Component.translatable("button.snapper.upload.tooltip.offline")));
+            } else if (SnapperConfig.HOLDER.get().axolotlClient().termsStatus() == AxolotlClientApi.TermsAcceptance.DENIED) {
+                this.uploadButton.active = false;
+                this.uploadButton.setTooltip(Tooltip.create(Component.translatable("button.snapper.upload.tooltip.tos")));
+            } else {
+                this.uploadButton.active = true;
+                this.uploadButton.setTooltip(null);
+            }
+        } else {
+            this.uploadButton.active = false;
+            this.uploadButton.setTooltip(null);
+        }
     }
 }

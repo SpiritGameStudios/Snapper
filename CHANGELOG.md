@@ -1,12 +1,5 @@
-## Snapper 1.1.3
-
-### Features
-- 26.2 support
-
-### Changes
-- Moved View Screenshots button to align with vanilla.
-- Changed default key mapping for `Open Latest Screenshot` from O to B as O is now used for the friends menu in vanilla.
+## Snapper 1.1.4
 
 ### Bug Fixes
-- Changes to the `View Mode` setting will now apply immediately after exiting the config menu.
-- Exiting the Screenshot Viewer screen now correctly returns to the previous screen instead of closing all screens.
+- Fix a bug where deleting a screenshot from the screenshot viewer would not close the screenshot viewer, allowing you to crash the game by interacting with any button.
+- Fix several unintended behaviours relating to the Terms of Service screen and upload button.

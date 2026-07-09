@@ -98,7 +98,7 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
         this.bar.deleteButton.active = hasScreenshot;
         this.bar.openButton.active = hasScreenshot;
         this.bar.renameButton.active = hasScreenshot;
-        this.bar.uploadButton.active = !SnapperUtil.isOfflineAccount() && hasScreenshot;
+        this.bar.setUploadButtonActive(hasScreenshot);
 
         this.selectedScreenshot = screenshot;
     }
