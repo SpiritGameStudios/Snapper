@@ -138,6 +138,7 @@ public class ScreenshotListScreen extends Screen implements ReloadableScreen {
 
     @Override
     public void reload() {
+        imageSelected(null);
         screenshots.reload();
     }
 
