@@ -111,7 +111,7 @@ public class ConfigScreen extends Screen {
         ));
 
         this.layout.addToFooter(
-                Button.builder(CommonComponents.GUI_DONE, button -> this.onClose())
+                Button.builder(CommonComponents.GUI_DONE, _ -> this.onClose())
                         .width(200)
                         .build()
         );
@@ -210,7 +210,7 @@ public class ConfigScreen extends Screen {
                     }
                 },
                 t -> Component.translatable("config.snapper." + name + "." + t.toString().toLowerCase()),
-                t -> tooltip,
+                _ -> tooltip,
                 setter
         );
     }
@@ -219,8 +219,7 @@ public class ConfigScreen extends Screen {
         Tooltip tooltip = getTooltip(name);
 
         FolderSelectWidget widget = new FolderSelectWidget(
-                0, 0,
-                150, 20,
+                150,
                 new FolderSelectWidget.PathFunctions() {
                     private Path value = currentValue;
 

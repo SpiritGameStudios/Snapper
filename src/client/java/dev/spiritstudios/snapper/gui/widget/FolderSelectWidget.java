@@ -8,6 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
@@ -17,43 +19,42 @@ import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
+import javax.naming.ldap.PagedResultsControl;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class FolderSelectWidget extends AbstractContainerWidget implements ContainerEventHandler {
+public class FolderSelectWidget extends AbstractContainerWidget {
     private static final Identifier FOLDER_ICON = Snapper.id("screenshots/folder");
     private static final Identifier RESET_ICON = Snapper.id("screenshots/reset");
 
-    private static final int BUTTON_WIDTH = 25; // Includes padding
+    private static final int BUTTON_SIZE = 20;
+    private static final int PADDING = 3;
 
-    private final PathFunctions value;
-
-    private final EditBox textInput;
-    private final SpriteIconButton fileDialogButton;
+    private final EditBox editBox;
     private final SpriteIconButton resetButton;
+    private final SpriteIconButton fileDialogButton;
+    private final Minecraft minecraft = Minecraft.getInstance();
+    private final LinearLayout layout;
+    private final PathFunctions functions;
 
-    public FolderSelectWidget(int x, int y, int width, int height, PathFunctions pathFunctions, String placeholderKey) {
-        super(x, y, width, height, CommonComponents.EMPTY, AbstractScrollArea.defaultSettings(0));
-        this.value = pathFunctions;
+    public FolderSelectWidget(int width,  PathFunctions pathFunctions, String placeholderKey) {
+        super(0, 0, width, 0, CommonComponents.EMPTY);
+        this.functions = pathFunctions;
         this.active = false;
 
-        Minecraft client = Minecraft.getInstance();
-
-        this.textInput = new EditBox(
-                client.font,
-                BUTTON_WIDTH * 2, 0,
-                width - (BUTTON_WIDTH * 2),
-                20,
+        this.layout = LinearLayout.horizontal().spacing(3);
+        this.editBox = new EditBox(
+                minecraft.font, width - ((BUTTON_SIZE + PADDING) * 2), 20,
                 Component.literal(pathFunctions.get().toString())
         );
 
-        this.textInput.setHint(Component.translatableWithFallback(placeholderKey, "").withStyle(ChatFormatting.DARK_GRAY));
-        this.textInput.setMaxLength(4096); // Unix maximum path length, shorter on windows (I think it may have been 240)
-        this.textInput.setValue(pathFunctions.get().toString());
-        this.textInput.setResponder(content -> {
+        this.editBox.setHint(Component.translatableWithFallback(placeholderKey, "").withStyle(ChatFormatting.DARK_GRAY));
+        this.editBox.setMaxLength(4096); // Unix maximum path length, shorter on windows (I think it may have been 240)
+        this.editBox.setValue(pathFunctions.get().toString());
+        this.editBox.setResponder(content -> {
             Path path;
 
             try {
@@ -63,20 +64,19 @@ public class FolderSelectWidget extends AbstractContainerWidget implements Conta
             }
 
             if (path == null || !Files.exists(path) || !Files.isDirectory(path)) {
-                this.textInput.setTextColor(CommonColors.RED);
+                this.editBox.setTextColor(CommonColors.RED);
             } else {
-                this.textInput.setTextColor(CommonColors.WHITE);
+                this.editBox.setTextColor(CommonColors.WHITE);
                 pathFunctions.set(path);
             }
         });
-        this.textInput.setTooltip(Tooltip.create(Component.translatable("config.snapper.customScreenshotFolder.input")));
-        this.textInput.moveCursorToStart(false);
+        this.editBox.setTooltip(Tooltip.create(Component.translatable("config.snapper.customScreenshotFolder.input")));
 
         this.fileDialogButton = SpriteIconButton.builder(
                         Component.translatable("config.snapper.customScreenshotFolder.select"),
-                        button -> {
+                        _ -> {
                             ExternalDialogOverlay overlay = new ExternalDialogOverlay();
-                            client.gui.setOverlay(overlay);
+                            minecraft.gui.setOverlay(overlay);
 
                             DirectoryConfigUtil.openFolderSelect(
                                             Component.translatable("prompt.snapper.folder_select")
@@ -84,71 +84,45 @@ public class FolderSelectWidget extends AbstractContainerWidget implements Conta
                                     )
                                     .thenAccept(path -> {
                                         valueFromSelectDialog(path.orElse(null));
-                                        client.submit(overlay::close).join();
+                                        minecraft.submit(overlay::close).join();
                                     });
                         },
                         true
                 )
-                .width(20)
+                .width(BUTTON_SIZE)
                 .sprite(FOLDER_ICON, 15, 15)
                 .build();
         this.fileDialogButton.setTooltip(Tooltip.create(Component.translatable("config.snapper.customScreenshotFolder.select")));
 
         this.resetButton = SpriteIconButton.builder(
                 Component.translatable("config.snapper.customScreenshotFolder.reset"),
-                button -> {
-                    value.reset();
-                    textInput.setValue(value.get().toString());
+                _ -> {
+                    functions.reset();
+                    editBox.setValue(functions.get().toString());
                 },
                 true
-        ).width(20).sprite(RESET_ICON, 15, 15).build();
+        ).width(BUTTON_SIZE).sprite(RESET_ICON, 15, 15).build();
         this.resetButton.setTooltip(Tooltip.create(Component.translatable("config.snapper.customScreenshotFolder.reset")));
-        resetButton.setX(BUTTON_WIDTH);
-    }
 
-    @Override
-    public @NonNull List<? extends AbstractWidget> children() {
-        return List.of(
-                this.fileDialogButton, this.resetButton, this.textInput
-        );
+        layout.addChild(fileDialogButton);
+        layout.addChild(resetButton);
+        layout.addChild(editBox);
+
+        this.layout.arrangeElements();
+        this.setHeight(this.layout.getHeight());
     }
 
     public void setActive(boolean value) {
         this.active = value;
 
-        textInput.setEditable(value);
-        textInput.active = value;
-        if (textInput.isFocused() && !value) {
-            textInput.setFocused(false);
+        editBox.setEditable(value);
+        editBox.active = value;
+        if (editBox.isFocused() && !value) {
+            editBox.setFocused(false);
         }
 
         fileDialogButton.active = value;
         resetButton.active = value;
-    }
-
-    @Override
-    public void setX(int x) {
-        super.setX(x);
-
-        fileDialogButton.setX(x);
-        resetButton.setX(x + BUTTON_WIDTH);
-        textInput.setX(x + (BUTTON_WIDTH * 2));
-    }
-
-    @Override
-    public void setY(int y) {
-        super.setY(y);
-
-        fileDialogButton.setY(y);
-        resetButton.setY(y);
-        textInput.setY(y);
-    }
-
-    @Override
-    public void setWidth(int width) {
-        super.setWidth(width);
-
-        textInput.setWidth(width - (BUTTON_WIDTH * 2));
     }
 
     private void valueFromSelectDialog(@Nullable Path value) {
@@ -157,68 +131,50 @@ public class FolderSelectWidget extends AbstractContainerWidget implements Conta
         }
 
         if (Files.exists(value)) {
-            this.value.set(value);
-            this.textInput.setValue(this.value.get().toString());
+            this.functions.set(value);
+            this.editBox.setValue(this.functions.get().toString());
         }
-    }
-
-    @Override
-    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
-        int clicksRan = 0;
-
-        for (AbstractWidget child : this.children()) {
-            if (child.isHovered() && child.isActive()) {
-                clicksRan += 1;
-                this.playDownSound(Minecraft.getInstance().getSoundManager());
-
-                if (child == textInput) {
-                    textInput.setFocused(true);
-                    this.setFocused(textInput);
-                    textInput.setFocused(true);
-                }
-
-                child.onClick(click, doubled);
-            }
-        }
-
-        return clicksRan == 1;
-    }
-
-    @Override
-    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        for (Renderable drawable : this.children()) {
-            drawable.extractRenderState(graphics, mouseX, mouseY, a);
-        }
-    }
-
-    @Override
-    protected void updateWidgetNarration(NarrationElementOutput builder) {
-        fileDialogButton.updateWidgetNarration(builder);
-        resetButton.updateWidgetNarration(builder);
-        textInput.updateWidgetNarration(builder);
-    }
-
-    @Override
-    public void visitWidgets(Consumer<AbstractWidget> consumer) {
-        this.children().forEach(consumer);
     }
 
     @Override
     protected int contentHeight() {
-        return 20;
+        return this.height;
     }
 
     @Override
-    protected double scrollRate() {
-        return 20 / 2f;
+    public void setX(final int x) {
+        super.setX(x);
+        this.layout.setX(x);
+        this.layout.arrangeElements();
     }
 
     @Override
-    public boolean isMouseOver(double mouseX, double mouseY) {
-        this.active = true;
-        var hovered = super.isMouseOver(mouseX, mouseY);
-        this.active = false;
-        return hovered;
+    public void setY(final int y) {
+        super.setY(y);
+        this.layout.setY(y);
+        this.layout.arrangeElements();
+    }
+
+    @Override
+    public void setWidth(int width) {
+        super.setWidth(width);
+        this.editBox.setWidth(width - ((BUTTON_SIZE + PADDING) * 2));
+        this.layout.arrangeElements();
+    }
+
+    @Override
+    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        this.layout.visitWidgets(child -> child.extractRenderState(graphics, mouseX, mouseY, a));
+    }
+
+    @Override
+    protected void updateWidgetNarration(NarrationElementOutput output) {
+
+    }
+
+    @Override
+    public List<? extends GuiEventListener> children() {
+        return List.of(resetButton, fileDialogButton, editBox);
     }
 
     public static abstract class PathFunctions {
