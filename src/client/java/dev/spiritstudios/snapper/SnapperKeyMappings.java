@@ -3,6 +3,7 @@ package dev.spiritstudios.snapper;
 import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
+import dev.spiritstudios.snapper.render.panorama.PanoramaGrabber;
 import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -48,9 +49,9 @@ public final class SnapperKeyMappings {
         });
     }
 
-    private static void takePanorama(Minecraft client) {
-        if (client.player == null) return;
-        client.grabPanoramixScreenshot(client.gameDirectory);
+    private static void takePanorama(Minecraft minecraft) {
+        if (minecraft.player == null) return;
+        PanoramaGrabber.grabSnapperPanorama(minecraft);
 
         SnapperToast.push(
                 SnapperToast.Type.PANORAMA,

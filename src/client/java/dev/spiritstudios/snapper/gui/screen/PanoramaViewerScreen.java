@@ -24,7 +24,7 @@ public class PanoramaViewerScreen extends Screen {
     private float spin = 0.0F;
 
     public PanoramaViewerScreen(PanoramaTexture texture, Screen parent) {
-        super(Component.translatable("menu.snapper.viewer_menu"));
+        super(Component.literal(texture.path.getFileName().toString()));
         this.parent = parent;
         this.texture = texture;
     }

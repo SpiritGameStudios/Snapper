@@ -47,9 +47,7 @@ public class GuiPanoramaRenderer extends PictureInPictureRenderer<GuiPanoramaRen
 
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();
-
-            modelViewStack.rotateX(Mth.PI);
-            modelViewStack.rotateX(10F * Mth.DEG_TO_RAD);
+            modelViewStack.rotateX(Mth.PI + (10F * Mth.DEG_TO_RAD));
             modelViewStack.rotateY(renderState.spin() * Mth.DEG_TO_RAD);
 
             GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(new Matrix4f(modelViewStack));
@@ -89,7 +87,7 @@ public class GuiPanoramaRenderer extends PictureInPictureRenderer<GuiPanoramaRen
 
     @Override
     protected void renderToTexture(GuiPanoramaRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
-
+        // Rendering is handled in prepare
     }
 
     @Override

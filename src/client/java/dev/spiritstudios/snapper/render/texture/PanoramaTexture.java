@@ -100,7 +100,7 @@ public final class PanoramaTexture extends GalleryTexture {
         public Texture(Supplier<String> label, NativeImage image) {
             GpuDevice device = RenderSystem.getDevice();
             int width = image.getWidth() / 3;
-            int height = image.getHeight() / 3;
+            int height = image.getHeight() / 2;
             this.close();
             this.texture = device.createTexture(
                     label,
@@ -112,10 +112,11 @@ public final class PanoramaTexture extends GalleryTexture {
             this.textureView = device.createTextureView(this.texture);
             GpuBufferSlice stagingBuffer = device.createCommandEncoder().transientMemory().uploadStaging(image.getPixelBytes(), 1L, GpuBuffer.USAGE_COPY_SRC);
 
+
             // RIGHT
             device.createCommandEncoder().copyBufferToTexture(
                     stagingBuffer,
-                    width * 2, height,
+                    width * 2, 0,
                     image.getWidth(), image.getHeight(),
                     this.texture,
                     0, 0,
@@ -126,7 +127,7 @@ public final class PanoramaTexture extends GalleryTexture {
             // LEFT
             device.createCommandEncoder().copyBufferToTexture(
                     stagingBuffer,
-                    0, height,
+                    0, 0,
                     image.getWidth(), image.getHeight(),
                     this.texture,
                     0, 0,
@@ -134,10 +135,10 @@ public final class PanoramaTexture extends GalleryTexture {
                     0, 1
             );
 
-            // TOP
+            // BOTTOM
             device.createCommandEncoder().copyBufferToTexture(
                     stagingBuffer,
-                    width, 0,
+                    0, height,
                     image.getWidth(), image.getHeight(),
                     this.texture,
                     0, 0,
@@ -145,10 +146,10 @@ public final class PanoramaTexture extends GalleryTexture {
                     0, 2
             );
 
-            // BOTTOM
+            // TOP
             device.createCommandEncoder().copyBufferToTexture(
                     stagingBuffer,
-                    width, height * 2,
+                    width, height,
                     image.getWidth(), image.getHeight(),
                     this.texture,
                     0, 0,
@@ -159,7 +160,7 @@ public final class PanoramaTexture extends GalleryTexture {
             // FRONT
             device.createCommandEncoder().copyBufferToTexture(
                     stagingBuffer,
-                    width, height,
+                    width, 0,
                     image.getWidth(), image.getHeight(),
                     this.texture,
                     0, 0,
@@ -170,7 +171,7 @@ public final class PanoramaTexture extends GalleryTexture {
             // BACK
             device.createCommandEncoder().copyBufferToTexture(
                     stagingBuffer,
-                    width * 2, 0,
+                    width * 2, height,
                     image.getWidth(), image.getHeight(),
                     this.texture,
                     0, 0,
