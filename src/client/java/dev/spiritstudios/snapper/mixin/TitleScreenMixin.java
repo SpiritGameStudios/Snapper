@@ -8,17 +8,13 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
-import net.minecraft.client.gui.components.CommonButtons;
+import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.client.gui.screens.options.AccessibilityOptionsScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -58,7 +54,7 @@ public abstract class TitleScreenMixin extends Screen {
     ) {
         if (SnapperConfig.HOLDER.get().snapperButton().showOnTitleScreen()) {
             SpriteIconButton snapperButton = this.addRenderableWidget(Snapper.createSnapperButton(20, _ -> {
-                this.minecraft.gui.setScreen(new ScreenshotListScreen(this));
+                this.minecraft.gui.setScreen(new GalleryScreen(this));
             }));
 
             var buttonIndex = currentButton.get() + 1;

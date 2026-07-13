@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
+import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.PauseScreen;
@@ -33,7 +33,7 @@ public abstract class PauseScreenMixin extends Screen {
     protected void addSnapperButton(CallbackInfo ci, @Local(name = "iconButtonRow") LinearLayout iconButtonRow) {
         if (SnapperConfig.HOLDER.get().snapperButton().showInGameMenu()) {
             iconButtonRow.addChild(Snapper.createSnapperButton(20, _ -> {
-                this.minecraft.gui.setScreen(new ScreenshotListScreen(this));
+                this.minecraft.gui.setScreen(new GalleryScreen(this));
             }));
         }
     }

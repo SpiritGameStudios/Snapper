@@ -8,8 +8,6 @@
     "PauseScreenMixin",
     "ScreenshotMixin",
     "TitleScreenMixin",
-    "CubeMapMixin",
-    "GuiRendererMixin",
     "accessor.CameraAccessor"
   ],
   "injectors": {
@@ -20,5 +18,11 @@
   },
   "mixinextras": {
     "minVersion": "0.5.0"
-  }
+  },
+  "mixins": [
+    "GuiGraphicsExtractorMixin",
+    "PictureInPictureRendererMixin",
+    "accessor.CubeMapAccessor",
+    "accessor.PictureInPictureRendererAccessor"
+  ]
 }

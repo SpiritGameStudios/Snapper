@@ -1,6 +1,9 @@
 package dev.spiritstudios.snapper.gui.widget;
 
-import dev.spiritstudios.snapper.util.ScreenshotTexture;
+import dev.spiritstudios.snapper.render.panorama.GuiPanoramaRenderState;
+import dev.spiritstudios.snapper.render.texture.GalleryTexture;
+import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
+import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -11,18 +14,23 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 
-public class ScreenshotListWidget extends ScreenshotsWidget {
+import java.util.List;
+import java.util.function.Supplier;
+
+public class ScreenshotListWidget extends GalleryWidget {
     public ScreenshotListWidget(
             Minecraft client,
             int width, int height,
             int y,
-            @Nullable ScreenshotsWidget previous,
+            Supplier<List<GalleryTexture>> findScreenshots,
+            @Nullable GalleryWidget previous,
             Screen parent
     ) {
-        super(client, width, height, y, 36, previous, parent);
+        super(client, width, height, y, 36, findScreenshots, previous, parent);
     }
 
     @Override
@@ -34,17 +42,19 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
     }
 
     @Override
-    protected ScreenshotEntry createEntry(ScreenshotTexture texture) {
+    protected ScreenshotEntry createEntry(GalleryTexture texture) {
         return new ListScreenshotEntry(texture);
     }
 
     private class ListScreenshotEntry extends ScreenshotEntry {
-        public ListScreenshotEntry(ScreenshotTexture texture) {
+        private float spin = 0.0F;
+
+        public ListScreenshotEntry(GalleryTexture texture) {
             super(texture);
         }
 
         @Override
-        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean isHovering, float partialTick) {
+        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean isHovering, float a) {
             texture.startLoading(minecraft, false);
 
             graphics.text(
@@ -66,15 +76,31 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
             );
 
             if (texture.isLoaded()) {
-                graphics.blit(
-                        RenderPipelines.GUI_TEXTURED,
-                        this.texture.textureLocation(),
-                        getContentX(), getContentY(),
-                        (texture.getHeight()) / 3.0f + 32, 0,
-                        getContentHeight(), getContentHeight(),
-                        texture.getHeight(), texture.getHeight(),
-                        texture.getWidth(), texture.getHeight()
-                );
+                switch (texture) {
+                    case PanoramaTexture _ -> {
+                        if (isHovering) {
+                            float delta = (float) ((double) a * minecraft.gameRenderer.gameRenderState().optionsRenderState.panoramaSpeed);
+                            this.spin = Mth.wrapDegrees(this.spin + delta * 0.1F);
+                        }
+
+                        graphics.snapper$panorama(
+                                -spin, this.texture.textureLocation,
+                                this.getContentX(), this.getContentY(),
+                                this.getContentX() + this.getContentHeight(), this.getContentY() + this.getContentHeight()
+                        );
+                    }
+                    case ScreenshotTexture _ -> {
+                        graphics.blit(
+                                RenderPipelines.GUI_TEXTURED,
+                                this.texture.textureLocation,
+                                getContentX(), getContentY(),
+                                (texture.getHeight()) / 3.0f + 32, 0,
+                                getContentHeight(), getContentHeight(),
+                                texture.getHeight(), texture.getHeight(),
+                                texture.getWidth(), texture.getHeight()
+                        );
+                    }
+                }
             } else {
                 String loadString = LoadingDotsText.get(Util.getMillis());
 
@@ -93,8 +119,8 @@ public class ScreenshotListWidget extends ScreenshotsWidget {
                 graphics.blitSprite(
                         RenderPipelines.GUI_TEXTURED,
                         mouseX - getContentX() < 32 && this.texture.isLoaded() ?
-                                ScreenshotsWidget.VIEW_HIGHLIGHTED_SPRITE :
-                                ScreenshotsWidget.VIEW_SPRITE,
+                                GalleryWidget.VIEW_HIGHLIGHTED_SPRITE :
+                                GalleryWidget.VIEW_SPRITE,
                         getContentX(), getContentY(),
                         32, 32
                 );

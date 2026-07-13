@@ -1,9 +1,9 @@
 package dev.spiritstudios.snapper;
 
-import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
+import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
-import dev.spiritstudios.snapper.util.ScreenshotTexture;
+import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
@@ -44,7 +44,7 @@ public final class SnapperKeyMappings {
         ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
             while (PANORAMA_KEY.consumeClick()) SnapperKeyMappings.takePanorama(minecraft);
             while (RECENT_SCREENSHOT_KEY.consumeClick()) SnapperKeyMappings.openRecentScreenshot(minecraft);
-            while (SCREENSHOT_MENU_KEY.consumeClick()) minecraft.gui.setScreen(new ScreenshotListScreen(minecraft.gui.screen()));
+            while (SCREENSHOT_MENU_KEY.consumeClick()) minecraft.gui.setScreen(new GalleryScreen(minecraft.gui.screen()));
         });
     }
 

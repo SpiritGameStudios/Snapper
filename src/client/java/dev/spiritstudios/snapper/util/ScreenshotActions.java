@@ -1,11 +1,14 @@
 package dev.spiritstudios.snapper.util;
 
 import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
+import dev.spiritstudios.snapper.render.texture.GalleryTexture;
+import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
+import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.ProgressScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
@@ -32,10 +35,10 @@ public class ScreenshotActions {
                                 } catch (IOException e) {
                                     Snapper.LOGGER.error("Failed to delete file", e);
                                 }
-
-                                if (screen instanceof ScreenshotListScreen listScreen) {
-                                    listScreen.getScreenshots().reload();
-                                }
+//
+//                                if (screen instanceof GalleryScreen listScreen) {
+//                                    listScreen.getScreenshots().reload();
+//                                }
                             }
 
                             minecraft.gui.setScreen(screen);
@@ -58,19 +61,50 @@ public class ScreenshotActions {
         }
     }
 
+    private static final Comparator<Path> SCREENSHOT_SORTER = Comparator.<Path>comparingLong(
+            path ->
+                    SafeFiles.getLastModifiedTime(path)
+                            .map(FileTime::toMillis)
+                            .orElse(0L)
+    ).reversed();
+
+    private static Stream<Path> listScreenshots(Path directory) throws IOException {
+        return Files.list(directory)
+                .filter(path -> !Files.isDirectory(path) && SafeFiles.isContentType(path, "image/png", ".png"))
+                .sorted(SCREENSHOT_SORTER);
+    }
+
     public static List<Path> getScreenshots() {
         Path screenshotDirectory = SnapperUtil.getConfiguredScreenshotDirectory();
-        if (!Files.exists(screenshotDirectory)) {
-            return List.of();
+        if (Files.notExists(screenshotDirectory)) return List.of();
+
+        try (Stream<Path> paths = listScreenshots(screenshotDirectory)) {
+            return paths.toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        try (Stream<Path> stream = Files.list(screenshotDirectory)) {
-            return stream.filter(path ->
-                            !Files.isDirectory(path) && SafeFiles.isContentType(path, "image/png", ".png"))
-                    .sorted(Comparator.<Path>comparingLong(path ->
-                                    SafeFiles.getLastModifiedTime(path)
-                                            .map(FileTime::toMillis)
-                                            .orElse(0L))
-                            .reversed())
+    }
+
+    public static List<GalleryTexture> getScreenshotTextures(TextureManager textureManager) {
+        Path screenshotDirectory = SnapperUtil.getConfiguredScreenshotDirectory();
+        if (Files.notExists(screenshotDirectory)) return List.of();
+
+        try (Stream<Path> paths = listScreenshots(screenshotDirectory)) {
+            return paths
+                    .<GalleryTexture>flatMap(path -> ScreenshotTexture.createScreenshot(textureManager, path).stream())
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<GalleryTexture> getPanoramaTextures(TextureManager textureManager) {
+        Path screenshotDirectory = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panoramas");
+        if (Files.notExists(screenshotDirectory)) return List.of();
+
+        try (Stream<Path> paths = listScreenshots(screenshotDirectory)) {
+            return paths
+                    .<GalleryTexture>flatMap(path -> PanoramaTexture.createScreenshot(textureManager, path).stream())
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);

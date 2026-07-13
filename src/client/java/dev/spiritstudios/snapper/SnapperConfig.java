@@ -1,7 +1,7 @@
 package dev.spiritstudios.snapper;
 
 import com.mojang.serialization.Codec;
-import dev.spiritstudios.snapper.gui.screen.ScreenshotListScreen;
+import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 
 public record SnapperConfig(boolean copyTakenScreenshot,
                             SnapperButton snapperButton,
-                            ScreenshotListScreen.ViewMode viewMode,
+                            GalleryScreen.ViewMode viewMode,
                             SnapperUtil.PanoramaSize panoramaDimensions,
                             CustomScreenshotFolder customScreenshotPath,
                             AxolotlClient axolotlClient) {
@@ -64,8 +64,8 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                             """
                                     Whether to show the screenshot menu in a grid or a list
                                     May be either 'grid' or 'list'""",
-                            ScreenshotListScreen.ViewMode.CODEC,
-                            ScreenshotListScreen.ViewMode.GRID,
+                            GalleryScreen.ViewMode.CODEC,
+                            GalleryScreen.ViewMode.GRID,
                             SnapperConfig::viewMode
                     ).withValue(
                             "panorama_size",
@@ -188,7 +188,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
     public static class Mutable {
         // Root
         public boolean copyTakenScreenshot;
-        public ScreenshotListScreen.ViewMode viewMode;
+        public GalleryScreen.ViewMode viewMode;
         public SnapperUtil.PanoramaSize panoramaDimensions;
 
         // Snapper Button

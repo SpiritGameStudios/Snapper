@@ -3,12 +3,11 @@ package dev.spiritstudios.snapper.gui;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ConfigScreen;
-import dev.spiritstudios.snapper.gui.screen.PanoramaViewerScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotRenameScreen;
 import dev.spiritstudios.snapper.gui.widget.ViewModeButton;
+import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
-import dev.spiritstudios.snapper.util.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
@@ -45,7 +44,7 @@ public class SnapperButtonBar {
             Screen screen,
             Screen postFlowScreen,
             HeaderAndFooterLayout layout,
-            Supplier<@Nullable ScreenshotTexture> getTexture,
+            Supplier<@Nullable GalleryTexture> getTexture,
             boolean enablePanoramaButton,
             @Nullable Runnable toggleGrid,
             @Nullable Runnable reload
@@ -77,7 +76,7 @@ public class SnapperButtonBar {
         this.openButton = bottomRow.addChild(Button.builder(
                 Component.translatable("button.snapper.open"),
                 _ -> {
-                    ScreenshotTexture selected = getTexture.get();
+                    GalleryTexture selected = getTexture.get();
 
                     if (selected != null) {
                         Util.getPlatform().openPath(selected.path);
@@ -95,7 +94,7 @@ public class SnapperButtonBar {
         SpriteIconButton panoramaButton = bottomRow.addChild(
                 SpriteIconButton.builder(
                         Component.translatable("button.snapper.screenshots"),
-                        _ -> minecraft.gui.setScreen(new PanoramaViewerScreen(Component.translatable("menu.snapper.panorama").getString(), screen)),
+                        _ -> {},
                         true
                 ).width(20).sprite(hasPanorama ? PANORAMA_BUTTON_ICON : PANORAMA_BUTTON_DISABLED_ICON, 15, 15).build());
 
@@ -121,7 +120,7 @@ public class SnapperButtonBar {
         this.deleteButton = topRow.addChild(Button.builder(
                 Component.translatable("button.snapper.delete"),
                 _ -> {
-                    ScreenshotTexture selected = getTexture.get();
+                    GalleryTexture selected = getTexture.get();
 
                     if (selected != null) {
                         ScreenshotActions.deleteScreenshot(selected.path, postFlowScreen);
@@ -132,7 +131,7 @@ public class SnapperButtonBar {
         this.renameButton = topRow.addChild(Button.builder(
                 Component.translatable("button.snapper.rename"),
                 _ -> {
-                    ScreenshotTexture selected = getTexture.get();
+                    GalleryTexture selected = getTexture.get();
 
                     if (selected != null) {
                         minecraft.gui.setScreen(new ScreenshotRenameScreen(selected.path, postFlowScreen));
@@ -143,7 +142,7 @@ public class SnapperButtonBar {
         this.copyButton = topRow.addChild(Button.builder(
                 Component.translatable("button.snapper.copy"),
                 _ -> {
-                    ScreenshotTexture selected = getTexture.get();
+                    GalleryTexture selected = getTexture.get();
 
                     if (selected != null) {
                         PlatformHelper.INSTANCE.copyScreenshot(selected.path);
@@ -152,7 +151,7 @@ public class SnapperButtonBar {
         ).width(buttonWidth).build());
 
         this.uploadButton = topRow.addChild(Button.builder(Component.translatable("button.snapper.upload"), button -> {
-            ScreenshotTexture selected = getTexture.get();
+            GalleryTexture selected = getTexture.get();
 
             if (selected == null) return;
 

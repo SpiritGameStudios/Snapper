@@ -1,7 +1,7 @@
 package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.gui.SnapperButtonBar;
-import dev.spiritstudios.snapper.util.ScreenshotTexture;
+import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -48,7 +48,7 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
 
     @Override
     public void onClose() {
-        if (!(parent instanceof ScreenshotListScreen listScreen)) {
+        if (!(parent instanceof GalleryScreen listScreen)) {
             this.texture.close();
         }
 
@@ -97,7 +97,7 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
         if (texture.isLoaded()) {
             graphics.blit(
                     RenderPipelines.GUI_TEXTURED,
-                    this.texture.textureLocation(),
+                    this.texture.textureLocation,
                     (this.width / 2) - (finalWidth / 2), layout.getHeaderHeight(),
                     0, 0,
                     finalWidth, finalHeight,

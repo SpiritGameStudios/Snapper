@@ -52,7 +52,7 @@ public class ConfigScreen extends Screen {
                         "viewMode",
                         b -> config.viewMode = b,
                         config.viewMode,
-                        ScreenshotListScreen.ViewMode.class
+                        GalleryScreen.ViewMode.class
                 )
         );
 

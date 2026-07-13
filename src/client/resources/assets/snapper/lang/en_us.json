@@ -7,6 +7,8 @@
   "menu.snapper.screenshot_menu": "Screenshots",
   "menu.snapper.viewer_menu": "Viewer",
   "menu.snapper.panorama": "View Panorama",
+  "menu.snapper.tab.screenshots": "Screenshots",
+  "menu.snapper.tab.panoramas": "Panoramas",
   "button.snapper.folder": "Open Folder",
   "button.snapper.panorama.tooltip": "View the current stored panorama.",
   "button.snapper.screenshots": "View Screenshots",

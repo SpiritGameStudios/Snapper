@@ -1,11 +1,9 @@
 package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.util.DynamicCubemapTexture;
-import dev.spiritstudios.snapper.util.SafeFiles;
+import dev.spiritstudios.snapper.render.panorama.GuiPanoramaRenderState;
+import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
-import net.minecraft.client.renderer.state.gui.PanoramaRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
@@ -14,61 +12,27 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.Stream;
 
 public class PanoramaViewerScreen extends Screen {
-    public static final RenderStateDataKey<PanoramaRenderState> SNAPPER_PANORAMA = RenderStateDataKey.create(() -> "Snapper Panorama");
+    private final PanoramaTexture texture;
 
-    public static final Identifier TEXTURE_ID = Snapper.id("screenshots/panorama");
-
-    private final DynamicCubemapTexture texture;
-
-    private final String title;
     private final Screen parent;
 
     private float spin = 0.0F;
 
-    public PanoramaViewerScreen(String title, Screen parent) {
+    public PanoramaViewerScreen(PanoramaTexture texture, Screen parent) {
         super(Component.translatable("menu.snapper.viewer_menu"));
-        this.title = title;
         this.parent = parent;
-        this.texture = this.getTexture();
-
-        if (texture != null) {
-            // TODO: May be worth doing texture loading here off-thread as not to cause a freeze
-            Minecraft.getInstance().getTextureManager().registerAndLoad(TEXTURE_ID, texture);
-        }
-    }
-
-    @Nullable
-    private DynamicCubemapTexture getTexture() {
-        Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
-        if (!SnapperUtil.panoramaPresent(panoramaDir)) return null;
-
-        try (Stream<Path> stream = Files.list(panoramaDir)) {
-            return stream.allMatch(path -> {
-                if (Files.isDirectory(path)) return false;
-
-                return SafeFiles.isContentType(path, "image/png", ".png");
-            }) ? new DynamicCubemapTexture(TEXTURE_ID, panoramaDir) : null;
-        } catch (IOException | NullPointerException e) {
-            Snapper.LOGGER.error("Failed to list the contents of directory", e);
-            return null;
-        }
+        this.texture = texture;
     }
 
     @Override
     public void onClose() {
-        if (texture != null) {
-            Minecraft.getInstance().getTextureManager().release(TEXTURE_ID);
-            texture.close();
+        if (!(parent instanceof GalleryScreen)) {
+            this.texture.close();
         }
 
         this.minecraft.gui.setScreen(this.parent);
@@ -83,24 +47,30 @@ public class PanoramaViewerScreen extends Screen {
             return;
         }
 
-        Path panoramaPath = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
         addRenderableWidget(Button.builder(Component.translatable("button.snapper.folder"), _ -> {
-            Util.getPlatform().openPath(panoramaPath);
+            Util.getPlatform().openPath(texture.path);
         }).bounds(width / 2 - 150 - 4, height - 32, 150, 20).build());
 
         addRenderableWidget(Button.builder(
                 CommonComponents.GUI_DONE,
-                button -> this.onClose()
+                _ -> this.onClose()
         ).bounds(width / 2 + 4, height - 32, 150, 20).build());
     }
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        Minecraft minecraft = Minecraft.getInstance();
         float delta = (float) ((double) a * minecraft.gameRenderer.gameRenderState().optionsRenderState.panoramaSpeed);
         this.spin = Mth.wrapDegrees(this.spin + delta * 0.1F);
 
-        minecraft.gameRenderer.gameRenderState().guiRenderState.setData(SNAPPER_PANORAMA, new PanoramaRenderState(-this.spin));
+        texture.startLoading(minecraft, false);
+        if (texture.isLoaded()) {
+            graphics.snapper$panorama(
+                    -this.spin,
+                    this.texture.textureLocation,
+                    0, 0,
+                    graphics.guiWidth(), graphics.guiHeight()
+            );
+        }
 
         graphics.centeredText(
                 this.font,
