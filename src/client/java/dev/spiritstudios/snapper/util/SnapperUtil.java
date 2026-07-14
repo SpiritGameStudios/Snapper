@@ -75,9 +75,17 @@ public final class SnapperUtil {
         }
     }
 
-    public static final Path UNIFIED_FOLDER = switch (Util.getPlatform()) {
-        case WINDOWS -> Path.of(System.getenv("APPDATA"), ".snapper");
-        case OSX -> Path.of(SystemProperties.getUserHome(), "Library", "Application Support", "snapper");
-        default -> Path.of(SystemProperties.getUserHome(), ".snapper");
-    };
+    private static Path getDataFolder() {
+        return switch (Util.getPlatform()) {
+            case WINDOWS -> Path.of(System.getenv("APPDATA"));
+            case OSX -> Path.of(SystemProperties.getUserHome(), "Library", "Application Support");
+            default -> {
+                String xdgDataHome = System.getenv("XDG_DATA_HOME");
+                if (xdgDataHome != null) yield Path.of(xdgDataHome);
+                else yield Path.of(SystemProperties.getUserHome(), ".local", "share");
+            }
+        };
+    }
+
+    public static final Path UNIFIED_FOLDER = getDataFolder().resolve("snapper");
 }
