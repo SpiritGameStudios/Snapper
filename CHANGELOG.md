@@ -3,6 +3,7 @@
 ### Features
 * You can now store more than one panorama at a time.
 * Panoramas are now saved as a single file instead of multiple.
+* There are now more toasts for certain errors.
 
 ### Changes
 * The overlay when using the file-picker dialogue now blurs the screen again.
@@ -11,3 +12,5 @@
 ### Bug Fixes
 * Fix a very rare race condition when taking a panorama if the GPU took more than 10ms to render a single face of a panorama.
 * Fix the game crashing or spamming the logs if a screenshot failed to load for any reason.
+* Fix inconsistent use of icons in toasts.
+* Fix inconsistent text in toasts.
