@@ -2,20 +2,18 @@ package dev.spiritstudios.snapper;
 
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
-import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
-import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
+import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
-import lgbt.greenhouse.config.api.v3.GreenhouseConfigSide;
 import lgbt.greenhouse.config.api.v3.GreenhouseConfigHolder;
+import lgbt.greenhouse.config.api.v3.GreenhouseConfigSide;
 import lgbt.greenhouse.config.api.v3.dfu.builder.DataFixerBuilderFunctions;
 import lgbt.greenhouse.config.api.v3.dfu.builder.schema.TypeTemplateBuilder;
 import lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigRelocateFieldsFix;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonCLang;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 
 import java.nio.file.Path;
@@ -27,11 +25,12 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                             GalleryScreen.ViewMode viewMode,
                             SnapperUtil.PanoramaSize panoramaDimensions,
                             CustomScreenshotFolder customScreenshotPath,
-                            AxolotlClient axolotlClient) {
+                            AxolotlClient axolotlClient,
+                            boolean showScreenshotHelper) {
     public static final GreenhouseConfigHolder<SnapperConfig> HOLDER = GreenhouseConfigHolder.register(
             SnapperConfig.class,
             Snapper.MOD_ID,
-            10101,
+            10200,
             GreenhouseConfigJsonCLang.INSTANCE,
             GreenhouseConfigSide.CLIENT,
             configBuilder -> configBuilder
@@ -111,6 +110,12 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             AxolotlClientApi.TermsAcceptance.UNSET,
                                             AxolotlClient::termsStatus
                                     )
+                    ).withValue(
+                            "show_screenshot_helper",
+                            "Whether to show a screenshot button in the Game Menu",
+                            Codec.BOOL,
+                            false,
+                            SnapperConfig::showScreenshotHelper
                     ),
             dataFixerBuilder -> dataFixerBuilder
                     .withSchema(
@@ -191,6 +196,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
         public boolean copyTakenScreenshot;
         public GalleryScreen.ViewMode viewMode;
         public SnapperUtil.PanoramaSize panoramaDimensions;
+        public boolean showScreenshotHelper;
 
         // Snapper Button
         public boolean showOnTitleScreen;
@@ -208,6 +214,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
             copyTakenScreenshot = config.copyTakenScreenshot;
             viewMode = config.viewMode;
             panoramaDimensions = config.panoramaDimensions;
+            showScreenshotHelper = config.showScreenshotHelper;
 
             showOnTitleScreen = config.snapperButton.showOnTitleScreen;
             showInGameMenu = config.snapperButton.showInGameMenu;
@@ -251,7 +258,8 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                     ),
                     new AxolotlClient(
                             termsAccepted
-                    )
+                    ),
+                    showScreenshotHelper
             );
         }
     }

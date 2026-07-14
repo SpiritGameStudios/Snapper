@@ -4,6 +4,7 @@
 * You can now store more than one panorama at a time.
 * Panoramas are now saved as a single file instead of multiple.
 * There are now more toasts for certain errors.
+* You can now enable a button to capture an in-game screenshot from the game menu.
 
 ### Changes
 * **Moved the default unified screenshot directory to match other apps.**
@@ -28,3 +29,5 @@ All translation changes have only made it to the en_us language file at this tim
 - `menu.snapper.panorama` ("View Panorama") has been removed and functionally replaced with `menu.snapper.tab.panoramas` ("Panoramas").
 - `text.snapper.empty` is now `text.snapper.empty.screenshot`, to account for two contexts of which near-identical text may be seen.
 - Added `text.snapper.empty.panorama`, to display specific information for empty panorama galleries.
+- Added `button.snapper.helper.screenshot` for a button in the Game Menu which lets users take screenshots without using the keyboard.
+- Added `subtitles.snapper.ui.shutter` for the sound that plays when Capture Screenshot is pressed from the Game Menu.

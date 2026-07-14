@@ -1,0 +1,10 @@
+{
+  "ui.shutter": {
+    "sounds": [
+      {
+        "name": "snapper:ui/shutter",
+        "volume": 0.4
+      }
+    ]
+  }
+}

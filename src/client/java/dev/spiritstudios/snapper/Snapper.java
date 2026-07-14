@@ -7,14 +7,20 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class Snapper implements ClientModInitializer {
     public static final String MOD_ID = "snapper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+    public static final SoundEvent SHUTTER = Registry.register(BuiltInRegistries.SOUND_EVENT, Identifier.fromNamespaceAndPath(MOD_ID, "ui.shutter"),
+            SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(MOD_ID, "ui.shutter")));
 
     @Override
     public void onInitializeClient() {
@@ -31,7 +37,7 @@ public final class Snapper implements ClientModInitializer {
                         true
                 )
                 .width(width)
-                .sprite(Snapper.id("screenshots/screenshot"), 15, 15)
+                .sprite(Snapper.id("screenshots/gallery"), 15, 15)
                 .tooltip(Component.translatable("button.snapper.gallery"))
                 .narration(_ -> Component.translatable("button.snapper.gallery"))
                 .build();

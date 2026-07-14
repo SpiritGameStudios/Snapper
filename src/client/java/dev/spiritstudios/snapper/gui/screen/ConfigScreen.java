@@ -6,8 +6,10 @@ import dev.spiritstudios.snapper.gui.widget.ConfigSliderWidget;
 import dev.spiritstudios.snapper.gui.widget.FolderSelectWidget;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -62,6 +64,14 @@ public class ConfigScreen extends Screen {
                         b -> config.panoramaDimensions = b,
                         config.panoramaDimensions,
                         SnapperUtil.PanoramaSize.class
+                )
+        );
+
+        this.list.addSmall(
+                booleanButton(
+                        "showScreenshotHelper",
+                        b -> config.showScreenshotHelper = b,
+                        config.showScreenshotHelper
                 )
         );
 

@@ -19,6 +19,8 @@
   "button.snapper.upload": "Upload",
   "button.snapper.upload.tooltip.offline": "Unable to upload screenshots while offline",
   "button.snapper.upload.tooltip.tos": "Unable to upload screenshots because you did not accept AxolotlClient's terms. You can change this in settings.",
+  "button.snapper.helper.screenshot": "Take Screenshot",
+  "button.snapper.reload": "Reload",
   "text.snapper.created": "Created",
   "text.snapper.generic": "Screenshot %d",
   "text.snapper.loading": "Loading Screenshots",
@@ -64,6 +66,7 @@
   "config.snapper.customScreenshotFolder.input": "Folder for all screenshots to be saved and viewed from",
   "config.snapper.customScreenshotFolder.select": "Select folder",
   "config.snapper.customScreenshotFolder.reset": "Reset to default",
+  "config.snapper.showScreenshotHelper": "Capture Button",
   "toast.snapper.screenshot.created": "Screenshot captured",
   "toast.snapper.screenshot.created.description": "Saved as %s. View by pressing %s",
   "toast.snapper.screenshot.created.description_copy": "Saved as %s. Automagically copied to clipboard",
@@ -98,5 +101,5 @@
   "text.snapper.screen_size": "Screen Size: %dx%d",
   "text.snapper.scale_factor": "Scale Factor: %s",
   "text.snapper.scale_size": "Scaled Size: %dx%d",
-  "button.snapper.reload": "Reload"
+  "subtitles.snapper.ui.shutter": "Shutter clicks"
 }
