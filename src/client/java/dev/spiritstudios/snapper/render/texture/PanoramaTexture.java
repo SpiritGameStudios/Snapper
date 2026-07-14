@@ -45,8 +45,10 @@ public final class PanoramaTexture extends GalleryTexture {
 
     @Override
     protected NativeImage load() {
-        try (InputStream inputStream = Files.newInputStream(path)) {
-            NativeImage flippedImage = NativeImage.read(inputStream);
+        try (
+                InputStream inputStream = Files.newInputStream(path);
+                NativeImage flippedImage = NativeImage.read(inputStream);
+        ) {
             NativeImage image = new NativeImage(flippedImage.getWidth(), flippedImage.getHeight(), false);
             flippedImage.copyRect(image, 0, 0, 0, 0, flippedImage.getWidth(), flippedImage.getHeight(), false, true);
 
@@ -66,7 +68,11 @@ public final class PanoramaTexture extends GalleryTexture {
         this.texture = new Texture(() -> "Screenshot " + this.textureLocation, image);
         this.textureManager.register(this.textureLocation, this.texture);
         image.close();
-        this.isLoaded = true;
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return this.texture != null;
     }
 
     @Override
@@ -80,14 +86,14 @@ public final class PanoramaTexture extends GalleryTexture {
     }
 
     @Override
-    public void close() {
+    public void clear() {
         if (this.texture != null) {
             this.textureManager.release(textureLocation);
             this.texture.close();
             this.texture = null;
         }
 
-        this.isClosed = true;
+        isLoadingStarted = false;
     }
 
     @Override
@@ -110,7 +116,6 @@ public final class PanoramaTexture extends GalleryTexture {
             );
             this.textureView = device.createTextureView(this.texture);
             GpuBufferSlice stagingBuffer = device.createCommandEncoder().transientMemory().uploadStaging(image.getPixelBytes(), 1L, GpuBuffer.USAGE_COPY_SRC);
-
 
             // RIGHT
             device.createCommandEncoder().copyBufferToTexture(

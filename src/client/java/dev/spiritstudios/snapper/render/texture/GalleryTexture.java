@@ -25,7 +25,6 @@ public sealed abstract class GalleryTexture implements AutoCloseable permits Pan
     public final Type textureType;
 
     protected boolean isClosed;
-    protected boolean isLoaded;
     protected boolean didLoadFail;
     protected boolean isLoadingStarted;
 
@@ -40,7 +39,7 @@ public sealed abstract class GalleryTexture implements AutoCloseable permits Pan
     protected abstract void upload(NativeImage image);
 
     public synchronized void startLoading(Minecraft minecraft, boolean force) {
-        if (!isLoaded && !didLoadFail && !isLoadingStarted && (CURRENTLY_LOADING.get() < MAX_LOADING || force)) {
+        if (!isLoaded() && !didLoadFail && !isLoadingStarted && (CURRENTLY_LOADING.get() < MAX_LOADING || force)) {
             CURRENTLY_LOADING.incrementAndGet();
             this.isLoadingStarted = true;
 
@@ -58,9 +57,7 @@ public sealed abstract class GalleryTexture implements AutoCloseable permits Pan
         }
     }
 
-    public boolean isLoaded() {
-        return isLoaded;
-    }
+    public abstract boolean isLoaded();
 
     public boolean didLoadFail() {
         return didLoadFail;
@@ -69,8 +66,12 @@ public sealed abstract class GalleryTexture implements AutoCloseable permits Pan
     public abstract int getWidth();
     public abstract int getHeight();
 
-    @Override
-    public abstract void close();
+    public abstract void clear();
+
+    public void close() {
+        this.clear();
+        this.isClosed = true;
+    }
 
     public abstract Screen createViewer(@Nullable Screen parent);
 
