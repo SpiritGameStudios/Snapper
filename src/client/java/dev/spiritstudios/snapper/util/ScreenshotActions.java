@@ -80,22 +80,32 @@ public final class ScreenshotActions {
                             .orElse(0L)
     ).reversed();
 
-    public static Path getScreenshotDirectory() {
-        if (SnapperConfig.HOLDER.get().customScreenshotPath().enabled()) {
-            Path customPath = SnapperConfig.HOLDER.get().customScreenshotPath().path().resolve("screenshots");
+    private static Path getSnapperDataDir() {
+        Path path = SnapperConfig.HOLDER.get().customScreenshotPath().enabled() ?
+                SnapperConfig.HOLDER.get().customScreenshotPath().path() :
+                Minecraft.getInstance().gameDirectory.toPath();
 
-            if (!SafeFiles.createDirectories(customPath)) {
-                Snapper.LOGGER.error("Failed to create directories of configured custom screenshot folder");
-            }
-
-            return customPath;
+        if (!SafeFiles.createDirectories(path)) {
+            Snapper.LOGGER.error("Failed to create snapper directory");
         }
 
-        return Minecraft.getInstance().gameDirectory.toPath().resolve("screenshots");
+        return path;
+    }
+
+    public static Path getScreenshotDirectory() {
+        Path path = getSnapperDataDir().resolve("screenshots");
+
+        if (!SafeFiles.createDirectories(path)) {
+            Snapper.LOGGER.error("Failed to create screenshot directory");
+        }
+
+        return path;
     }
 
     public static Path getPanoramaDirectory() {
-        return getScreenshotDirectory().resolve("panoramas");
+        Path path = getSnapperDataDir().resolve("panoramas");
+        if (!SafeFiles.createDirectories(path)) Snapper.LOGGER.error("Failed to create panorama directory");
+        return path;
     }
 
     private static Stream<Path> listScreenshots(Path directory) throws IOException {
