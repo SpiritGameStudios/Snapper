@@ -74,7 +74,6 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
                 this.parent,
                 this.layout,
                 () -> this.texture,
-                false,
                 null,
                 null
         );

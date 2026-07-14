@@ -1,22 +1,17 @@
 package dev.spiritstudios.snapper.render.panorama;
 
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuFence;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 
 import java.nio.file.Path;
@@ -58,8 +53,8 @@ public final class PanoramaGrabber {
             RenderSystem.queueFencedTask(() ->
                     Util.ioPool().execute(() -> {
                         try (output) {
-                            Path path = SnapperUtil.getConfiguredScreenshotDirectory()
-                                    .resolve("panoramas")
+                            Path path = ScreenshotActions
+                                    .getPanoramaDirectory()
                                     .resolve(Util.getFilenameFormattedDateTime() + ".png");
 
                             output.writeToFile(path);

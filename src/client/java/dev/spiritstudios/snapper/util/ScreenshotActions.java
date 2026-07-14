@@ -1,6 +1,8 @@
 package dev.spiritstudios.snapper.util;
 
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.gui.screen.ReloadableScreen;
 import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
@@ -20,7 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class ScreenshotActions {
+public final class ScreenshotActions {
     public static void deleteScreenshot(Path path, Screen screen) {
         if (!Files.exists(path)) return;
 
@@ -35,10 +37,10 @@ public class ScreenshotActions {
                                 } catch (IOException e) {
                                     Snapper.LOGGER.error("Failed to delete file", e);
                                 }
-//
-//                                if (screen instanceof GalleryScreen listScreen) {
-//                                    listScreen.getScreenshots().reload();
-//                                }
+
+                                if (screen instanceof ReloadableScreen reloadable) {
+                                    reloadable.reload();
+                                }
                             }
 
                             minecraft.gui.setScreen(screen);
@@ -68,6 +70,24 @@ public class ScreenshotActions {
                             .orElse(0L)
     ).reversed();
 
+    public static Path getScreenshotDirectory() {
+        if (SnapperConfig.HOLDER.get().customScreenshotPath().enabled()) {
+            Path customPath = SnapperConfig.HOLDER.get().customScreenshotPath().path().resolve("screenshots");
+
+            if (!SafeFiles.createDirectories(customPath)) {
+                Snapper.LOGGER.error("Failed to create directories of configured custom screenshot folder");
+            }
+
+            return customPath;
+        }
+
+        return Minecraft.getInstance().gameDirectory.toPath().resolve("screenshots");
+    }
+
+    public static Path getPanoramaDirectory() {
+        return getScreenshotDirectory().resolve("panoramas");
+    }
+
     private static Stream<Path> listScreenshots(Path directory) throws IOException {
         return Files.list(directory)
                 .filter(path -> !Files.isDirectory(path) && SafeFiles.isContentType(path, "image/png", ".png"))
@@ -75,7 +95,7 @@ public class ScreenshotActions {
     }
 
     public static List<Path> getScreenshots() {
-        Path screenshotDirectory = SnapperUtil.getConfiguredScreenshotDirectory();
+        Path screenshotDirectory = ScreenshotActions.getScreenshotDirectory();
         if (Files.notExists(screenshotDirectory)) return List.of();
 
         try (Stream<Path> paths = listScreenshots(screenshotDirectory)) {
@@ -86,7 +106,7 @@ public class ScreenshotActions {
     }
 
     public static List<GalleryTexture> getScreenshotTextures(TextureManager textureManager) {
-        Path screenshotDirectory = SnapperUtil.getConfiguredScreenshotDirectory();
+        Path screenshotDirectory = ScreenshotActions.getScreenshotDirectory();
         if (Files.notExists(screenshotDirectory)) return List.of();
 
         try (Stream<Path> paths = listScreenshots(screenshotDirectory)) {
@@ -99,7 +119,7 @@ public class ScreenshotActions {
     }
 
     public static List<GalleryTexture> getPanoramaTextures(TextureManager textureManager) {
-        Path screenshotDirectory = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panoramas");
+        Path screenshotDirectory = ScreenshotActions.getPanoramaDirectory();
         if (Files.notExists(screenshotDirectory)) return List.of();
 
         try (Stream<Path> paths = listScreenshots(screenshotDirectory)) {

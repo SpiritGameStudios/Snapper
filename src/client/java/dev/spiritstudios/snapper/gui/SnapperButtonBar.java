@@ -17,6 +17,7 @@ import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -28,9 +29,6 @@ import java.nio.file.Path;
 import java.util.function.Supplier;
 
 public class SnapperButtonBar {
-    private static final Identifier PANORAMA_BUTTON_ICON = Snapper.id("screenshots/panorama");
-    private static final Identifier PANORAMA_BUTTON_DISABLED_ICON = Snapper.id("screenshots/panorama_disabled");
-
     private static final Identifier SETTINGS_ICON = Snapper.id("screenshots/settings");
     private static final Identifier RELOAD_ICON = Snapper.id("screenshots/reset");
 
@@ -45,7 +43,6 @@ public class SnapperButtonBar {
             Screen postFlowScreen,
             HeaderAndFooterLayout layout,
             Supplier<@Nullable GalleryTexture> getTexture,
-            boolean enablePanoramaButton,
             @Nullable Runnable toggleGrid,
             @Nullable Runnable reload
     ) {
@@ -53,6 +50,8 @@ public class SnapperButtonBar {
 
         final int hSpacing = 4;
 
+        final int iconSize = 20;
+        final int iconSpriteSize = 15;
         final int buttonWidth = 74;
         final int bottomButtonWidth = 100;
 
@@ -66,11 +65,11 @@ public class SnapperButtonBar {
                 Component.translatable("config.snapper.title"),
                 _ -> minecraft.gui.setScreen(new ConfigScreen(screen)),
                 true
-        ).width(20).sprite(SETTINGS_ICON, 15, 15).build());
+        ).width(iconSize).sprite(SETTINGS_ICON, iconSpriteSize, iconSpriteSize).build());
 
         bottomRow.addChild(Button.builder(
                 Component.translatable("button.snapper.folder"),
-                _ -> Util.getPlatform().openPath(SnapperUtil.getConfiguredScreenshotDirectory())
+                _ -> Util.getPlatform().openPath(ScreenshotActions.getScreenshotDirectory())
         ).width(bottomButtonWidth).build());
 
         this.openButton = bottomRow.addChild(Button.builder(
@@ -88,23 +87,16 @@ public class SnapperButtonBar {
                 CommonComponents.GUI_DONE,
                 _ -> screen.onClose()
         ).width(bottomButtonWidth).build());
-        Path panoramaDir = SnapperUtil.getConfiguredScreenshotDirectory().resolve("panorama");
 
-        boolean hasPanorama = enablePanoramaButton && SnapperUtil.panoramaPresent(panoramaDir);
-        SpriteIconButton panoramaButton = bottomRow.addChild(
-                SpriteIconButton.builder(
-                        Component.translatable("button.snapper.screenshots"),
-                        _ -> {},
-                        true
-                ).width(20).sprite(hasPanorama ? PANORAMA_BUTTON_ICON : PANORAMA_BUTTON_DISABLED_ICON, 15, 15).build());
-
-        panoramaButton.active = hasPanorama;
-
-        if (enablePanoramaButton) {
-            panoramaButton.setTooltip(Tooltip.create(Component.translatable(hasPanorama ?
-                    "button.snapper.panorama.tooltip" :
-                    "text.snapper.panorama_encourage")));
-        }
+        var reloadButton = SpriteIconButton.builder(
+                Component.translatable("button.snapper.reload"),
+                _ -> {
+                    if (reload != null) reload.run();
+                },
+                true
+        ).width(iconSize).sprite(RELOAD_ICON, iconSpriteSize, iconSpriteSize).build();
+        reloadButton.active = reload != null;
+        bottomRow.addChild(reloadButton);
 
         ViewModeButton viewModeButton = new ViewModeButton(
                 _ -> {
@@ -161,17 +153,7 @@ public class SnapperButtonBar {
 
         this.setUploadButtonActive(true);
 
-        var reloadButton = SpriteIconButton.builder(
-                Component.translatable("button.snapper.reload"),
-                _ -> {
-                    if (reload != null) reload.run();
-                },
-                true
-        ).width(20).sprite(RELOAD_ICON, 15, 15).build();
-
-        reloadButton.active = reload != null;
-
-        topRow.addChild(reloadButton);
+        topRow.addChild(new SpacerElement(iconSize, iconSize));
     }
 
     public void setUploadButtonActive(boolean value) {

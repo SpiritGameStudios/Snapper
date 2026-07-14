@@ -22,20 +22,6 @@ import java.util.stream.Collectors;
 public final class SnapperUtil {
     // Helper things. Please order alphabetically. <3 Lynn
 
-    public static Path getConfiguredScreenshotDirectory() {
-        if (SnapperConfig.HOLDER.get().customScreenshotPath().enabled()) {
-            Path customPath = SnapperConfig.HOLDER.get().customScreenshotPath().path().resolve("screenshots");
-
-            if (!SafeFiles.createDirectories(customPath)) {
-                Snapper.LOGGER.error("Failed to create directories of configured custom screenshot folder");
-            }
-
-            return customPath;
-        }
-
-        return Minecraft.getInstance().gameDirectory.toPath().resolve("screenshots");
-    }
-
     public static boolean inBoundingBox(int x, int y, int w, int h, double mouseX, double mouseY) {
         return mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h;
     }

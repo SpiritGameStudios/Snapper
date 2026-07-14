@@ -116,7 +116,6 @@ public class GalleryScreen extends Screen implements ReloadableScreen {
                 this,
                 this.layout,
                 () -> this.selected != null ? this.selected.texture : null,
-                true,
                 this::toggleGrid,
                 this::reload
         );
@@ -186,7 +185,7 @@ public class GalleryScreen extends Screen implements ReloadableScreen {
         }
 
         if (input.key() == InputConstants.KEY_RETURN) {
-            minecraft.gui.setScreen(selected.texture.createViewer(parent));
+            minecraft.gui.setScreen(selected.texture.createViewer(this));
             return true;
         }
 
