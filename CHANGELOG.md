@@ -6,6 +6,10 @@
 * There are now more toasts for certain errors.
 
 ### Changes
+* **Moved the default unified screenshot directory to match other apps.**
+    * Windows: `%APPDATA%/snapper` -> `%APPDATA%/snapper`
+    * Linux: `$HOME/.snapper` -> `$HOME/.local/share/snapper`
+    * macOS: Unchanged
 * The overlay when using the file-picker dialogue now blurs the screen again.
     * This was originally removed due to a vanilla change making it impossible to blur the screen more than once per-frame. We have worked around this by cancelling the earlier blur if it existed.
 

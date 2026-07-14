@@ -103,6 +103,8 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
         for (Entry entry : this.children()) {
             if (entry.getY() + entry.getHeight() >= this.getY() && entry.getY() <= this.getBottom()) {
                 this.extractItem(graphics, mouseX, mouseY, partialTick, entry);
+            } else if (entry instanceof ScreenshotEntry screenshotEntry) {
+                screenshotEntry.texture.clear();
             }
         }
     }

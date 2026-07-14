@@ -55,17 +55,22 @@ public final class ScreenshotTexture extends GalleryTexture {
         this.texture = new DynamicTexture(() -> "Screenshot " + this.textureLocation, image);
         this.textureManager.register(this.textureLocation, this.texture);
         image.close();
-        this.isLoaded = true;
     }
 
     @Override
-    public void close() {
+    public boolean isLoaded() {
+        return this.texture != null;
+    }
+
+    @Override
+    public void clear() {
         if (this.texture != null) {
             this.textureManager.release(textureLocation);
             this.texture.close();
+            this.texture = null;
         }
 
-        this.isClosed = true;
+        this.isLoadingStarted = false;
     }
 
     @Override
