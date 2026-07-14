@@ -30,25 +30,6 @@ import java.util.function.Consumer;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
-    @Final
-    @Shadow
-    public Options options;
-
-    @Final
-    @Shadow
-    public GameRenderer gameRenderer;
-
-    @WrapOperation(
-            method = "grabPanoramixScreenshot",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/Screenshot;grab(Ljava/io/File;Ljava/lang/String;Lcom/mojang/blaze3d/pipeline/RenderTarget;ILjava/util/function/Consumer;)V")
-    )
-    private void saveScreenshot(File workDir, String forceName, RenderTarget target, int downscaleFactor, Consumer<Component> callback, Operation<Void> original) {
-        forceName = "panorama/" + forceName;
-        original.call(workDir, forceName, target, downscaleFactor, callback);
-    }
-
     @Inject(
             method = "<init>",
             at = @At("TAIL")
@@ -56,32 +37,4 @@ public abstract class MinecraftMixin {
     private void init(GameConfig gameConfig, CallbackInfo ci) {
         if (Clipboard.INSTANCE instanceof AWTClipboard) System.setProperty("java.awt.headless", "false");
     }
-
-    @WrapOperation(
-            method = "grabPanoramixScreenshot",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setYRot(F)V")
-    )
-    private void captureSetYaw(LocalPlayer player, float value, Operation<Void> op, @Share("yaw") LocalFloatRef yaw) {
-        if (!this.options.getCameraType().isFirstPerson()) yaw.set(value);
-        else op.call(player, value);
-    }
-
-    @WrapOperation(
-            method = "grabPanoramixScreenshot",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setYRot(F)V")
-    )
-    private void applyThirdPersonCameraRotation(LocalPlayer player, float value, Operation<Void> op, @Share("yaw") LocalFloatRef yaw) {
-        if (!this.options.getCameraType().isFirstPerson())
-            ((CameraAccessor) this.gameRenderer.mainCamera()).invokeSetRotation(yaw.get(), value);
-        else op.call(player, value);
-    }
-
-    @ModifyConstant(
-            method = "grabPanoramixScreenshot",
-            constant = @Constant(intValue = 4096)
-    )
-    private int configurablePanoramaSize(int original) {
-        return SnapperConfig.HOLDER.get().panoramaDimensions().size() * 4;
-    }
-
 }

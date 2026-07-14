@@ -26,25 +26,8 @@ public final class SnapperUtil {
         return mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h;
     }
 
-    public static FormattedCharSequence clipText(Font font, Component message, int width) {
-        if (font.width(message) < width) return message.getVisualOrderText();
-
-        FormattedText formattedText = font.substrByWidth(message, width - font.width(CommonComponents.ELLIPSIS));
-        return Language.getInstance().getVisualOrder(FormattedText.composite(formattedText, CommonComponents.ELLIPSIS));
-    }
-
     public static boolean isOfflineAccount() {
         return Minecraft.getInstance().getUser().getAccessToken().length() < 400;
-    }
-
-    public static boolean panoramaPresent(Path path) {
-        if (!Files.exists(path) || !Files.isDirectory(path)) return false;
-
-        for (int i = 0; i < 6; i++) {
-            if (!Files.exists(path.resolve("panorama_%s.png".formatted(i)))) return false;
-        }
-
-        return true;
     }
 
     public enum PanoramaSize {

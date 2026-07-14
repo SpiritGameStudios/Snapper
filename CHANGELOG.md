@@ -13,6 +13,8 @@
     * macOS: Unchanged
 * The overlay when using the file-picker dialogue now blurs the screen again.
     * This was originally removed due to a vanilla change making it impossible to blur the screen more than once per-frame. We have worked around this by cancelling the earlier blur if it existed.
+* Use the command line tools `wl-copy` or `xclip` instead of AWT to copy images if they are available
+    * This should make Auto-clipboard work without any setup on most Linux systems.
 
 ### Bug Fixes
 * Fix a very rare race condition when taking a panorama if the GPU took more than 10ms to render a single face of a panorama.

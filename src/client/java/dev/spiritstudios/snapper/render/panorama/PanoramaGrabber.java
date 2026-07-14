@@ -11,10 +11,7 @@ import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
-import net.minecraft.client.Camera;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.Screenshot;
+import net.minecraft.client.*;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
@@ -31,6 +28,7 @@ public final class PanoramaGrabber {
 
         int oldWidth = window.getWidth();
         int oldHeight = window.getHeight();
+        CameraType oldCameraType = minecraft.options.getCameraType();
         RenderTarget target = minecraft.gameRenderer.mainRenderTarget();
         float xRot = minecraft.player.getXRot();
         float yRot = minecraft.player.getYRot();
@@ -40,6 +38,7 @@ public final class PanoramaGrabber {
         Camera camera = minecraft.gameRenderer.mainCamera();
 
         try {
+            minecraft.options.setCameraType(CameraType.FIRST_PERSON);
             camera.enablePanoramicMode();
             window.setWidth(faceSize * 4);
             window.setHeight(faceSize * 4);
@@ -73,8 +72,6 @@ public final class PanoramaGrabber {
         } catch (Throwable e) {
             Snapper.LOGGER.error("Failed to take panorama", e);
         } finally {
-            RenderSystem.executePendingTasks();
-
             minecraft.player.setXRot(xRot);
             minecraft.player.setYRot(yRot);
             minecraft.player.xRotO = xRotO;
@@ -84,6 +81,7 @@ public final class PanoramaGrabber {
             window.setHeight(oldHeight);
             target.resize(oldWidth, oldHeight);
             camera.disablePanoramicMode();
+            minecraft.options.setCameraType(oldCameraType);
         }
     }
 

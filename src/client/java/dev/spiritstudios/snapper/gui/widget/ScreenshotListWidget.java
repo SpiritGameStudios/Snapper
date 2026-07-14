@@ -6,6 +6,7 @@ import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.ComponentRenderUtils;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -59,7 +60,7 @@ public class ScreenshotListWidget extends GalleryWidget {
 
             graphics.text(
                     minecraft.font,
-                    SnapperUtil.clipText(minecraft.font, fileName, getContentWidth() - 32 - 6),
+                    ComponentRenderUtils.clipText(fileName, minecraft.font, getContentWidth() - 32 - 6),
                     getContentX() + 32 + 3, getContentY() + 1,
                     CommonColors.WHITE,
                     true

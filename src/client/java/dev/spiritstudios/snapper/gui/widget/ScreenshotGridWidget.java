@@ -6,6 +6,7 @@ import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.ComponentRenderUtils;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
@@ -148,7 +149,7 @@ public class ScreenshotGridWidget extends GalleryWidget {
 
             int centreX = getContentX() + getContentWidth() / 2;
             int centreY = getContentY() + getContentHeight() / 2;
-
+            
             clickThroughHovered = SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY);
 
             if (this.texture.isLoaded()) {
@@ -200,7 +201,7 @@ public class ScreenshotGridWidget extends GalleryWidget {
 
                     graphics.text(
                             minecraft.font,
-                            SnapperUtil.clipText(minecraft.font, fileName, getContentWidth() - 5),
+                            ComponentRenderUtils.clipText(fileName, minecraft.font, getContentWidth() - 5),
                             getContentX() + 5,
                             getContentY() + 6,
                             CommonColors.WHITE,
@@ -218,7 +219,7 @@ public class ScreenshotGridWidget extends GalleryWidget {
 
                     graphics.text(
                             minecraft.font,
-                            SnapperUtil.clipText(minecraft.font, creation, getContentWidth() - 5),
+                            ComponentRenderUtils.clipText(creation, minecraft.font, getContentWidth() - 5),
                             getContentX() + 5,
                             getContentY() + getContentHeight() - 12,
                             CommonColors.LIGHT_GRAY,
