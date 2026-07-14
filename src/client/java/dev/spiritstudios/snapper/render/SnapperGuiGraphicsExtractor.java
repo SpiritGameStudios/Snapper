@@ -11,4 +11,8 @@ public interface SnapperGuiGraphicsExtractor {
     ) {
         throw new UnsupportedOperationException("Implemented via mixin.");
     }
+
+    default void snapper$forceBlurBeforeThisStratum() {
+        throw new UnsupportedOperationException("Implemented via mixin.");
+    }
 }

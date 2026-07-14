@@ -1,5 +1,6 @@
 package dev.spiritstudios.snapper.mixin;
 
+import dev.spiritstudios.snapper.mixin.accessor.GuiRenderStateAccessor;
 import dev.spiritstudios.snapper.render.SnapperGuiGraphicsExtractor;
 import dev.spiritstudios.snapper.render.panorama.GuiPanoramaRenderState;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -31,5 +32,12 @@ public class GuiGraphicsExtractorMixin implements SnapperGuiGraphicsExtractor {
                         this.scissorStack.peek()
                 )
         );
+    }
+
+    @Override
+    public void snapper$forceBlurBeforeThisStratum() {
+        GuiRenderStateAccessor accessor = (GuiRenderStateAccessor)this.guiRenderState;
+
+        accessor.setFirstStratumAfterBlur(accessor.getStrata().size() - 1);
     }
 }

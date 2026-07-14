@@ -23,6 +23,7 @@
     "GuiGraphicsExtractorMixin",
     "PictureInPictureRendererMixin",
     "accessor.CubeMapAccessor",
+    "accessor.GuiRenderStateAccessor",
     "accessor.PictureInPictureRendererAccessor"
   ]
 }

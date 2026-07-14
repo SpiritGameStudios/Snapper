@@ -24,6 +24,7 @@ public class ExternalDialogOverlay extends Overlay {
         }
 
         graphics.nextStratum();
+        graphics.snapper$forceBlurBeforeThisStratum();
 
         graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
