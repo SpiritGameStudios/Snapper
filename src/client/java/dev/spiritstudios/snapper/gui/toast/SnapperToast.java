@@ -16,24 +16,24 @@ import org.jspecify.annotations.NonNull;
 import java.util.List;
 
 public class SnapperToast implements Toast {
-    private static final Identifier TEXTURE = Snapper.id("toast/snapper");
+    private static final Identifier BACKGROUND_SPRITE = Snapper.id("toast/snapper");
+
     private static final Identifier SCREENSHOT_ICON = Snapper.id("icon/image");
     private static final Identifier PANORAMA_ICON = Snapper.id("icon/panorama");
     private static final Identifier UPLOAD_ICON = Snapper.id("icon/upload");
-    private static final Identifier DENY_ICON = Snapper.id("icon/nuh_uh");
-    private static final int VISIBILITY_DURATION = 5000;
+    private static final Identifier FAILURE_ICON = Snapper.id("icon/nuh_uh");
+
+    private static final int DISPLAY_TIME = 5000;
     private static final int WIDTH = 256;
-    private static final int LINE_HEIGHT = 12;
-    private static final int PADDING = 10;
+    private static final int PADDING = 7;
 
     private final Type type;
     private final Component title;
     private final List<FormattedCharSequence> lines;
-    private Visibility visibility;
+    private Visibility visibility = Visibility.HIDE;
 
     public SnapperToast(Type type, Component title, Component description) {
         this.type = type;
-        this.visibility = Visibility.HIDE;
 
         this.title = title;
         Minecraft minecraft = Minecraft.getInstance();
@@ -56,18 +56,14 @@ public class SnapperToast implements Toast {
         return this.visibility;
     }
 
-    public Visibility setWantedVisibility(Visibility visibility) {
-        return this.visibility = visibility;
-    }
-
     @Override
     public void update(ToastManager manager, long time) {
-        this.visibility = (double) time >= VISIBILITY_DURATION * manager.getNotificationDisplayTimeMultiplier() ? Visibility.HIDE : Visibility.SHOW;
+        this.visibility = (double) time >= DISPLAY_TIME * manager.getNotificationDisplayTimeMultiplier() ? Visibility.HIDE : Visibility.SHOW;
     }
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, Font font, long startTime) {
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURE, 0, 0, this.width(), this.height());
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND_SPRITE, 0, 0, this.width(), this.height());
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, getCurrentComponenture(), PADDING, PADDING, 16, 16);
 
         graphics.text(font, title, PADDING * 2 + 12, this.lines.isEmpty() ? 12 : 7, CommonColors.YELLOW, false);
@@ -82,19 +78,19 @@ public class SnapperToast implements Toast {
     }
 
     public int height() {
-        return PADDING * 2 + Math.max(this.lines.size(), 1) * LINE_HEIGHT;
+        return PADDING * 2 + (this.lines.size() + 1) * Minecraft.getInstance().font.lineHeight;
     }
 
     private Identifier getCurrentComponenture() {
         return switch (type) {
             case UPLOAD -> UPLOAD_ICON;
             case PANORAMA -> PANORAMA_ICON;
-            case DENY -> DENY_ICON;
+            case FAILURE -> FAILURE_ICON;
             default -> SCREENSHOT_ICON;
         };
     }
 
     public enum Type {
-        SCREENSHOT, PANORAMA, UPLOAD, DENY
+        SCREENSHOT, PANORAMA, UPLOAD, FAILURE
     }
 }

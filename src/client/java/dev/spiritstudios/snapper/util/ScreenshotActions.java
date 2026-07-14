@@ -1,8 +1,10 @@
 package dev.spiritstudios.snapper.util;
 
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.SnapperComponents;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ReloadableScreen;
+import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
 import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
@@ -51,6 +53,14 @@ public final class ScreenshotActions {
                         CommonComponents.GUI_CANCEL
                 )
         );
+    }
+
+    public static void copyScreenshot(Path path) {
+        if (PlatformHelper.INSTANCE.copyScreenshot(path)) {
+            SnapperToasts.screenshotCopySuccess();
+        } else {
+            SnapperToasts.screenshotCopyFailure();
+        }
     }
 
     public static void renameScreenshot(Path screenshot, String newName) {
@@ -111,7 +121,7 @@ public final class ScreenshotActions {
 
         try (Stream<Path> paths = listScreenshots(screenshotDirectory)) {
             return paths
-                    .<GalleryTexture>flatMap(path -> ScreenshotTexture.createScreenshot(textureManager, path).stream())
+                    .<GalleryTexture>map(path -> ScreenshotTexture.createScreenshot(textureManager, path))
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -124,7 +134,7 @@ public final class ScreenshotActions {
 
         try (Stream<Path> paths = listScreenshots(screenshotDirectory)) {
             return paths
-                    .<GalleryTexture>flatMap(path -> PanoramaTexture.createScreenshot(textureManager, path).stream())
+                    .<GalleryTexture>map(path -> PanoramaTexture.createScreenshot(textureManager, path))
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);

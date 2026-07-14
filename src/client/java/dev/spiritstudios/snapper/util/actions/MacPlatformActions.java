@@ -64,7 +64,7 @@ public class MacPlatformActions implements PlatformHelper {
     */
 
     @Override
-    public void copyScreenshot(Path screenshot) {
+    public boolean copyScreenshot(Path screenshot) {
         Client client = Client.getInstance();
         Proxy url = client.sendProxy("NSURL", "fileURLWithPath:", screenshot.toAbsolutePath().toString());
 
@@ -76,9 +76,6 @@ public class MacPlatformActions implements PlatformHelper {
 
         Proxy pasteboard = client.sendProxy("NSPasteboard", "generalPasteboard");
         pasteboard.send("clearContents");
-        boolean wasSuccessful = pasteboard.sendBoolean("writeObjects:", array);
-        if (!wasSuccessful) {
-            Snapper.LOGGER.error("Failed to write image to pasteboard.");
-        }
+        return pasteboard.sendBoolean("writeObjects:", array);
     }
 }

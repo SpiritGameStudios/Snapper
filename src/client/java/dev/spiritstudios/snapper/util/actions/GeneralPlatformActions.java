@@ -19,10 +19,10 @@ import java.util.Optional;
 
 public class GeneralPlatformActions implements PlatformHelper {
     @Override
-    public void copyScreenshot(Path path) {
+    public boolean copyScreenshot(Path path) {
         if (!Files.exists(path)) {
 			Snapper.LOGGER.warn("Attempted to copy screenshot {} that does not exist", path);
-			return;
+			return false;
 		}
 
         try (InputStream stream = Files.newInputStream(path)) {
@@ -30,8 +30,14 @@ public class GeneralPlatformActions implements PlatformHelper {
 
             getClipboard().ifPresent(clipboard ->
                     clipboard.setContents(new TransferableImage(imageBuffer), null));
-        } catch (IOException e) {
-            Snapper.LOGGER.error("Copying of image at {} failed", path);
+
+			return true;
+        }catch (NoClassDefFoundError | AWTError e) {
+			Snapper.LOGGER.error("Failed to copy image at {}. This is likely because your Java Virtual Machine does not properly support AWT. Please try switching to another JVM before reporting this as a bug.", path, e);
+			return false;
+		} catch (Throwable e) {
+            Snapper.LOGGER.error("Failed to copy image at {}.", path, e);
+			return false;
         }
     }
 

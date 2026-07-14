@@ -25,16 +25,16 @@ public final class ScreenshotTexture extends GalleryTexture {
     private DynamicTexture texture;
 
     @SuppressWarnings("deprecation") // Vanilla uses sha1 for this, copying it
-    public static Optional<ScreenshotTexture> createScreenshot(TextureManager textureManager, Path path) {
+    public static ScreenshotTexture createScreenshot(TextureManager textureManager, Path path) {
         String name = path.getFileName().toString();
 
-        return Optional.of(new ScreenshotTexture(
+        return new ScreenshotTexture(
                 textureManager,
                 Snapper.id(
                         "screenshots/" + Util.sanitizeName(name, Identifier::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(name)
                 ),
                 path
-        ));
+        );
     }
 
     @Override

@@ -179,8 +179,7 @@ public class GalleryScreen extends Screen implements ReloadableScreen {
         if (selected == null) return false;
 
         if ((input.modifiers() & InputConstants.MOD_CONTROL) != 0 && input.key() == InputConstants.KEY_C) {
-            PlatformHelper.INSTANCE.copyScreenshot(selected.texture.path);
-            SnapperToast.push(SnapperToast.Type.SCREENSHOT, Component.translatable("toast.snapper.screenshot.copy"), null);
+            ScreenshotActions.copyScreenshot(selected.texture.path);
             return true;
         }
 

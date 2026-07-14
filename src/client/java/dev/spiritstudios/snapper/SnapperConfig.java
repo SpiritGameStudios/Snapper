@@ -3,6 +3,7 @@ package dev.spiritstudios.snapper;
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
+import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
@@ -229,14 +230,9 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                     Util.ioPool()
             ).exceptionallyCompose(error -> Minecraft.getInstance().submit(() -> {
                 Snapper.LOGGER.error("Failed to save configuration file.", error);
+                SnapperToasts.configSaveFailure();
 
                 HOLDER.set(oldValue, null);
-
-                SnapperToast.push(
-                        SnapperToast.Type.DENY,
-                        Component.translatable("toast.snapper.config.failure.title"),
-                        Component.translatable("toast.snapper.config.failure.description")
-                );
             }));
         }
 

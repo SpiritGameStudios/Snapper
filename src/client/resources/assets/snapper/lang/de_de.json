@@ -76,7 +76,7 @@
   "toast.snapper.upload.success.description": "Ein Link zum hochgeladenen Bild wurde in die Zwischenablage kopiert.",
   "toast.snapper.upload.failure": "Fehler beim Hochladen des Bildes",
   "toast.snapper.upload.axolotlclient.api_disabled": "Du hast die Bedingungen des AxolotlClients nicht akzeptiert, deshalb ist das Hochladen des Bildes nicht möglich.",
-  "toast.snapper.upload.offline": "Du bist gerade offline.",
+  "toast.snapper.upload.failure.offline": "Du bist gerade offline.",
   "toast.snapper.upload.failure.generic": "Mehr Informationen können in den Logs gefunden werden.",
   "prompt.snapper.folder_select": "Wähle einen benutzerdefinierten Screenshot-Ordner für Snapper aus.",
   "overlay.snapper.external_dialog.folder": "Ordner-Auswahl Dialog wurde geöffnet. Durch das Klicken von \"Abbrechen\" im Dialog schließen.",

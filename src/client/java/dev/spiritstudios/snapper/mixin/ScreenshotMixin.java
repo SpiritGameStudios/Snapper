@@ -9,7 +9,9 @@ import com.mojang.blaze3d.platform.NativeImage;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.SnapperKeyMappings;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
+import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
 import dev.spiritstudios.snapper.util.PlatformHelper;
+import dev.spiritstudios.snapper.util.ScreenshotActions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.network.chat.Component;
@@ -46,7 +48,7 @@ public abstract class ScreenshotMixin {
     )
     private static void saveWrittenFileToClipboard(NativeImage image, File file, Consumer<Component> callback, CallbackInfo ci) {
         if (!file.getAbsolutePath().contains("/panorama/") && SnapperConfig.HOLDER.get().copyTakenScreenshot()) {
-            PlatformHelper.INSTANCE.copyScreenshot(file.toPath());
+            ScreenshotActions.copyScreenshot(file.toPath());
         }
     }
 
@@ -87,17 +89,7 @@ public abstract class ScreenshotMixin {
                 (Consumer<Component>) message -> {
                     // Execute on the render thread.
                     Minecraft.getInstance().execute(() -> {
-                        // Lovely tree of decisions to decide what instructions make sense. <3 Lynn
-                        String inGameDeterminedDescription = minecraft.gui.screen() == null ? "toast.snapper.screenshot.created.description"
-                                : "toast.snapper.screenshot.created.description_in_menu";
-                        String copyDeterminedDescription = SnapperConfig.HOLDER.get().copyTakenScreenshot() ?
-                                "toast.snapper.screenshot.created.description_copy" : inGameDeterminedDescription;
-
-                        SnapperToast.push(
-                                SnapperToast.Type.SCREENSHOT,
-                                Component.translatable("toast.snapper.screenshot.created"),
-                                Component.translatable(copyDeterminedDescription, message, SnapperKeyMappings.RECENT_SCREENSHOT_KEY.getTranslatedKeyMessage())
-                        );
+                        SnapperToasts.screenshotCreateSuccess(message);
                     });
                 }
         );

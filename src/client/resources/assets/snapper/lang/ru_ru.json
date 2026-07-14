@@ -66,7 +66,7 @@
   "toast.snapper.upload.in_progress.description": "Подождите...",
   "toast.snapper.upload.success.description": "Ссылка на скриншот скопирована в буфер обмена.",
   "toast.snapper.upload.axolotlclient.api_disabled": "Вы не приняли условия AxolotlClient, из-за чего загрузка скриншотов невозможна.",
-  "toast.snapper.upload.offline": "Нет соединения с сервисом. Возможно, у вас нет подключения к интернету.",
+  "toast.snapper.upload.failure.offline": "Нет соединения с сервисом. Возможно, у вас нет подключения к интернету.",
   "toast.snapper.upload.failure.generic": "Больше информации вы можете найти в логах.",
   "prompt.snapper.folder_select": "Выберите свою папку для скриншотов Snapper.",
   "overlay.snapper.external_dialog.folder": "Диалог выбора папки открыт. Выйти можно нажав \"Отмена\" в диалоге.",

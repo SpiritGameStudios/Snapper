@@ -6,12 +6,17 @@ import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.SnapperKeyMappings;
+import dev.spiritstudios.snapper.gui.toast.SnapperToast;
+import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 
 import java.nio.file.Path;
@@ -58,6 +63,8 @@ public final class PanoramaGrabber {
                                     .resolve(Util.getFilenameFormattedDateTime() + ".png");
 
                             output.writeToFile(path);
+
+                            SnapperToasts.panoramaCreateSuccess(Component.literal(path.getFileName().toString()));
                         } catch (Exception e) {
                             Snapper.LOGGER.warn("Couldn't save screenshot", e);
                         }

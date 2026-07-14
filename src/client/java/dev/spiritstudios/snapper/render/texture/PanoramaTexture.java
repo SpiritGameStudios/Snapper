@@ -29,16 +29,16 @@ public final class PanoramaTexture extends GalleryTexture {
     }
 
     @SuppressWarnings("deprecation") // Vanilla uses sha1 for this, copying it
-    public static Optional<PanoramaTexture> createScreenshot(TextureManager textureManager, Path path) {
+    public static PanoramaTexture createScreenshot(TextureManager textureManager, Path path) {
         String name = path.getFileName().toString();
 
-        return Optional.of(new PanoramaTexture(
+        return new PanoramaTexture(
                 textureManager,
                 Snapper.id(
                         "screenshots/panoramas/" + Util.sanitizeName(name, Identifier::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(name)
                 ),
                 path
-        ));
+        );
     }
 
     private Texture texture;

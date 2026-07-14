@@ -4,6 +4,7 @@ import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.PrivacyNoticeScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
+import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
@@ -31,28 +32,16 @@ public class ScreenshotUploading {
         return done;
     }
 
-    private static void apiDisabledToast() {
-        SnapperToast.push(
-                SnapperToast.Type.DENY,
-                Component.translatable("toast.snapper.upload.failure"),
-                Component.translatable("toast.snapper.upload.axolotlclient.api_disabled")
-        );
-    }
-
     public static CompletableFuture<Void> upload(Path image, boolean promptAcceptTerms) {
         if (SnapperUtil.isOfflineAccount()) {
-            SnapperToast.push(
-                    SnapperToast.Type.DENY,
-                    Component.translatable("toast.snapper.upload.failure"),
-                    Component.translatable("toast.snapper.upload.offline")
-            );
+            SnapperToasts.imageUploadFailureOffline();
             return CompletableFuture.failedFuture(new IllegalStateException("Minecraft is currently running in offline mode."));
         }
 
         AxolotlClientApi.TermsAcceptance termsStatus = SnapperConfig.HOLDER.get().axolotlClient().termsStatus();
 
         if (termsStatus == AxolotlClientApi.TermsAcceptance.DENIED) {
-            apiDisabledToast();
+            SnapperToasts.imageUploadApiDisabledToast();
             return CompletableFuture.failedFuture(new IllegalStateException("AxolotlClient API is disabled."));
         }
 
@@ -60,7 +49,7 @@ public class ScreenshotUploading {
             if (promptAcceptTerms) {
                 return requestTerms().thenCompose(_ -> upload(image, false));
             } else {
-                apiDisabledToast();
+                SnapperToasts.imageUploadApiDisabledToast();
                 return CompletableFuture.failedFuture(new IllegalStateException("AxolotlClient API was not accepted."));
             }
         }
@@ -72,25 +61,15 @@ public class ScreenshotUploading {
 
     private static void imageUploaded(String imageId) {
         if (imageId == null) {
-            SnapperToast.push(
-                    SnapperToast.Type.DENY,
-                    Component.translatable("toast.snapper.upload.failure"),
-                    Component.translatable("toast.snapper.upload.failure.generic")
-            );
+            SnapperToasts.imageUploadFailureGeneric();
             return;
         }
 
         Minecraft client = Minecraft.getInstance();
         String snapperUrl = SNAPPER_WEB_URL.formatted(imageId);
 
-        Snapper.LOGGER.info("Uploaded screenshot to: {}", snapperUrl);
-
         client.keyboardHandler.setClipboard(snapperUrl);
-        SnapperToast.push(
-                SnapperToast.Type.UPLOAD,
-                Component.translatable("toast.snapper.upload.success"),
-                Component.translatable("toast.snapper.upload.success.description", snapperUrl)
-        );
+        SnapperToasts.imageUploadSuccess(Component.literal(snapperUrl));
     }
 
     public static void close() {

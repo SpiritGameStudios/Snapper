@@ -45,29 +45,21 @@ public final class SnapperKeyMappings {
         ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
             while (PANORAMA_KEY.consumeClick()) SnapperKeyMappings.takePanorama(minecraft);
             while (RECENT_SCREENSHOT_KEY.consumeClick()) SnapperKeyMappings.openRecentScreenshot(minecraft);
-            while (SCREENSHOT_MENU_KEY.consumeClick()) minecraft.gui.setScreen(new GalleryScreen(minecraft.gui.screen()));
+            while (SCREENSHOT_MENU_KEY.consumeClick())
+                minecraft.gui.setScreen(new GalleryScreen(minecraft.gui.screen()));
         });
     }
 
     private static void takePanorama(Minecraft minecraft) {
         if (minecraft.player == null) return;
         PanoramaGrabber.grabSnapperPanorama(minecraft);
-
-        SnapperToast.push(
-                SnapperToast.Type.PANORAMA,
-                Component.translatable("toast.snapper.panorama.created"),
-                Component.translatable(
-                        "toast.snapper.panorama.created.description",
-                        SCREENSHOT_MENU_KEY.getTranslatedKeyMessage()
-                )
-        );
     }
 
     private static void openRecentScreenshot(Minecraft minecraft) {
         List<Path> screenshots = ScreenshotActions.getScreenshots();
         if (screenshots.isEmpty()) {
             SnapperToast.push(
-                    SnapperToast.Type.SCREENSHOT,
+                    SnapperToast.Type.FAILURE,
                     Component.translatable("toast.snapper.screenshot.recent.failure"),
                     Component.translatable("toast.snapper.screenshot.recent.failure.not_exist")
             );
@@ -75,19 +67,10 @@ public final class SnapperKeyMappings {
         }
 
         Path latestPath = screenshots.getFirst();
-        ScreenshotTexture.createScreenshot(minecraft.getTextureManager(), latestPath)
-                .ifPresentOrElse(
-                        image -> {
-                            minecraft.gui.setScreen(new ScreenshotViewerScreen(
-                                    image,
-                                    minecraft.gui.screen()
-                            ));
-                        },
-                        () -> SnapperToast.push(
-                                SnapperToast.Type.DENY,
-                                Component.translatable("toast.snapper.screenshot.recent.failure"),
-                                Component.translatable("toast.snapper.screenshot.recent.failure.generic")
-                        )
-                );
+
+        minecraft.gui.setScreen(new ScreenshotViewerScreen(
+                ScreenshotTexture.createScreenshot(minecraft.getTextureManager(), latestPath),
+                minecraft.gui.screen()
+        ));
     }
 }

@@ -11,5 +11,5 @@ public interface PlatformHelper {
             new MacPlatformActions() :
             new GeneralPlatformActions();
 
-    void copyScreenshot(Path screenshot);
+    boolean copyScreenshot(Path screenshot);
 }
