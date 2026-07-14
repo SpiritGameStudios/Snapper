@@ -107,28 +107,6 @@ public class SnapperButtonBar {
 
         topRow.addChild(viewModeButton);
 
-        this.deleteButton = topRow.addChild(Button.builder(
-                Component.translatable("button.snapper.delete"),
-                _ -> {
-                    GalleryTexture selected = getTexture.get();
-
-                    if (selected != null) {
-                        ScreenshotActions.deleteScreenshot(selected.path, postFlowScreen);
-                    }
-                }
-        ).width(buttonWidth).build());
-
-        this.renameButton = topRow.addChild(Button.builder(
-                Component.translatable("button.snapper.rename"),
-                _ -> {
-                    GalleryTexture selected = getTexture.get();
-
-                    if (selected != null) {
-                        minecraft.gui.setScreen(new ScreenshotRenameScreen(selected.path, postFlowScreen));
-                    }
-                }
-        ).width(buttonWidth).build());
-
         this.copyButton = topRow.addChild(Button.builder(
                 Component.translatable("button.snapper.copy"),
                 _ -> {
@@ -150,6 +128,28 @@ public class SnapperButtonBar {
         }).width(buttonWidth).build());
 
         this.setUploadButtonActive(true);
+
+        this.renameButton = topRow.addChild(Button.builder(
+                Component.translatable("button.snapper.rename"),
+                _ -> {
+                    GalleryTexture selected = getTexture.get();
+
+                    if (selected != null) {
+                        minecraft.gui.setScreen(new ScreenshotRenameScreen(selected.path, postFlowScreen));
+                    }
+                }
+        ).width(buttonWidth).build());
+
+        this.deleteButton = topRow.addChild(Button.builder(
+                Component.translatable("button.snapper.delete"),
+                _ -> {
+                    GalleryTexture selected = getTexture.get();
+
+                    if (selected != null) {
+                        ScreenshotActions.deleteScreenshot(selected.path, postFlowScreen);
+                    }
+                }
+        ).width(buttonWidth).build());
 
         topRow.addChild(new SpacerElement(iconSize, iconSize));
     }

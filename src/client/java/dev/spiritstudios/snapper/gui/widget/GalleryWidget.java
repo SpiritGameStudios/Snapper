@@ -6,6 +6,7 @@ import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
 import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.util.SafeFiles;
+import dev.spiritstudios.snapper.util.ScreenshotActions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -149,6 +150,14 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
             if (entry instanceof ScreenshotEntry screenshotEntry) return screenshotEntry.click();
         }
 
+        if (input.key() == InputConstants.KEY_DELETE) {
+            Entry entry = this.getSelected();
+            if (entry instanceof ScreenshotEntry screenshotEntry && screenshotEntry.texture != null) {
+                ScreenshotActions.deleteScreenshot(screenshotEntry.texture.path, this.screen);
+                return super.keyPressed(input);
+            };
+        }
+
         return super.keyPressed(input);
     }
 
@@ -183,7 +192,7 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
                     (screen.width - this.minecraft.font.width(LOADING_LIST_TEXT)) / 2,
                     getY() + (getHeight() - 9) / 2,
                     CommonColors.WHITE,
-                    false
+                    true
             );
 
             String loadString = LoadingDotsText.get(Util.getMillis());
@@ -194,7 +203,7 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
                     (screen.width - this.minecraft.font.width(loadString)) / 2,
                     getY() + (getHeight() - 9) / 2 + 9,
                     CommonColors.GRAY,
-                    false
+                    true
             );
         }
     }
@@ -234,7 +243,7 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
                     (screen.width - this.minecraft.font.width(useContentSpecificText())) / 2,
                     getY() + getHeight() / 2,
                     CommonColors.WHITE,
-                    false
+                    true
             );
 
             context.text(
@@ -243,7 +252,7 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
                     (screen.width - this.minecraft.font.width(EMPTY_CUSTOM_LIST_TEXT)) / 2,
                     getY() + getHeight() / 2 + 10,
                     CommonColors.WHITE,
-                    false
+                    true
             );
         }
     }

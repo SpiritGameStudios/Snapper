@@ -62,7 +62,7 @@ public class ScreenshotListWidget extends GalleryWidget {
                     SnapperUtil.clipText(minecraft.font, fileName, getContentWidth() - 32 - 6),
                     getContentX() + 32 + 3, getContentY() + 1,
                     CommonColors.WHITE,
-                    false
+                    true
             );
 
             graphics.text(
@@ -72,7 +72,7 @@ public class ScreenshotListWidget extends GalleryWidget {
                             .append(creation),
                     getContentX() + 35, getContentY() + 12,
                     CommonColors.GRAY,
-                    false
+                    true
             );
 
             if (texture.isLoaded()) {
@@ -128,7 +128,7 @@ public class ScreenshotListWidget extends GalleryWidget {
                         getContentX() + (getContentWidth() - minecraft.font.width(text)) / 2,
                         this.getContentYMiddle() - minecraft.font.lineHeight / 2,
                         CommonColors.WHITE,
-                        false
+                        true
                 );
             } else {
                 String loadString = LoadingDotsText.get(Util.getMillis());
@@ -139,7 +139,7 @@ public class ScreenshotListWidget extends GalleryWidget {
                         getContentX() + (16 - minecraft.font.width(loadString) / 2),
                         (getContentY() + getContentHeight() / 2) - minecraft.font.lineHeight / 2,
                         CommonColors.GRAY,
-                        false
+                        true
                 );
             }
         }
