@@ -4,9 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.SnapperButtonBar;
-import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.gui.widget.GalleryWidget;
-import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.tabs.GridLayoutTab;
@@ -45,7 +43,7 @@ public class GalleryScreen extends Screen implements ReloadableScreen {
     private GalleryWidget.ScreenshotEntry selected = null;
 
     public GalleryScreen(Screen parent) {
-        super(Component.translatable("menu.snapper.screenshot_menu"));
+        super(Component.translatable("menu.snapper.gallery"));
         this.parent = parent;
     }
 

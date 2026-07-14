@@ -14,3 +14,11 @@
 * Fix the game crashing or spamming the logs if a screenshot failed to load for any reason.
 * Fix inconsistent use of icons in toasts.
 * Fix inconsistent text in toasts.
+
+### Translation Changes
+All translation changes have only made it to the en_us language file at this time.
+- `button.snapper.screenshots` is now `button.snapper.gallery`, and the menu has been renamed to the "Screenshot Gallery".
+- `menu.snapper.screenshot_menu` is now `menu.snapper.gallery`, and the menu has been renamed to "Screenshot Gallery".
+- `key.snapper.screenshot_menu` is now `key.snapper.open_gallery`, and the title has been renamed to "Open Gallery".
+- "Take Panoramic Screenshots" is now "Take Panorama" (`key.snapper.panorama`)
+- `menu.snapper.panorama` ("View Panorama") has been removed and functionally replaced with `menu.snapper.tab.panoramas` ("Panoramas").

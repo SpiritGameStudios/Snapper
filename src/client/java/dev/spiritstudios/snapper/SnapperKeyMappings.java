@@ -31,8 +31,8 @@ public final class SnapperKeyMappings {
             SNAPPER_CATEGORY
     );
 
-    public static final KeyMapping SCREENSHOT_MENU_KEY = new KeyMapping(
-            "key.snapper.screenshot_menu",
+    public static final KeyMapping GALLERY_KEY = new KeyMapping(
+            "key.snapper.open_gallery",
             GLFW.GLFW_KEY_V,
             SNAPPER_CATEGORY
     );
@@ -40,12 +40,12 @@ public final class SnapperKeyMappings {
     public static void init() {
         KeyMappingHelper.registerKeyMapping(PANORAMA_KEY);
         KeyMappingHelper.registerKeyMapping(RECENT_SCREENSHOT_KEY);
-        KeyMappingHelper.registerKeyMapping(SCREENSHOT_MENU_KEY);
+        KeyMappingHelper.registerKeyMapping(GALLERY_KEY);
 
         ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
             while (PANORAMA_KEY.consumeClick()) SnapperKeyMappings.takePanorama(minecraft);
             while (RECENT_SCREENSHOT_KEY.consumeClick()) SnapperKeyMappings.openRecentScreenshot(minecraft);
-            while (SCREENSHOT_MENU_KEY.consumeClick())
+            while (GALLERY_KEY.consumeClick())
                 minecraft.gui.setScreen(new GalleryScreen(minecraft.gui.screen()));
         });
     }

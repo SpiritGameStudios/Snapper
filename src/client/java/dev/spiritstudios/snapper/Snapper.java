@@ -26,7 +26,7 @@ public final class Snapper implements ClientModInitializer {
 
     public static SpriteIconButton createSnapperButton(final int width, final Button.OnPress onPress) {
         return SpriteIconButton.builder(
-                        Component.translatable("button.snapper.screenshots"),
+                        Component.translatable("button.snapper.gallery"),
                         onPress,
                         true
                 )
