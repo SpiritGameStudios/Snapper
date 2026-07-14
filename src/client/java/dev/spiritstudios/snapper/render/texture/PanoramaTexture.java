@@ -52,7 +52,6 @@ public final class PanoramaTexture extends GalleryTexture {
 
             return image;
         } catch (IOException e) {
-            Snapper.LOGGER.error("Error loading image", e);
             throw new RuntimeException(e);
         }
     }

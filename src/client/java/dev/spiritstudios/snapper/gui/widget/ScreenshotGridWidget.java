@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
@@ -177,63 +178,80 @@ public class ScreenshotGridWidget extends GalleryWidget {
                         );
                     }
                 }
+
+                if ((isHovering && mouseX < getX() + getWidth()) || safeIsSelected(this)) {
+                    graphics.blit(
+                            RenderPipelines.GUI_TEXTURED,
+                            GRID_SELECTION_BACKGROUND_TEXTURE,
+                            getContentX(), getContentY(),
+                            0, 0,
+                            getContentWidth(), getContentHeight(),
+                            16, 16
+                    );
+
+
+                    graphics.blitSprite(
+                            RenderPipelines.GUI_TEXTURED,
+                            clickThroughHovered && texture.isLoaded() ?
+                                    GalleryWidget.VIEW_HIGHLIGHTED_SPRITE : GalleryWidget.VIEW_SPRITE,
+                            centreX - 16,
+                            centreY - 16,
+                            32, 32
+                    );
+
+                    graphics.text(
+                            minecraft.font,
+                            SnapperUtil.clipText(minecraft.font, fileName, getContentWidth() - 5),
+                            getContentX() + 5,
+                            getContentY() + 6,
+                            CommonColors.WHITE,
+                            true
+                    );
+
+                    graphics.text(
+                            minecraft.font,
+                            Component.translatable("text.snapper.created"),
+                            getContentX() + 5,
+                            getContentY() + getContentHeight() - 22,
+                            CommonColors.LIGHT_GRAY,
+                            true
+                    );
+
+                    graphics.text(
+                            minecraft.font,
+                            SnapperUtil.clipText(minecraft.font, creation, getContentWidth() - 5),
+                            getContentX() + 5,
+                            getContentY() + getContentHeight() - 12,
+                            CommonColors.LIGHT_GRAY,
+                            true
+                    );
+                }
+            } else if (this.texture.didLoadFail()) {
+                Component text = Component.translatable("menu.snapper.failure.load_image");
+
+                graphics.fill(
+                        getContentX(), getContentY(),
+                        getContentRight(), getContentBottom(),
+                        CommonColors.BLACK
+                );
+
+                graphics.text(
+                        minecraft.font,
+                        Component.translatable("menu.snapper.failure.load_image"),
+                        getContentX() + (getContentWidth() - minecraft.font.width(text)) / 2,
+                        this.getContentYMiddle() - minecraft.font.lineHeight / 2,
+                        CommonColors.WHITE,
+                        false
+                );
             } else {
                 String loadString = LoadingDotsText.get(Util.getMillis());
 
-                graphics.text(
+                graphics.centeredText(
                         minecraft.font,
                         loadString,
-                        getContentX() + (getContentWidth() - minecraft.font.width(loadString)) / 2, getContentY() + getContentHeight() / 2,
-                        CommonColors.GRAY,
-                        false
-                );
-            }
-
-            if ((isHovering && mouseX < getX() + getWidth()) || safeIsSelected(this)) {
-                graphics.blit(
-                        RenderPipelines.GUI_TEXTURED,
-                        GRID_SELECTION_BACKGROUND_TEXTURE,
-                        getContentX(), getContentY(),
-                        0, 0,
-                        getContentWidth(), getContentHeight(),
-                        16, 16
-                );
-
-
-                graphics.blitSprite(
-                        RenderPipelines.GUI_TEXTURED,
-                        clickThroughHovered && texture.isLoaded() ?
-                                GalleryWidget.VIEW_HIGHLIGHTED_SPRITE : GalleryWidget.VIEW_SPRITE,
-                        centreX - 16,
-                        centreY - 16,
-                        32, 32
-                );
-
-                graphics.text(
-                        minecraft.font,
-                        SnapperUtil.clipText(minecraft.font, fileName, getContentWidth() - 5),
-                        getContentX() + 5,
-                        getContentY() + 6,
-                        CommonColors.WHITE,
-                        true
-                );
-
-                graphics.text(
-                        minecraft.font,
-                        Component.translatable("text.snapper.created"),
-                        getContentX() + 5,
-                        getContentY() + getContentHeight() - 22,
-                        CommonColors.LIGHT_GRAY,
-                        true
-                );
-
-                graphics.text(
-                        minecraft.font,
-                        SnapperUtil.clipText(minecraft.font, creation, getContentWidth() - 5),
-                        getContentX() + 5,
-                        getContentY() + getContentHeight() - 12,
-                        CommonColors.LIGHT_GRAY,
-                        true
+                        this.getContentXMiddle(),
+                        this.getContentYMiddle() - minecraft.font.lineHeight / 2,
+                        CommonColors.GRAY
                 );
             }
         }

@@ -101,6 +101,35 @@ public class ScreenshotListWidget extends GalleryWidget {
                         );
                     }
                 }
+
+                if (isHovering) {
+                    graphics.fill(getContentX(), getContentY(), getContentX() + 32, getContentY() + 32, 0xA0909090);
+                    graphics.blitSprite(
+                            RenderPipelines.GUI_TEXTURED,
+                            mouseX - getContentX() < 32 && this.texture.isLoaded() ?
+                                    GalleryWidget.VIEW_HIGHLIGHTED_SPRITE :
+                                    GalleryWidget.VIEW_SPRITE,
+                            getContentX(), getContentY(),
+                            32, 32
+                    );
+                }
+            } else if (this.texture.didLoadFail()) {
+                Component text = Component.translatable("menu.snapper.failure.load_image");
+
+                graphics.fill(
+                        getContentX(), getContentY(),
+                        getContentRight(), getContentBottom(),
+                        CommonColors.BLACK
+                );
+
+                graphics.text(
+                        minecraft.font,
+                        Component.translatable("menu.snapper.failure.load_image"),
+                        getContentX() + (getContentWidth() - minecraft.font.width(text)) / 2,
+                        this.getContentYMiddle() - minecraft.font.lineHeight / 2,
+                        CommonColors.WHITE,
+                        false
+                );
             } else {
                 String loadString = LoadingDotsText.get(Util.getMillis());
 
@@ -111,18 +140,6 @@ public class ScreenshotListWidget extends GalleryWidget {
                         (getContentY() + getContentHeight() / 2) - minecraft.font.lineHeight / 2,
                         CommonColors.GRAY,
                         false
-                );
-            }
-
-            if (isHovering) {
-                graphics.fill(getContentX(), getContentY(), getContentX() + 32, getContentY() + 32, 0xA0909090);
-                graphics.blitSprite(
-                        RenderPipelines.GUI_TEXTURED,
-                        mouseX - getContentX() < 32 && this.texture.isLoaded() ?
-                                GalleryWidget.VIEW_HIGHLIGHTED_SPRITE :
-                                GalleryWidget.VIEW_SPRITE,
-                        getContentX(), getContentY(),
-                        32, 32
                 );
             }
         }

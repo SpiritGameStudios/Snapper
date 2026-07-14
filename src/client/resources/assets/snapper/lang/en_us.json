@@ -8,6 +8,7 @@
   "menu.snapper.panorama": "View Panorama",
   "menu.snapper.tab.screenshots": "Screenshots",
   "menu.snapper.tab.panoramas": "Panoramas",
+  "menu.snapper.failure.load_image": "Failed to load image",
   "button.snapper.folder": "Open Folder",
   "button.snapper.panorama.tooltip": "View the current stored panorama.",
   "button.snapper.screenshots": "View Screenshots",

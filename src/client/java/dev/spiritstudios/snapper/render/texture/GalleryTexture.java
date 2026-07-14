@@ -25,6 +25,8 @@ public sealed abstract class GalleryTexture implements AutoCloseable permits Pan
 
     protected boolean isClosed;
     protected boolean isLoaded;
+    protected boolean didLoadFail;
+    protected boolean isLoadingStarted;
 
     protected GalleryTexture(TextureManager textureManager, Identifier textureLocation, Path path) {
         this.textureManager = textureManager;
@@ -36,14 +38,19 @@ public sealed abstract class GalleryTexture implements AutoCloseable permits Pan
     protected abstract void upload(NativeImage image);
 
     public synchronized void startLoading(Minecraft minecraft, boolean force) {
-        if (!isLoaded && (CURRENTLY_LOADING.get() < MAX_LOADING || force)) {
+        if (!isLoaded && !didLoadFail && !isLoadingStarted && (CURRENTLY_LOADING.get() < MAX_LOADING || force)) {
             CURRENTLY_LOADING.incrementAndGet();
+            this.isLoadingStarted = true;
 
             CompletableFuture
                     .supplyAsync(this::load, Util.nonCriticalIoPool())
                     .thenAcceptAsync(this::upload, minecraft)
                     .whenComplete((_, e) -> {
-                        if (e != null) Snapper.LOGGER.error("Error loading image", e);
+                        if (e != null) {
+                            Snapper.LOGGER.error("Error loading image", e);
+                            this.didLoadFail = true;
+                        }
+
                         CURRENTLY_LOADING.decrementAndGet();
                     });
         }
@@ -51,6 +58,10 @@ public sealed abstract class GalleryTexture implements AutoCloseable permits Pan
 
     public boolean isLoaded() {
         return isLoaded;
+    }
+
+    public boolean didLoadFail() {
+        return didLoadFail;
     }
 
     public abstract int getWidth();
