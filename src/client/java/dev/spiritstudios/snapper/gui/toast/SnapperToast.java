@@ -38,7 +38,7 @@ public class SnapperToast implements Toast {
         this.title = title;
         Minecraft minecraft = Minecraft.getInstance();
         Font textRenderer = minecraft.font;
-        this.lines = textRenderer.split(description, WIDTH - PADDING * 3 - 16);
+        this.lines = description != null ? textRenderer.split(description, WIDTH - PADDING * 3 - 16) : List.of();
     }
 
     public static void push(Type type, Component title, Component description) {
@@ -78,7 +78,7 @@ public class SnapperToast implements Toast {
     }
 
     public int height() {
-        return PADDING * 2 + (this.lines.size() + 1) * Minecraft.getInstance().font.lineHeight;
+        return PADDING * 2 + (Math.max(this.lines.size(), 1) + 1) * Minecraft.getInstance().font.lineHeight;
     }
 
     private Identifier getCurrentComponenture() {

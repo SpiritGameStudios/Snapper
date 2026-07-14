@@ -6,7 +6,6 @@ import dev.spiritstudios.snapper.gui.screen.ConfigScreen;
 import dev.spiritstudios.snapper.gui.screen.ScreenshotRenameScreen;
 import dev.spiritstudios.snapper.gui.widget.ViewModeButton;
 import dev.spiritstudios.snapper.render.texture.GalleryTexture;
-import dev.spiritstudios.snapper.util.PlatformHelper;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
@@ -25,7 +24,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import org.jspecify.annotations.Nullable;
 
-import java.nio.file.Path;
 import java.util.function.Supplier;
 
 public class SnapperButtonBar {

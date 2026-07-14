@@ -7,6 +7,8 @@ import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.mixin.accessor.CameraAccessor;
+import dev.spiritstudios.snapper.util.clipboard.AWTClipboard;
+import dev.spiritstudios.snapper.util.clipboard.Clipboard;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -52,7 +54,7 @@ public abstract class MinecraftMixin {
             at = @At("TAIL")
     )
     private void init(GameConfig gameConfig, CallbackInfo ci) {
-        if (Util.getPlatform() != Util.OS.OSX) System.setProperty("java.awt.headless", "false");
+        if (Clipboard.INSTANCE instanceof AWTClipboard) System.setProperty("java.awt.headless", "false");
     }
 
     @WrapOperation(

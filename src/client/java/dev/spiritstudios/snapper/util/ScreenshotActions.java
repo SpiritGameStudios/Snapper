@@ -1,13 +1,13 @@
 package dev.spiritstudios.snapper.util;
 
 import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.SnapperComponents;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.ReloadableScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
 import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
+import dev.spiritstudios.snapper.util.clipboard.Clipboard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.ProgressScreen;
@@ -56,7 +56,7 @@ public final class ScreenshotActions {
     }
 
     public static void copyScreenshot(Path path) {
-        if (PlatformHelper.INSTANCE.copyScreenshot(path)) {
+        if (Clipboard.INSTANCE.copyScreenshot(path)) {
             SnapperToasts.screenshotCopySuccess();
         } else {
             SnapperToasts.screenshotCopyFailure();
