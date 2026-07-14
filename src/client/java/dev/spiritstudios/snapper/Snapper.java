@@ -32,8 +32,8 @@ public final class Snapper implements ClientModInitializer {
                 )
                 .width(width)
                 .sprite(Snapper.id("screenshots/screenshot"), 15, 15)
-                .tooltip(Component.translatable("button.snapper.screenshots"))
-                .narration(_ -> Component.translatable("button.snapper.screenshots"))
+                .tooltip(Component.translatable("button.snapper.gallery"))
+                .narration(_ -> Component.translatable("button.snapper.gallery"))
                 .build();
     }
 

@@ -15,11 +15,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 public final class ScreenshotTexture extends GalleryTexture {
     private ScreenshotTexture(TextureManager textureManager, Identifier textureLocation, Path path) {
-        super(textureManager, textureLocation, path);
+        super(textureManager, textureLocation, path, Type.SCREENSHOT);
     }
 
     private DynamicTexture texture;

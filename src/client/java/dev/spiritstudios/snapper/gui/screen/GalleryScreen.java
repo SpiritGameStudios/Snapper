@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.SnapperButtonBar;
 import dev.spiritstudios.snapper.gui.widget.GalleryWidget;
+import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.tabs.GridLayoutTab;
@@ -84,6 +85,7 @@ public class GalleryScreen extends Screen implements ReloadableScreen {
                 0,
                 () -> ScreenshotActions.getScreenshotTextures(minecraft.getTextureManager()),
                 screenshots,
+                GalleryTexture.Type.SCREENSHOT,
                 this
         );
 
@@ -93,6 +95,7 @@ public class GalleryScreen extends Screen implements ReloadableScreen {
                 0,
                 () -> ScreenshotActions.getPanoramaTextures(minecraft.getTextureManager()),
                 panoramas,
+                GalleryTexture.Type.PANORAMA,
                 this
         );
 

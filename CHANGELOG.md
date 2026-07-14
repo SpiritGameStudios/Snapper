@@ -22,3 +22,5 @@ All translation changes have only made it to the en_us language file at this tim
 - `key.snapper.screenshot_menu` is now `key.snapper.open_gallery`, and the title has been renamed to "Open Gallery".
 - "Take Panoramic Screenshots" is now "Take Panorama" (`key.snapper.panorama`)
 - `menu.snapper.panorama` ("View Panorama") has been removed and functionally replaced with `menu.snapper.tab.panoramas` ("Panoramas").
+- `text.snapper.empty` is now `text.snapper.empty.screenshot`, to account for two contexts of which near-identical text may be seen.
+- Added `text.snapper.empty.panorama`, to display specific information for empty panorama galleries.

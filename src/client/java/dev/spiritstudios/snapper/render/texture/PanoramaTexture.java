@@ -11,7 +11,8 @@ import com.mojang.blaze3d.textures.GpuTexture;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.screen.PanoramaViewerScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.texture.*;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import org.jspecify.annotations.Nullable;
@@ -20,12 +21,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public final class PanoramaTexture extends GalleryTexture {
     private PanoramaTexture(TextureManager textureManager, Identifier textureLocation, Path path) {
-        super(textureManager, textureLocation, path);
+        super(textureManager, textureLocation, path, Type.PANORAMA);
     }
 
     @SuppressWarnings("deprecation") // Vanilla uses sha1 for this, copying it

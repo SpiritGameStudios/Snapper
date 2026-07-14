@@ -40,6 +40,7 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
 
     protected final Screen screen;
     protected List<GalleryTexture> textures;
+    protected final GalleryTexture.Type textureType;
 
     @Override
     public void removeEntry(Entry entry) {
@@ -52,12 +53,13 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
             int y,
             Supplier<List<GalleryTexture>> findScreenshots,
             @Nullable GalleryWidget previous,
+            GalleryTexture.Type textureType,
             Screen parent
     ) {
         if (SnapperConfig.HOLDER.get().viewMode() == GalleryScreen.ViewMode.GRID) {
-            return new ScreenshotGridWidget(minecraft, width, height, y, findScreenshots, previous, parent);
+            return new ScreenshotGridWidget(minecraft, width, height, y, findScreenshots, previous, textureType, parent);
         } else {
-            return new ScreenshotListWidget(minecraft, width, height, y, findScreenshots, previous, parent);
+            return new ScreenshotListWidget(minecraft, width, height, y, findScreenshots, previous, textureType, parent);
         }
     }
 
@@ -67,9 +69,11 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
             int y, int itemHeight,
             Supplier<List<GalleryTexture>> findScreenshots,
             @Nullable GalleryWidget previous,
+            GalleryTexture.Type textureType,
             Screen screen
     ) {
         super(minecraft, width, height, y, itemHeight);
+        this.textureType = textureType;
         this.findScreenshots = findScreenshots;
 
         this.screen = screen;
@@ -115,7 +119,7 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
 
     protected void addEntries() {
         if (textures.isEmpty()) {
-            addEntry(new EmptyEntry(minecraft));
+            addEntry(new EmptyEntry(minecraft, textureType));
         } else {
             for (GalleryTexture texture : textures) {
                 addEntry(createEntry(texture));
@@ -196,17 +200,27 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
     }
 
     public static class EmptyEntry extends Entry implements AutoCloseable {
-        private static final Component EMPTY_LIST_TEXT = Component.translatable("text.snapper.empty");
+        private static final Component EMPTY_SCREENSHOT_LIST_TEXT = Component.translatable("text.snapper.empty.screenshot");
+        private static final Component EMPTY_PANORAMA_LIST_TEXT = Component.translatable("text.snapper.empty.panorama");
         private static final Component EMPTY_CUSTOM_LIST_TEXT = Component.translatable("text.snapper.empty.custom");
         private final Minecraft minecraft;
+        private final GalleryTexture.Type requestedContentType;
 
-        public EmptyEntry(Minecraft minecraft) {
+        public EmptyEntry(Minecraft minecraft, GalleryTexture.Type requestedContentType) {
             this.minecraft = minecraft;
+            this.requestedContentType = requestedContentType;
+        }
+
+        private Component useContentSpecificText() {
+            return switch (requestedContentType) {
+                case SCREENSHOT -> EMPTY_SCREENSHOT_LIST_TEXT;
+                case PANORAMA -> EMPTY_PANORAMA_LIST_TEXT;
+            };
         }
 
         @Override
         public @NonNull Component getNarration() {
-            return EMPTY_LIST_TEXT;
+            return useContentSpecificText();
         }
 
         @Override
@@ -216,8 +230,8 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
 
             context.text(
                     this.minecraft.font,
-                    EMPTY_LIST_TEXT,
-                    (screen.width - this.minecraft.font.width(EMPTY_LIST_TEXT)) / 2,
+                    useContentSpecificText(),
+                    (screen.width - this.minecraft.font.width(useContentSpecificText())) / 2,
                     getY() + getHeight() / 2,
                     CommonColors.WHITE,
                     false

@@ -1,6 +1,5 @@
 package dev.spiritstudios.snapper.gui.widget;
 
-import dev.spiritstudios.snapper.render.panorama.GuiPanoramaRenderState;
 import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
@@ -12,7 +11,6 @@ import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
@@ -32,9 +30,10 @@ public class ScreenshotGridWidget extends GalleryWidget {
             int y,
             Supplier<List<GalleryTexture>> findScreenshots,
             @Nullable GalleryWidget previous,
+            GalleryTexture.Type textureType,
             Screen parent
     ) {
-        super(client, width, height, y, 81, findScreenshots, previous, parent);
+        super(client, width, height, y, 81, findScreenshots, previous, textureType, parent);
     }
 
     private int getColumnCount() {

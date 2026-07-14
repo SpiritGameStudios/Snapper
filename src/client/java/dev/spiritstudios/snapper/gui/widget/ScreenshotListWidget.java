@@ -1,6 +1,5 @@
 package dev.spiritstudios.snapper.gui.widget;
 
-import dev.spiritstudios.snapper.render.panorama.GuiPanoramaRenderState;
 import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
@@ -28,9 +27,10 @@ public class ScreenshotListWidget extends GalleryWidget {
             int y,
             Supplier<List<GalleryTexture>> findScreenshots,
             @Nullable GalleryWidget previous,
+            GalleryTexture.Type textureType,
             Screen parent
     ) {
-        super(client, width, height, y, 36, findScreenshots, previous, parent);
+        super(client, width, height, y, 36, findScreenshots, previous, textureType, parent);
     }
 
     @Override

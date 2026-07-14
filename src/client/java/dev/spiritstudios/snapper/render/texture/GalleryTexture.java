@@ -22,16 +22,18 @@ public sealed abstract class GalleryTexture implements AutoCloseable permits Pan
     protected final TextureManager textureManager;
     public final Identifier textureLocation;
     public final Path path;
+    public final Type textureType;
 
     protected boolean isClosed;
     protected boolean isLoaded;
     protected boolean didLoadFail;
     protected boolean isLoadingStarted;
 
-    protected GalleryTexture(TextureManager textureManager, Identifier textureLocation, Path path) {
+    protected GalleryTexture(TextureManager textureManager, Identifier textureLocation, Path path, GalleryTexture.Type textureType) {
         this.textureManager = textureManager;
         this.textureLocation = textureLocation;
         this.path = path;
+        this.textureType = textureType;
     }
 
     protected abstract NativeImage load();
@@ -71,4 +73,9 @@ public sealed abstract class GalleryTexture implements AutoCloseable permits Pan
     public abstract void close();
 
     public abstract Screen createViewer(@Nullable Screen parent);
+
+    public enum Type {
+        SCREENSHOT,
+        PANORAMA
+    }
 }
