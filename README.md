@@ -24,7 +24,7 @@ With Snapper, you can:
 - Rename, delete, copy, and externally open images
 - Create, view, and share panoramas
 - Share your screenshots with anyone via uploading
-- ~~Not having to install a mod from an EXE~~
+- ~~Not have to install a mod from an EXE~~
 
 ## ❓ FAQ
 * Forge? <br/>
