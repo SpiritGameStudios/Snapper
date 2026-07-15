@@ -11,3 +11,5 @@ accessible field net/minecraft/client/renderer/CubeMap PROJECTION_Z_FAR F
 accessible field net/minecraft/client/renderer/CubeMap PROJECTION_FOV F
 
 inject-interface net/minecraft/client/gui/GuiGraphicsExtractor dev/spiritstudios/snapper/render/SnapperGuiGraphicsExtractor
+
+accessible method net/minecraft/client/gui/components/SpriteIconButton <init> (IILnet/minecraft/network/chat/Component;IIIILnet/minecraft/client/gui/components/WidgetSprites;Lnet/minecraft/client/gui/components/Button$OnPress;Lnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/components/Button$CreateNarration;Z)V

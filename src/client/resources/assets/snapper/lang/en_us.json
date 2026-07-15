@@ -19,7 +19,7 @@
   "button.snapper.upload": "Upload",
   "button.snapper.upload.tooltip.offline": "Unable to upload screenshots while offline",
   "button.snapper.upload.tooltip.tos": "Unable to upload screenshots because you did not accept AxolotlClient's terms. You can change this in settings.",
-  "button.snapper.helper.screenshot": "Take Screenshot",
+  "button.snapper.helper.screenshot": "Capture Screenshot",
   "button.snapper.reload": "Reload",
   "text.snapper.created": "Created",
   "text.snapper.generic": "Screenshot %d",

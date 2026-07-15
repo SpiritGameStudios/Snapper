@@ -50,7 +50,8 @@ public class SnapperToasts {
         SnapperToast.push(
                 SnapperToast.Type.SCREENSHOT,
                 Component.translatable("toast.snapper.screenshot.created"),
-                chooseScreenshotCreateDescription(fileName)
+                // Strip out embedded link to file for formatting consistency; you can't click it anyway
+                chooseScreenshotCreateDescription(Component.literal(fileName.getString()))
         );
     }
 

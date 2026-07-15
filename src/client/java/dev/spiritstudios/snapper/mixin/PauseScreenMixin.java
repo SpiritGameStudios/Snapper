@@ -6,8 +6,10 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
+import dev.spiritstudios.snapper.gui.widget.SilentSpriteIconButton;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.SpriteIconButton;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -39,20 +41,24 @@ public abstract class PauseScreenMixin extends Screen {
             }));
         }
         if (SnapperConfig.HOLDER.get().showScreenshotHelper()) {
-            iconButtonRow.addChild(SpriteIconButton.builder(
-                            Component.translatable("button.snapper.helper.screenshot"),
-                            _ -> {
-                                this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(Snapper.SHUTTER, 1.0F));
-                                this.minecraft.gui.setScreen(null);
-                                Screenshot.grab(this.minecraft, false);
-                            },
-                            true
-                    )
-                    .width(20)
-                    .sprite(Snapper.id("screenshots/helper"), 15, 15)
-                    .tooltip(Component.translatable("button.snapper.helper.screenshot"))
-                    .narration(_ -> Component.translatable("button.snapper.helper.screenshot"))
-                    .build());
+            iconButtonRow.addChild(new SilentSpriteIconButton(
+                    20,
+                    20,
+                    Component.translatable("button.snapper.helper.screenshot"),
+                    15,
+                    15,
+                    0,
+                    0,
+                    new WidgetSprites(Snapper.id("screenshots/helper")),
+                    _ -> {
+                        this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(Snapper.SHUTTER_SOUND, 1.0F));
+                        this.minecraft.gui.setScreen(null);
+                        Screenshot.grab(this.minecraft, false);
+                    },
+                    Component.translatable("button.snapper.helper.screenshot"),
+                    _ -> Component.translatable("button.snapper.helper.screenshot"),
+                    false
+            ));
         }
     }
 }

@@ -19,7 +19,7 @@ public final class Snapper implements ClientModInitializer {
     public static final String MOD_ID = "snapper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static final SoundEvent SHUTTER = Registry.register(BuiltInRegistries.SOUND_EVENT, Identifier.fromNamespaceAndPath(MOD_ID, "ui.shutter"),
+    public static final SoundEvent SHUTTER_SOUND = Registry.register(BuiltInRegistries.SOUND_EVENT, Identifier.fromNamespaceAndPath(MOD_ID, "ui.shutter"),
             SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(MOD_ID, "ui.shutter")));
 
     @Override
