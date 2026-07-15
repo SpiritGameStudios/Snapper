@@ -20,7 +20,9 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 public class ConfigScreen extends Screen {
     private final @Nullable Screen lastScreen;
@@ -58,6 +60,16 @@ public class ConfigScreen extends Screen {
                 )
         );
 
+        this.list.addSmall(
+                booleanButton(
+                        "showScreenshotHelper",
+                        b -> config.showScreenshotHelper = b,
+                        config.showScreenshotHelper
+                )
+        );
+
+        this.list.addHeader(Component.translatable("config.snapper.panorama"));
+
         this.list.addBig(
                 enumSlider(
                         "panoramaDimensions",
@@ -67,11 +79,12 @@ public class ConfigScreen extends Screen {
                 )
         );
 
-        this.list.addSmall(
-                booleanButton(
-                        "showScreenshotHelper",
-                        b -> config.showScreenshotHelper = b,
-                        config.showScreenshotHelper
+        this.list.addBig(
+                intSlider(
+                        "panoramaSuperSampling",
+                        b -> config.superSampling = b,
+                        config.superSampling,
+                        List.of(1, 2, 3, 4, 5, 6, 7, 8)
                 )
         );
 
@@ -220,6 +233,40 @@ public class ConfigScreen extends Screen {
                     }
                 },
                 t -> Component.translatable("config.snapper." + name + "." + t.toString().toLowerCase()),
+                _ -> tooltip,
+                setter
+        );
+    }
+
+    private AbstractWidget intSlider(
+            String name,
+            Consumer<Integer> setter,
+            int currentValue,
+            List<Integer> values
+    ) {
+        Tooltip tooltip = getTooltip(name);
+
+        return new ConfigSliderWidget<>(
+                0, 0,
+                150, 20,
+                Component.translatable("config.snapper." + name),
+                currentValue,
+                slider -> {
+                    if (slider >= 1.0) {
+                        slider = 0.99999F;
+                    }
+
+                    int index = Mth.floor(Mth.map(slider, 0.0, 1.0, 0.0, values.size()));
+                    return values.get(Mth.clamp(index, 0, values.size() - 1));
+                },
+                value -> {
+                    if (Objects.equals(value, values.getFirst())) {
+                        return 0.0;
+                    } else {
+                        return Objects.equals(value, values.getLast()) ? 1.0 : Mth.map(values.indexOf(value), 0.0, values.size() - 1, 0.0, 1.0);
+                    }
+                },
+                t -> Component.translatable("config.snapper." + name + ".value", t),
                 _ -> tooltip,
                 setter
         );

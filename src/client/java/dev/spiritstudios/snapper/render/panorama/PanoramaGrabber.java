@@ -20,7 +20,8 @@ import java.nio.file.Path;
 
 public final class PanoramaGrabber {
     public static void grabSnapperPanorama(Minecraft minecraft) {
-        int faceSize = SnapperConfig.HOLDER.get().panoramaDimensions().size();
+        int faceSize = SnapperConfig.HOLDER.get().panorama().dimensions().size();
+        int superSampling = SnapperConfig.HOLDER.get().panorama().superSampling();
         int outputWidth = faceSize * 3;
         int outputHeight = faceSize * 2;
 
@@ -40,9 +41,9 @@ public final class PanoramaGrabber {
         try {
             minecraft.options.setCameraType(CameraType.FIRST_PERSON);
             camera.enablePanoramicMode();
-            window.setWidth(faceSize * 4);
-            window.setHeight(faceSize * 4);
-            target.resize(faceSize * 4, faceSize * 4);
+            window.setWidth(faceSize * superSampling);
+            window.setHeight(faceSize * superSampling);
+            target.resize(faceSize * superSampling, faceSize * superSampling);
 
             NativeImage output = new NativeImage(outputWidth, outputHeight, false);
 
@@ -101,7 +102,7 @@ public final class PanoramaGrabber {
         minecraft.gameRenderer.extract(DeltaTracker.ONE, true);
         minecraft.gameRenderer.renderLevel(DeltaTracker.ONE);
 
-        Screenshot.takeScreenshot(target, 4, image -> {
+        Screenshot.takeScreenshot(target, SnapperConfig.HOLDER.get().panorama().superSampling(), image -> {
             image.copyRect(
                     output,
                     0, 0,

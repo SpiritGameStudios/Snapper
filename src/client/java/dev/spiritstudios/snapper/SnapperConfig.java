@@ -11,19 +11,23 @@ import lgbt.greenhouse.config.api.v3.GreenhouseConfigSide;
 import lgbt.greenhouse.config.api.v3.dfu.builder.DataFixerBuilderFunctions;
 import lgbt.greenhouse.config.api.v3.dfu.builder.schema.TypeTemplateBuilder;
 import lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigRelocateFieldsFix;
+import lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigSetFieldsFix;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonCLang;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Util;
 
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import static lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigSetFieldsFix.function;
+
 public record SnapperConfig(boolean copyTakenScreenshot,
                             SnapperButton snapperButton,
                             GalleryScreen.ViewMode viewMode,
-                            SnapperUtil.PanoramaSize panoramaDimensions,
+                            Panorama panorama,
                             CustomScreenshotFolder customScreenshotPath,
                             AxolotlClient axolotlClient,
                             boolean showScreenshotHelper) {
@@ -67,14 +71,31 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                             GalleryScreen.ViewMode.CODEC,
                             GalleryScreen.ViewMode.GRID,
                             SnapperConfig::viewMode
-                    ).withValue(
-                            "panorama_size",
-                            """
-                                    Dimensions of individual panorama images when saved
-                                    May be 1024, 2048, or 4096""",
-                            SnapperUtil.PanoramaSize.CODEC,
-                            SnapperUtil.PanoramaSize.ONE_THOUSAND_TWENTY_FOUR,
-                            SnapperConfig::panoramaDimensions
+                    ).withMapValue(
+                            Panorama.class,
+                            "panorama",
+                            "Settings relating to panoramas",
+                            SnapperConfig::panorama,
+                            mapBuilder -> mapBuilder
+                                    .withValue(
+                                            "dimensions",
+                                            """
+                                                    Dimensions of individual panorama images when saved
+                                                    May be 1024, 2048, or 4096""",
+                                            SnapperUtil.PanoramaSize.CODEC,
+                                            SnapperUtil.PanoramaSize.ONE_THOUSAND_TWENTY_FOUR,
+                                            Panorama::dimensions
+                                    )
+                                    .withValue(
+                                            "super_sampling",
+                                            """
+                                                    How many times to super sample panorama images.
+                                                    Increases panorama quality at the cost of rendering time.
+                                                    Must be a positive integer.""",
+                                            ExtraCodecs.NON_NEGATIVE_INT,
+                                            4,
+                                            Panorama::superSampling
+                                    )
                     ).withMapValue(
                             CustomScreenshotFolder.class,
                             "custom_screenshot_path",
@@ -142,7 +163,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                                             .withField("show_in_game_menu", TypeTemplateBuilder.BOOL)
                                             ))
                                             .withField("view_mode", TypeTemplateBuilder.STRING)
-                                            .withField("panorama_dimensions", TypeTemplateBuilder.STRING)
+                                            .withField("panorama_dimensions", TypeTemplateBuilder.INT)
                                             .withField("custom_screenshot_path", TypeTemplateBuilder.map(
                                                     mapBuilder -> mapBuilder
                                                             .withField("enabled", TypeTemplateBuilder.BOOL)
@@ -165,7 +186,47 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             GreenhouseConfigRelocateFieldsFix.data("termsAccepted", "axolotl_client.terms_status")
                                     )
                             )
+                    ).withSchemaAndFixes(
+                            10101,
+                            DataFixerBuilderFunctions.create(
+                                    builder -> builder
+                                            .withoutField("panorama_dimensions")
+                                            .withField("panorama_size", TypeTemplateBuilder.INT),
+                                    schema -> GreenhouseConfigRelocateFieldsFix.create(
+                                            schema,
+                                            GreenhouseConfigRelocateFieldsFix.data("panorama_dimensions", "panorama_size")
+                                    )
+                            )
+                    ).withSchemaAndFixes(
+                            10200,
+                            DataFixerBuilderFunctions.create(
+                                    builder -> builder
+                                            .withoutField("panorama_size")
+                                            .withField("panorama", TypeTemplateBuilder.map(
+                                                    mapBuilder -> mapBuilder
+                                                            .withField("dimensions", TypeTemplateBuilder.INT)
+                                            )),
+                                    schema -> GreenhouseConfigRelocateFieldsFix.create(
+                                            schema,
+                                            GreenhouseConfigRelocateFieldsFix.data("panorama_size", "panorama.dimensions")
+                                    )
+                            ),
+                            DataFixerBuilderFunctions.create(
+                                    builder -> builder
+                                            .withField("panorama", TypeTemplateBuilder.map(
+                                                    mapBuilder -> mapBuilder
+                                                            .withField("dimensions", TypeTemplateBuilder.INT)
+                                                            .withField("super_sampling", TypeTemplateBuilder.INT)
+                                            ))
+                                            .withField("show_screenshot_helper", TypeTemplateBuilder.BOOL),
+                                    schema -> GreenhouseConfigSetFieldsFix.create(
+                                            schema,
+                                            function("panorama.super_sampling", (_, field) -> field.createInt(4)),
+                                            function("show_screenshot_helper", (_, field) -> field.createBoolean(true))
+                                    )
+                            )
                     )
+
     );
 
     public record SnapperButton(boolean showOnTitleScreen, boolean showInGameMenu) {
@@ -175,6 +236,10 @@ public record SnapperConfig(boolean copyTakenScreenshot,
     }
 
     public record AxolotlClient(AxolotlClientApi.TermsAcceptance termsStatus) {
+    }
+
+    public record Panorama(SnapperUtil.PanoramaSize dimensions, int superSampling) {
+
     }
 
     public static void init() {
@@ -195,12 +260,15 @@ public record SnapperConfig(boolean copyTakenScreenshot,
         // Root
         public boolean copyTakenScreenshot;
         public GalleryScreen.ViewMode viewMode;
-        public SnapperUtil.PanoramaSize panoramaDimensions;
         public boolean showScreenshotHelper;
 
         // Snapper Button
         public boolean showOnTitleScreen;
         public boolean showInGameMenu;
+
+        // Panorama
+        public SnapperUtil.PanoramaSize panoramaDimensions;
+        public int superSampling;
 
         // Custom Screenshot Folder
         public boolean enabled;
@@ -213,11 +281,13 @@ public record SnapperConfig(boolean copyTakenScreenshot,
             SnapperConfig config = HOLDER.get();
             copyTakenScreenshot = config.copyTakenScreenshot;
             viewMode = config.viewMode;
-            panoramaDimensions = config.panoramaDimensions;
             showScreenshotHelper = config.showScreenshotHelper;
 
             showOnTitleScreen = config.snapperButton.showOnTitleScreen;
             showInGameMenu = config.snapperButton.showInGameMenu;
+
+            panoramaDimensions = config.panorama.dimensions;
+            superSampling = config.panorama.superSampling;
 
             enabled = config.customScreenshotPath.enabled;
             path = config.customScreenshotPath.path;
@@ -251,7 +321,10 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                             showInGameMenu
                     ),
                     viewMode,
-                    panoramaDimensions,
+                    new Panorama(
+                            panoramaDimensions,
+                            superSampling
+                    ),
                     new CustomScreenshotFolder(
                             enabled,
                             path
