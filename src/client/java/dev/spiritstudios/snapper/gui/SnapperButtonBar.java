@@ -113,7 +113,7 @@ public class SnapperButtonBar {
                     GalleryTexture selected = getTexture.get();
 
                     if (selected != null) {
-                        ScreenshotActions.copyScreenshot(selected.path);
+                        ScreenshotActions.copyScreenshot(selected.path, true);
                     }
                 }
         ).width(buttonWidth).build());

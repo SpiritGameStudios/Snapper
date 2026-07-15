@@ -180,7 +180,7 @@ public class GalleryScreen extends Screen implements ReloadableScreen {
         if (selected == null) return false;
 
         if ((input.modifiers() & InputConstants.MOD_CONTROL) != 0 && input.key() == InputConstants.KEY_C) {
-            ScreenshotActions.copyScreenshot(selected.texture.path);
+            ScreenshotActions.copyScreenshot(selected.texture.path, true);
             return true;
         }
 

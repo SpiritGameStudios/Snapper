@@ -45,7 +45,7 @@ public abstract class ScreenshotMixin {
     )
     private static void saveWrittenFileToClipboard(NativeImage image, File file, Consumer<Component> callback, CallbackInfo ci) {
         if (!file.getAbsolutePath().contains("/panorama/") && SnapperConfig.HOLDER.get().copyTakenScreenshot()) {
-            ScreenshotActions.copyScreenshot(file.toPath());
+            ScreenshotActions.copyScreenshot(file.toPath(), false);
         }
     }
 
@@ -85,7 +85,7 @@ public abstract class ScreenshotMixin {
                 target,
                 (Consumer<Component>) message -> {
                     // Execute on the render thread.
-                    Minecraft.getInstance().execute(() -> {
+                    minecraft.execute(() -> {
                         SnapperToasts.screenshotCreateSuccess(message);
                     });
                 }

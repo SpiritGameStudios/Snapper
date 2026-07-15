@@ -55,9 +55,11 @@ public final class ScreenshotActions {
         );
     }
 
-    public static void copyScreenshot(Path path) {
+    public static void copyScreenshot(Path path, boolean successToast) {
         if (Clipboard.INSTANCE.copyScreenshot(path)) {
-            SnapperToasts.screenshotCopySuccess();
+            if (successToast) {
+                SnapperToasts.screenshotCopySuccess();
+            }
         } else {
             SnapperToasts.screenshotCopyFailure();
         }
