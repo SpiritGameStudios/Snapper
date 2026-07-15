@@ -92,7 +92,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                                     How many times to super sample panorama images.
                                                     Increases panorama quality at the cost of rendering time.
                                                     Must be a positive integer.""",
-                                            ExtraCodecs.NON_NEGATIVE_INT,
+                                            ExtraCodecs.POSITIVE_INT,
                                             4,
                                             Panorama::superSampling
                                     )

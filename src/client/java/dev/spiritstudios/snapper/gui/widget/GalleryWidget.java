@@ -300,6 +300,11 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
             this.creation = creation;
         }
 
+        protected boolean safeIsSelected(Entry entry) {
+            @Nullable Entry nullableSelected = getSelected();
+            return (nullableSelected != null && nullableSelected.equals(entry));
+        }
+
         @Override
         public void setFocused(boolean focused) {
             if (focused) {

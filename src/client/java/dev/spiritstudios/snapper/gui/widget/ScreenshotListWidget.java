@@ -79,7 +79,7 @@ public class ScreenshotListWidget extends GalleryWidget {
             if (texture.isLoaded()) {
                 switch (texture) {
                     case PanoramaTexture _ -> {
-                        if (isHovering) {
+                        if (isHovering || safeIsSelected(this)) {
                             float delta = (float) ((double) a * minecraft.gameRenderer.gameRenderState().optionsRenderState.panoramaSpeed);
                             this.spin = Mth.wrapDegrees(this.spin + delta * 0.1F);
                         }

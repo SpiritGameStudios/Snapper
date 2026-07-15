@@ -138,11 +138,6 @@ public class ScreenshotGridWidget extends GalleryWidget {
             super(texture);
         }
 
-        private boolean safeIsSelected(Entry entry) {
-            @Nullable Entry nullableSelected = getSelected();
-            return (nullableSelected != null && nullableSelected.equals(entry));
-        }
-
         @Override
         public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean isHovering, float a) {
             texture.startLoading(minecraft, false);
@@ -155,7 +150,7 @@ public class ScreenshotGridWidget extends GalleryWidget {
             if (this.texture.isLoaded()) {
                 switch (texture) {
                     case PanoramaTexture _ -> {
-                        if (isHovering) {
+                        if (isHovering || safeIsSelected(this)) {
                             float delta = (float) ((double) a * minecraft.gameRenderer.gameRenderState().optionsRenderState.panoramaSpeed);
                             this.spin = Mth.wrapDegrees(this.spin + delta * 0.1F);
                         }
