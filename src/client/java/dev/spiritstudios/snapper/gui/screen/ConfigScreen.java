@@ -216,21 +216,7 @@ public class ConfigScreen extends Screen {
                 150, 20,
                 Component.translatable("config.snapper." + name),
                 currentValue,
-                slider -> {
-                    if (slider >= 1.0) {
-                        slider = 0.99999F;
-                    }
-
-                    int index = Mth.floor(Mth.map(slider, 0.0, 1.0, 0.0, values.size()));
-                    return values.get(Mth.clamp(index, 0, values.size() - 1));
-                },
-                value -> {
-                    if (value == values.getFirst()) {
-                        return 0.0;
-                    } else {
-                        return value == values.getLast() ? 1.0 : Mth.map(values.indexOf(value), 0.0, values.size() - 1, 0.0, 1.0);
-                    }
-                },
+                values,
                 t -> Component.translatable("config.snapper." + name + "." + t.toString().toLowerCase()),
                 _ -> tooltip,
                 setter
@@ -250,21 +236,7 @@ public class ConfigScreen extends Screen {
                 150, 20,
                 Component.translatable("config.snapper." + name),
                 currentValue,
-                slider -> {
-                    if (slider >= 1.0) {
-                        slider = 0.99999F;
-                    }
-
-                    int index = Mth.floor(Mth.map(slider, 0.0, 1.0, 0.0, values.size()));
-                    return values.get(Mth.clamp(index, 0, values.size() - 1));
-                },
-                value -> {
-                    if (Objects.equals(value, values.getFirst())) {
-                        return 0.0;
-                    } else {
-                        return Objects.equals(value, values.getLast()) ? 1.0 : Mth.map(values.indexOf(value), 0.0, values.size() - 1, 0.0, 1.0);
-                    }
-                },
+                values,
                 t -> Component.translatable("config.snapper." + name + ".value", t),
                 _ -> tooltip,
                 setter

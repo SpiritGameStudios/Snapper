@@ -22,6 +22,7 @@
 * Fix the game crashing or spamming the logs if a screenshot failed to load for any reason.
 * Fix inconsistent use of icons in toasts.
 * Fix inconsistent text in toasts.
+* Fix keyboard input for sliders on the config screen.
 
 ### Translation Changes
 All translation changes have only made it to the en_us language file at this time.

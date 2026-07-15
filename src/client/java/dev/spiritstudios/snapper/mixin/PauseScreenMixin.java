@@ -6,7 +6,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
-import dev.spiritstudios.snapper.gui.widget.SilentSpriteIconButton;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -14,6 +13,7 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,14 +41,11 @@ public abstract class PauseScreenMixin extends Screen {
             }));
         }
         if (SnapperConfig.HOLDER.get().showScreenshotHelper()) {
-            iconButtonRow.addChild(new SilentSpriteIconButton(
-                    20,
-                    20,
+            iconButtonRow.addChild(new SpriteIconButton.CenteredIcon(
+                    20, 20,
                     Component.translatable("button.snapper.helper.screenshot"),
-                    15,
-                    15,
-                    0,
-                    0,
+                    15, 15,
+                    0, 0,
                     new WidgetSprites(Snapper.id("screenshots/helper")),
                     _ -> {
                         this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(Snapper.SHUTTER_SOUND, 1.0F));
@@ -58,7 +55,11 @@ public abstract class PauseScreenMixin extends Screen {
                     Component.translatable("button.snapper.helper.screenshot"),
                     _ -> Component.translatable("button.snapper.helper.screenshot"),
                     false
-            ));
+            ) {
+                @Override
+                public void playDownSound(SoundManager soundManager) {
+                }
+            });
         }
     }
 }

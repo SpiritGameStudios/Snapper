@@ -7,24 +7,22 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
-import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 
-import javax.naming.ldap.PagedResultsControl;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FolderSelectWidget extends AbstractContainerWidget {
     private static final Identifier FOLDER_ICON = Snapper.id("screenshots/folder");
@@ -71,6 +69,7 @@ public class FolderSelectWidget extends AbstractContainerWidget {
             }
         });
         this.editBox.setTooltip(Tooltip.create(Component.translatable("config.snapper.customScreenshotFolder.input")));
+        this.editBox.moveCursorToStart(false);
 
         this.fileDialogButton = SpriteIconButton.builder(
                         Component.translatable("config.snapper.customScreenshotFolder.select"),
@@ -137,6 +136,18 @@ public class FolderSelectWidget extends AbstractContainerWidget {
     }
 
     @Override
+    public void setFocused(final @org.jspecify.annotations.Nullable GuiEventListener focused) {
+        if (this.getFocused() != focused) {
+            super.setFocused(focused);
+        }
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        return super.mouseClicked(event, doubleClick);
+    }
+
+    @Override
     protected int contentHeight() {
         return this.height;
     }
@@ -159,6 +170,7 @@ public class FolderSelectWidget extends AbstractContainerWidget {
     public void setWidth(int width) {
         super.setWidth(width);
         this.editBox.setWidth(width - ((BUTTON_SIZE + PADDING) * 2));
+        this.editBox.moveCursorToStart(false);
         this.layout.arrangeElements();
     }
 
@@ -169,7 +181,22 @@ public class FolderSelectWidget extends AbstractContainerWidget {
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput output) {
+    }
 
+    @Override
+    public boolean isMouseOver(final double mouseX, final double mouseY) {
+        AtomicBoolean mouseOver = new AtomicBoolean();
+        this.layout.visitChildren(child -> {
+            if (child.getRectangle().containsPoint((int)mouseX, (int)mouseY)) {
+                mouseOver.set(true);
+            }
+        });
+        return mouseOver.get();
+    }
+
+    @Override
+    public ScreenRectangle getRectangle() {
+        return this.layout.getRectangle();
     }
 
     @Override
