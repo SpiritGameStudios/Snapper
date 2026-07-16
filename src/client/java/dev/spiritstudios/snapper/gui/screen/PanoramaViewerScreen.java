@@ -5,6 +5,7 @@ import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.Panorama;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -14,6 +15,7 @@ public class PanoramaViewerScreen extends ParentReloaderScreen {
     private final PanoramaTexture texture;
 
     private float spin = 0.0F;
+
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, HeaderAndFooterLayout.DEFAULT_HEADER_AND_FOOTER_HEIGHT, 60);
 
     public PanoramaViewerScreen(PanoramaTexture texture, Screen parent) {
@@ -36,6 +38,7 @@ public class PanoramaViewerScreen extends ParentReloaderScreen {
     protected void init() {
         this.layout.addTitleHeader(this.title, this.font);
 
+
         SnapperButtonBar bar = new SnapperButtonBar(
                 this,
                 this.parent,
@@ -44,10 +47,20 @@ public class PanoramaViewerScreen extends ParentReloaderScreen {
                 null
         );
 
-        this.layout.addToFooter(bar.layout);
+        layout.addToFooter(bar.layout);
 
         this.layout.visitWidgets(this::addRenderableWidget);
         this.repositionElements();
+    }
+
+    @Override
+    public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+        if (event.buttonInfo().button() == 0) {
+            this.spin = (float) Mth.wrapDegrees(this.spin + dx);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

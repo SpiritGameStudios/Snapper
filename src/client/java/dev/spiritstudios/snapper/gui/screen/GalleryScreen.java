@@ -42,6 +42,7 @@ public class GalleryScreen extends Screen implements ReloadableScreen {
             },
             _ -> setSelected(null)
     );
+
     private @Nullable MenuTabBar tabNavigationBar;
 
     private @Nullable GalleryWidget screenshots;
