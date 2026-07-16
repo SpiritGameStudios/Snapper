@@ -23,8 +23,6 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
     private final ScreenshotTexture texture;
 
     private final Screen parent;
-    private final @Nullable List<Path> screenshots;
-    private final int screenshotIndex;
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 33, 60);
 
     public boolean shouldReloadParent = false;
@@ -40,15 +38,11 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
 
         this.texture = texture;
         texture.startLoading(Minecraft.getInstance(), true);
-
-        this.screenshots = screenshots;
-
-        this.screenshotIndex = this.screenshots != null ? this.screenshots.indexOf(this.texture.path) : -1;
     }
 
     @Override
     public void onClose() {
-        if (!(parent instanceof GalleryScreen listScreen)) {
+        if (!(parent instanceof GalleryScreen)) {
             this.texture.close();
         }
 
@@ -101,16 +95,6 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
                     0, 0,
                     finalWidth, finalHeight,
                     finalWidth, finalHeight
-            );
-        }
-
-        if (screenshotIndex != -1 && screenshots != null) {
-            graphics.centeredText(
-                    this.font,
-                    "Screenshot %d/%d".formatted(screenshotIndex + 1, screenshots.size()),
-                    this.width / 2,
-                    30,
-                    CommonColors.WHITE
             );
         }
 
