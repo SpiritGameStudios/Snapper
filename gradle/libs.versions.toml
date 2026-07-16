@@ -1,6 +1,6 @@
 [versions]
 fabric_loom = "1.17-SNAPSHOT"
-modpublish = "2.0.0"
+modpublish = "2.1.1"
 
 minecraft = "26.2"
 
