@@ -3,13 +3,13 @@ package dev.spiritstudios.snapper.gui.widget;
 import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
-import dev.spiritstudios.snapper.util.SnapperUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ComponentRenderUtils;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.Panorama;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -88,6 +88,15 @@ public class ScreenshotListWidget extends GalleryWidget {
                                 -spin, this.texture.textureLocation,
                                 this.getContentX(), this.getContentY(),
                                 this.getContentX() + this.getContentHeight(), this.getContentY() + this.getContentHeight()
+                        );
+
+                        graphics.blit(
+                                RenderPipelines.GUI_TEXTURED,
+                                Panorama.PANORAMA_OVERLAY,
+                                this.getContentX(), this.getContentY(),
+                                0.0F, 0.0F,
+                                this.getContentWidth(), this.getContentHeight(),
+                                16, 128, 16, 128
                         );
                     }
                     case ScreenshotTexture _ -> {

@@ -14,8 +14,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public sealed abstract class GalleryTexture implements AutoCloseable permits PanoramaTexture, ScreenshotTexture {
-    protected static final Identifier UNKNOWN_SERVER = Identifier.withDefaultNamespace("textures/misc/unknown_server.png");
-
     private static final int MAX_LOADING = 10;
     private static final AtomicInteger CURRENTLY_LOADING = new AtomicInteger();
 

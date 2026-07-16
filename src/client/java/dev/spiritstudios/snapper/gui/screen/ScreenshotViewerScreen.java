@@ -11,30 +11,16 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
-import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
-import java.util.List;
-
-public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
+public class ScreenshotViewerScreen extends ParentReloaderScreen {
     private static final Identifier MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_list_background.png");
     private static final Identifier INWORLD_MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
 
     private final ScreenshotTexture texture;
-
-    private final Screen parent;
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 33, 60);
 
-    public boolean shouldReloadParent = false;
-    public boolean shouldRecreateParent = false;
-
     public ScreenshotViewerScreen(ScreenshotTexture texture, Screen parent) {
-        this(texture, parent, null);
-    }
-
-    public ScreenshotViewerScreen(ScreenshotTexture texture, Screen parent, @Nullable List<Path> screenshots) {
-        super(Component.literal(texture.path.getFileName().toString()));
-        this.parent = parent;
+        super(Component.literal(texture.path.getFileName().toString()), parent);
 
         this.texture = texture;
         texture.startLoading(Minecraft.getInstance(), true);
@@ -42,16 +28,8 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
 
     @Override
     public void onClose() {
-        if (!(parent instanceof GalleryScreen)) {
-            this.texture.close();
-        }
-
-        if (parent instanceof ReloadableScreen reloadable) {
-            if (shouldReloadParent) reloadable.reload();
-            if (shouldRecreateParent) reloadable.recreateList();
-        }
-
-        this.minecraft.gui.setScreen(this.parent);
+        if (!(parent instanceof GalleryScreen)) this.texture.close();
+        super.onClose();
     }
 
     @Override
@@ -63,14 +41,15 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
     protected void init() {
         this.layout.addTitleHeader(this.title, this.font);
 
-        new SnapperButtonBar(
+        SnapperButtonBar bar = new SnapperButtonBar(
                 this,
                 this.parent,
-                this.layout,
                 () -> this.texture,
                 null,
                 null
         );
+
+        this.layout.addToFooter(bar.layout);
 
         this.layout.visitWidgets(this::addRenderableWidget);
         this.repositionElements();
@@ -165,15 +144,5 @@ public class ScreenshotViewerScreen extends Screen implements ReloadableScreen {
                 width, 2,
                 32, 2
         );
-    }
-
-    @Override
-    public void reload() {
-        this.shouldReloadParent = true;
-    }
-
-    @Override
-    public void recreateList() {
-        this.shouldRecreateParent = true;
     }
 }

@@ -30,11 +30,16 @@ public class GalleryScreen extends Screen implements ReloadableScreen {
 
     private SnapperButtonBar bar;
 
-    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, 33, 60);
+    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(
+            this,
+            HeaderAndFooterLayout.DEFAULT_HEADER_AND_FOOTER_HEIGHT, 60
+    );
+
     private final TabManager tabManager = new TabManager(
             this::addRenderableWidget,
             this::removeWidget,
-            _ -> {},
+            _ -> {
+            },
             _ -> setSelected(null)
     );
     private @Nullable MenuTabBar tabNavigationBar;
@@ -115,11 +120,12 @@ public class GalleryScreen extends Screen implements ReloadableScreen {
         this.bar = new SnapperButtonBar(
                 this,
                 this,
-                this.layout,
                 () -> this.selected != null ? this.selected.texture : null,
                 this::toggleGrid,
                 this::reload
         );
+
+        this.layout.addToFooter(bar.layout);
 
         this.layout.visitWidgets(button -> {
             button.setTabOrderGroup(1);

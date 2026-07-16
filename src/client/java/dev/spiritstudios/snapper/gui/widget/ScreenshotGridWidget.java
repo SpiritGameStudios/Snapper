@@ -11,6 +11,7 @@ import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.Panorama;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
@@ -159,6 +160,15 @@ public class ScreenshotGridWidget extends GalleryWidget {
                                 -spin, this.texture.textureLocation,
                                 this.getContentX(), this.getContentY(),
                                 this.getContentRight(), this.getContentBottom()
+                        );
+
+                        graphics.blit(
+                                RenderPipelines.GUI_TEXTURED,
+                                Panorama.PANORAMA_OVERLAY,
+                                this.getContentX(), this.getContentY(),
+                                0.0F, 0.0F,
+                                this.getContentWidth(), this.getContentHeight(),
+                                16, 128, 16, 128
                         );
                     }
                     case ScreenshotTexture _ -> {

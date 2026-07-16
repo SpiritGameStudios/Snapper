@@ -1,7 +1,6 @@
 package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.util.ScreenshotActions;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -37,12 +36,12 @@ public class ScreenshotRenameScreen extends Screen {
         this.renameInput.setMaxLength(255);
         this.addRenderableWidget(Button.builder(
                 Component.translatable("button.snapper.rename"),
-                button -> this.renameScreenshot(this.renameInput.getValue())
+                _ -> this.renameScreenshot(this.renameInput.getValue())
         ).bounds(width / 2 - 150 - 4, height - 32, 150, 20).build());
 
         this.addRenderableWidget(Button.builder(
                 CommonComponents.GUI_CANCEL,
-                button -> this.onClose()
+                _ -> this.onClose()
         ).bounds(width / 2 + 4, height - 32, 150, 20).build());
     }
 

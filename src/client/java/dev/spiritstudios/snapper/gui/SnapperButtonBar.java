@@ -14,7 +14,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.client.gui.screens.Screen;
@@ -30,6 +29,8 @@ public class SnapperButtonBar {
     private static final Identifier SETTINGS_ICON = Snapper.id("screenshots/settings");
     private static final Identifier RELOAD_ICON = Snapper.id("screenshots/reset");
 
+    public final LinearLayout layout;
+
     public final Button deleteButton;
     public final Button renameButton;
     public final Button copyButton;
@@ -39,7 +40,6 @@ public class SnapperButtonBar {
     public SnapperButtonBar(
             Screen screen,
             Screen postFlowScreen,
-            HeaderAndFooterLayout layout,
             Supplier<@Nullable GalleryTexture> getTexture,
             @Nullable Runnable toggleGrid,
             @Nullable Runnable reload
@@ -53,8 +53,11 @@ public class SnapperButtonBar {
         final int buttonWidth = 74;
         final int bottomButtonWidth = 100;
 
-        LinearLayout vertical = layout.addToFooter(LinearLayout.vertical().spacing(4));
+
+        LinearLayout vertical = LinearLayout.vertical().spacing(4);
         vertical.defaultCellSetting().alignHorizontallyCenter();
+
+        this.layout = vertical;
 
         LinearLayout topRow = vertical.addChild(LinearLayout.horizontal().spacing(hSpacing));
         LinearLayout bottomRow = vertical.addChild(LinearLayout.horizontal().spacing(hSpacing));
