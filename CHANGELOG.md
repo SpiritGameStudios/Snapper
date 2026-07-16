@@ -7,6 +7,7 @@
 * You can now enable a button to capture an in-game screenshot from the game menu.
 * Panorama super-sampling is now configurable (Defaults to 4x).
 * The panorama viewer now uses the same button bar as other Snapper screens.
+* Panoramas can now be dragged in the panorama viewer.
 
 ### Changes
 * **Moved the default unified screenshot directory to match other apps.**

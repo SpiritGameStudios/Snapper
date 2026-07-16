@@ -1,11 +1,14 @@
 package dev.spiritstudios.snapper.gui.screen;
 
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.spiritstudios.snapper.gui.SnapperButtonBar;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.CubeMap;
 import net.minecraft.client.renderer.Panorama;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -56,17 +59,24 @@ public class PanoramaViewerScreen extends ParentReloaderScreen {
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
         if (event.buttonInfo().button() == 0) {
-            this.spin = (float) Mth.wrapDegrees(this.spin + dx);
+            Window window = minecraft.getWindow();
+            double dxW = (dx * window.getScreenWidth()) / window.getGuiScaledWidth();
+            float degPerPixel = (float) dxW / CubeMap.PROJECTION_FOV;
+            degPerPixel = degPerPixel * Mth.sign(dx);
+            this.spin = (float) Mth.wrapDegrees(this.spin - (dx * degPerPixel));
             return true;
         } else {
             return false;
         }
     }
 
+
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         float delta = (float) ((double) a * minecraft.gameRenderer.gameRenderState().optionsRenderState.panoramaSpeed);
         this.spin = Mth.wrapDegrees(this.spin + delta * 0.1F);
+
+        graphics.requestCursor(CursorTypes.RESIZE_EW);
 
         texture.startLoading(minecraft, false);
         if (texture.isLoaded()) {
