@@ -11,6 +11,7 @@ import lgbt.greenhouse.config.api.v3.GreenhouseConfigSide;
 import lgbt.greenhouse.config.api.v3.dfu.builder.DataFixerBuilderFunctions;
 import lgbt.greenhouse.config.api.v3.dfu.builder.schema.TypeTemplateBuilder;
 import lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigRelocateFieldsFix;
+import lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigSetFieldsFix;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonCLang;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
 import net.minecraft.client.Minecraft;
@@ -20,6 +21,8 @@ import net.minecraft.util.Util;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+
+import static lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigSetFieldsFix.function;
 
 public record SnapperConfig(boolean copyTakenScreenshot,
                             SnapperButton snapperButton,
@@ -202,11 +205,24 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             .withField("panorama", TypeTemplateBuilder.map(
                                                     mapBuilder -> mapBuilder
                                                             .withField("dimensions", TypeTemplateBuilder.INT)
-                                                            .withField("super_sampling", TypeTemplateBuilder.INT)
                                             )),
                                     schema -> GreenhouseConfigRelocateFieldsFix.create(
                                             schema,
                                             GreenhouseConfigRelocateFieldsFix.data("panorama_size", "panorama.dimensions")
+                                    )
+                            ),
+                            DataFixerBuilderFunctions.create(
+                                    builder -> builder
+                                            .withField("panorama", TypeTemplateBuilder.map(
+                                                    mapBuilder -> mapBuilder
+                                                            .withField("dimensions", TypeTemplateBuilder.INT)
+                                                            .withField("super_sampling", TypeTemplateBuilder.INT)
+                                            ))
+                                            .withField("show_screenshot_helper", TypeTemplateBuilder.BOOL),
+                                    schema -> GreenhouseConfigSetFieldsFix.create(
+                                            schema,
+                                            function("panorama.super_sampling", (_, field) -> field.createInt(4)),
+                                            function("show_screenshot_helper", (_, field) -> field.createBoolean(true))
                                     )
                             )
                     )
