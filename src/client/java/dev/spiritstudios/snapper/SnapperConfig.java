@@ -229,6 +229,10 @@ public record SnapperConfig(boolean copyTakenScreenshot,
 
     );
 
+    public static SnapperConfig get() {
+        return HOLDER.get();
+    }
+
     public record SnapperButton(boolean showOnTitleScreen, boolean showInGameMenu) {
     }
 
@@ -243,6 +247,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
     }
 
     public static void init() {
+        HOLDER.reload(null);
     }
 
     public static Mutable mutable() {

@@ -32,7 +32,7 @@ public abstract class TitleScreenMixin extends Screen {
     @Expression("numberOfButtons = ?")
     @Inject(method = "init", at = @At(value = "MIXINEXTRAS:EXPRESSION", shift = At.Shift.AFTER))
     private void increaseNumberOfButtons(CallbackInfo ci, @Local(name = "numberOfButtons") LocalIntRef numberOfButtons) {
-        if (SnapperConfig.HOLDER.get().snapperButton().showOnTitleScreen()) {
+        if (SnapperConfig.get().snapperButton().showOnTitleScreen()) {
             numberOfButtons.set(numberOfButtons.get() + 1);
         }
     }
@@ -52,7 +52,7 @@ public abstract class TitleScreenMixin extends Screen {
             @Local(name = "numberOfButtons") int numberOfButtons,
             @Local(name = "topPos") int topPos
     ) {
-        if (SnapperConfig.HOLDER.get().snapperButton().showOnTitleScreen()) {
+        if (SnapperConfig.get().snapperButton().showOnTitleScreen()) {
             SpriteIconButton snapperButton = this.addRenderableWidget(Snapper.createSnapperButton(20, _ -> {
                 this.minecraft.gui.setScreen(new GalleryScreen(this));
             }));

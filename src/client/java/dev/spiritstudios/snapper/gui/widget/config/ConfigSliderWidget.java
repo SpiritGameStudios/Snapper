@@ -1,4 +1,4 @@
-package dev.spiritstudios.snapper.gui.widget;
+package dev.spiritstudios.snapper.gui.widget.config;
 
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;

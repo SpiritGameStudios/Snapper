@@ -1,7 +1,7 @@
 package dev.spiritstudios.snapper;
 
 import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
-import dev.spiritstudios.snapper.gui.screen.ScreenshotViewerScreen;
+import dev.spiritstudios.snapper.gui.screen.viewer.ScreenshotViewerScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToast;
 import dev.spiritstudios.snapper.render.panorama.PanoramaGrabber;
 import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;

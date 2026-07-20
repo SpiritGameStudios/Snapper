@@ -1,4 +1,4 @@
-package dev.spiritstudios.snapper.gui.widget;
+package dev.spiritstudios.snapper.gui.widget.config;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.overlay.ExternalDialogOverlay;

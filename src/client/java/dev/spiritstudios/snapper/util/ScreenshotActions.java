@@ -82,9 +82,9 @@ public final class ScreenshotActions {
                             .orElse(0L)
     ).reversed();
 
-    private static Path getSnapperDataDir() {
-        Path path = SnapperConfig.HOLDER.get().customScreenshotPath().enabled() ?
-                SnapperConfig.HOLDER.get().customScreenshotPath().path() :
+    public static Path getSnapperDataDir() {
+        Path path = SnapperConfig.get().customScreenshotPath().enabled() ?
+                SnapperConfig.get().customScreenshotPath().path() :
                 Minecraft.getInstance().gameDirectory.toPath();
 
         if (!SafeFiles.createDirectories(path)) {

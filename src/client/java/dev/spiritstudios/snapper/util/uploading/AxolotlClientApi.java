@@ -122,7 +122,7 @@ public class AxolotlClientApi implements Closeable {
     }
 
     private CompletableFuture<HttpResponse<String>> request(String route, Map<String, String> query, byte[] rawBody, String method) {
-        if (SnapperConfig.HOLDER.get().axolotlClient().termsStatus() != TermsAcceptance.ACCEPTED)
+        if (SnapperConfig.get().axolotlClient().termsStatus() != TermsAcceptance.ACCEPTED)
             return CompletableFuture.failedFuture(new IllegalStateException("Terms not accepted"));
 
         StringBuilder url = new StringBuilder(BASE_URL);

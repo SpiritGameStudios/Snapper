@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.SnapperButtonBar;
-import dev.spiritstudios.snapper.gui.widget.GalleryWidget;
+import dev.spiritstudios.snapper.gui.widget.gallery.GalleryWidget;
 import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.util.ScreenshotActions;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -168,7 +168,7 @@ public class GalleryScreen extends Screen implements ReloadableScreen {
     }
 
     public void toggleGrid() {
-        SnapperConfig.editAsync(m -> m.viewMode = SnapperConfig.HOLDER.get().viewMode() == ViewMode.GRID ? ViewMode.LIST : ViewMode.GRID);
+        SnapperConfig.editAsync(m -> m.viewMode = SnapperConfig.get().viewMode() == ViewMode.GRID ? ViewMode.LIST : ViewMode.GRID);
 
         recreateList();
     }

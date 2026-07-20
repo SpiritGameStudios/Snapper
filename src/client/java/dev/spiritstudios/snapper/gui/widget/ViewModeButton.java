@@ -25,7 +25,7 @@ public class ViewModeButton extends Button {
         int x = this.getX() + this.getWidth() / 2 - SPRITE_SIZE / 2;
         int y = this.getY() + this.getHeight() / 2 - SPRITE_SIZE / 2;
 
-        WidgetSprites sprite = switch (SnapperConfig.HOLDER.get().viewMode()) {
+        WidgetSprites sprite = switch (SnapperConfig.get().viewMode()) {
             case LIST -> LIST_SPRITES;
             case GRID -> GRID_SPRITES;
         };

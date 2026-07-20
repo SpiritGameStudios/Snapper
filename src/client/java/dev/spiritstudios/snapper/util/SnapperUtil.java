@@ -2,19 +2,10 @@ package dev.spiritstudios.snapper.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.SnapperConfig;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.locale.Language;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Util;
 import org.apache.commons.lang3.SystemProperties;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -58,7 +49,7 @@ public final class SnapperUtil {
         }
     }
 
-    private static Path getDataFolder() {
+    private static Path getAppDataFolder() {
         return switch (Util.getPlatform()) {
             case WINDOWS -> Path.of(System.getenv("APPDATA"));
             case OSX -> Path.of(SystemProperties.getUserHome(), "Library", "Application Support");
@@ -70,5 +61,5 @@ public final class SnapperUtil {
         };
     }
 
-    public static final Path UNIFIED_FOLDER = getDataFolder().resolve("snapper");
+    public static final Path UNIFIED_FOLDER = getAppDataFolder().resolve("snapper");
 }

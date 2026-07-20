@@ -1,4 +1,4 @@
-package dev.spiritstudios.snapper.gui.widget;
+package dev.spiritstudios.snapper.gui.widget.gallery;
 
 import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;

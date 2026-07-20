@@ -1,6 +1,8 @@
-package dev.spiritstudios.snapper.gui.screen;
+package dev.spiritstudios.snapper.gui.screen.viewer;
 
 import dev.spiritstudios.snapper.gui.SnapperButtonBar;
+import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
+import dev.spiritstudios.snapper.gui.screen.ParentReloaderScreen;
 import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;

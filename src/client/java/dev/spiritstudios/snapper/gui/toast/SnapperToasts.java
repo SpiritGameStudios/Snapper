@@ -39,7 +39,7 @@ public class SnapperToasts {
                 "toast.snapper.screenshot.created.description" :
                 "toast.snapper.screenshot.created.description_in_menu";
 
-        String copyDeterminedDescription = SnapperConfig.HOLDER.get().copyTakenScreenshot() ?
+        String copyDeterminedDescription = SnapperConfig.get().copyTakenScreenshot() ?
                 "toast.snapper.screenshot.created.description_copy" :
                 inGameDeterminedDescription;
 

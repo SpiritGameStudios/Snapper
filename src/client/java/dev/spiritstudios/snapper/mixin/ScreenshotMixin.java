@@ -44,7 +44,7 @@ public abstract class ScreenshotMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Component;literal(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;", shift = At.Shift.AFTER)
     )
     private static void saveWrittenFileToClipboard(NativeImage image, File file, Consumer<Component> callback, CallbackInfo ci) {
-        if (!file.getAbsolutePath().contains("/panorama/") && SnapperConfig.HOLDER.get().copyTakenScreenshot()) {
+        if (!file.getAbsolutePath().contains("/panorama/") && SnapperConfig.get().copyTakenScreenshot()) {
             ScreenshotActions.copyScreenshot(file.toPath(), false);
         }
     }
@@ -62,9 +62,9 @@ public abstract class ScreenshotMixin {
     @WrapMethod(method = "grab(Ljava/io/File;Ljava/lang/String;Lcom/mojang/blaze3d/pipeline/RenderTarget;ILjava/util/function/Consumer;)V")
     private static void getConfiguredGameDirectory(File workDir, String forceName, RenderTarget target, int downscaleFactor, Consumer<Component> callback, Operation<Void> original) {
         original.call(
-                SnapperConfig.HOLDER.get().customScreenshotPath().enabled() && Files.exists(SnapperConfig.HOLDER.get().customScreenshotPath().path()) ?
-                        SnapperConfig.HOLDER.get().customScreenshotPath().path().toFile() :
-                        workDir,
+                !workDir.equals(Minecraft.getInstance().gameDirectory) ?
+                        workDir :
+                        ScreenshotActions.getSnapperDataDir().toFile(),
                 forceName,
                 target,
                 downscaleFactor,

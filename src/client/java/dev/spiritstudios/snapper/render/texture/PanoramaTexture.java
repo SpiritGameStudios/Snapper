@@ -9,7 +9,7 @@ import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTexture;
 import dev.spiritstudios.snapper.Snapper;
-import dev.spiritstudios.snapper.gui.screen.PanoramaViewerScreen;
+import dev.spiritstudios.snapper.gui.screen.viewer.PanoramaViewerScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;

@@ -1,7 +1,9 @@
-package dev.spiritstudios.snapper.gui.screen;
+package dev.spiritstudios.snapper.gui.screen.viewer;
 
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.spiritstudios.snapper.gui.SnapperButtonBar;
+import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
+import dev.spiritstudios.snapper.gui.screen.ParentReloaderScreen;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;

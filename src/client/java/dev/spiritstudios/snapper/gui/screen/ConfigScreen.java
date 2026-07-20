@@ -1,9 +1,9 @@
 package dev.spiritstudios.snapper.gui.screen;
 
 import dev.spiritstudios.snapper.SnapperConfig;
-import dev.spiritstudios.snapper.gui.widget.ConfigList;
-import dev.spiritstudios.snapper.gui.widget.ConfigSliderWidget;
-import dev.spiritstudios.snapper.gui.widget.FolderSelectWidget;
+import dev.spiritstudios.snapper.gui.widget.config.ConfigList;
+import dev.spiritstudios.snapper.gui.widget.config.ConfigSliderWidget;
+import dev.spiritstudios.snapper.gui.widget.config.FolderSelectWidget;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -14,13 +14,11 @@ import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public class ConfigScreen extends Screen {
@@ -160,21 +158,13 @@ public class ConfigScreen extends Screen {
     private AbstractWidget booleanButton(String name, Consumer<Boolean> setter, boolean currentValue) {
         Tooltip tooltip = getTooltip(name);
 
-        return CycleButton.builder(
-                        boolean_ -> boolean_
-                                ? CommonComponents.OPTION_ON
-                                : CommonComponents.OPTION_OFF,
-                        currentValue
-                )
-                .withValues(List.of(Boolean.TRUE, Boolean.FALSE))
+        return CycleButton.onOffBuilder(currentValue)
                 .withTooltip(b -> tooltip)
                 .create(
                         0, 0,
                         150, 20,
                         Component.translatable("config.snapper." + name),
-                        (cycleButton, object) -> {
-                            setter.accept(object);
-                        }
+                        (_, object) -> setter.accept(object)
                 );
     }
 
@@ -191,14 +181,12 @@ public class ConfigScreen extends Screen {
                         currentValue
                 )
                 .withValues(Arrays.asList(clazz.getEnumConstants()))
-                .withTooltip(b -> tooltip)
+                .withTooltip(_ -> tooltip)
                 .create(
                         0, 0,
                         150, 20,
                         Component.translatable("config.snapper." + name),
-                        (cycleButton, object) -> {
-                            setter.accept(object);
-                        }
+                        (_, object) -> setter.accept(object)
                 );
     }
 
@@ -277,7 +265,7 @@ public class ConfigScreen extends Screen {
 
     @Override
     public void onClose() {
-        var viewMode = SnapperConfig.HOLDER.get().viewMode();
+        var viewMode = SnapperConfig.get().viewMode();
 
         config.saveAsync();
 

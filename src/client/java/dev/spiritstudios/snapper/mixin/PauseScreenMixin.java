@@ -35,12 +35,12 @@ public abstract class PauseScreenMixin extends Screen {
             at = @At(value = "MIXINEXTRAS:EXPRESSION", shift = At.Shift.AFTER)
     )
     protected void addSnapperButton(CallbackInfo ci, @Local(name = "iconButtonRow") LinearLayout iconButtonRow) {
-        if (SnapperConfig.HOLDER.get().snapperButton().showInGameMenu()) {
+        if (SnapperConfig.get().snapperButton().showInGameMenu()) {
             iconButtonRow.addChild(Snapper.createSnapperButton(20, _ -> {
                 this.minecraft.gui.setScreen(new GalleryScreen(this));
             }));
         }
-        if (SnapperConfig.HOLDER.get().showScreenshotHelper()) {
+        if (SnapperConfig.get().showScreenshotHelper()) {
             iconButtonRow.addChild(new SpriteIconButton.CenteredIcon(
                     20, 20,
                     Component.translatable("button.snapper.helper.screenshot"),

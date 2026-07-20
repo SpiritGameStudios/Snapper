@@ -1,4 +1,4 @@
-package dev.spiritstudios.snapper.gui.widget;
+package dev.spiritstudios.snapper.gui.widget.gallery;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.spiritstudios.snapper.Snapper;
@@ -57,7 +57,7 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
             GalleryTexture.Type textureType,
             Screen parent
     ) {
-        if (SnapperConfig.HOLDER.get().viewMode() == GalleryScreen.ViewMode.GRID) {
+        if (SnapperConfig.get().viewMode() == GalleryScreen.ViewMode.GRID) {
             return new ScreenshotGridWidget(minecraft, width, height, y, findScreenshots, previous, textureType, parent);
         } else {
             return new ScreenshotListWidget(minecraft, width, height, y, findScreenshots, previous, textureType, parent);

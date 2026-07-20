@@ -3,7 +3,7 @@ package dev.spiritstudios.snapper.mixin;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import dev.spiritstudios.snapper.gui.screen.PanoramaViewerScreen;
+import dev.spiritstudios.snapper.gui.screen.viewer.PanoramaViewerScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.screens.LevelLoadingScreen;

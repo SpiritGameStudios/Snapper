@@ -38,7 +38,7 @@ public class ScreenshotUploading {
             return CompletableFuture.failedFuture(new IllegalStateException("Minecraft is currently running in offline mode."));
         }
 
-        AxolotlClientApi.TermsAcceptance termsStatus = SnapperConfig.HOLDER.get().axolotlClient().termsStatus();
+        AxolotlClientApi.TermsAcceptance termsStatus = SnapperConfig.get().axolotlClient().termsStatus();
 
         if (termsStatus == AxolotlClientApi.TermsAcceptance.DENIED) {
             SnapperToasts.imageUploadApiDisabledToast();

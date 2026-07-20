@@ -162,7 +162,7 @@ public class SnapperButtonBar {
             if (SnapperUtil.isOfflineAccount()) {
                 this.uploadButton.active = false;
                 this.uploadButton.setTooltip(Tooltip.create(Component.translatable("button.snapper.upload.tooltip.offline")));
-            } else if (SnapperConfig.HOLDER.get().axolotlClient().termsStatus() == AxolotlClientApi.TermsAcceptance.DENIED) {
+            } else if (SnapperConfig.get().axolotlClient().termsStatus() == AxolotlClientApi.TermsAcceptance.DENIED) {
                 this.uploadButton.active = false;
                 this.uploadButton.setTooltip(Tooltip.create(Component.translatable("button.snapper.upload.tooltip.tos")));
             } else {
