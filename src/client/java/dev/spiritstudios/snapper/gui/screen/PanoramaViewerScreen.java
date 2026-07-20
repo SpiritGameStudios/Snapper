@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.spiritstudios.snapper.gui.SnapperButtonBar;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -13,10 +14,18 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
+import java.util.Optional;
+
 public class PanoramaViewerScreen extends ParentReloaderScreen {
     private final PanoramaTexture texture;
 
+    private static final float DRAG = 1.0F;
+    private static final float SPEED = 20F;
+
+    private boolean isHeld = false;
+
     private float spin = 0.0F;
+    private float velocity = 0.0F;
 
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this, HeaderAndFooterLayout.DEFAULT_HEADER_AND_FOOTER_HEIGHT, 60);
 
@@ -56,9 +65,27 @@ public class PanoramaViewerScreen extends ParentReloaderScreen {
     }
 
     @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        boolean result = super.mouseClicked(event, doubleClick);
+        Optional<GuiEventListener> child = this.getChildAt(event.x(), event.y());
+
+        if (event.button() == 0 && child.isEmpty()) {
+            this.isHeld = true;
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        if (event.button() == 0) this.isHeld = false;
+        return super.mouseReleased(event);
+    }
+
+    @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
         if (event.buttonInfo().button() == 0) {
-            this.spin = (float) Mth.wrapDegrees(this.spin - ((dx * 25F) / CubeMap.PROJECTION_FOV));
+            this.velocity += (float) ((dx * SPEED) / CubeMap.PROJECTION_FOV);
             return true;
         } else {
             return false;
@@ -67,8 +94,14 @@ public class PanoramaViewerScreen extends ParentReloaderScreen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        float delta = (float) ((double) a * minecraft.gameRenderer.gameRenderState().optionsRenderState.panoramaSpeed);
-        this.spin = Mth.wrapDegrees(this.spin + delta * 0.1F);
+        float aRealTime = minecraft.getDeltaTracker().getRealtimeDeltaTicks();
+        float delta = (float) ((double) aRealTime * minecraft.gameRenderer.gameRenderState().optionsRenderState.panoramaSpeed);
+
+        float constantSpin = isHeld ? 0.0F : delta * 0.1F;
+        float velocityPerSecond = velocity * aRealTime;
+
+        this.spin = Mth.wrapDegrees(this.spin + constantSpin + velocityPerSecond);
+        this.velocity -= (velocity / DRAG) * aRealTime;
 
         graphics.requestCursor(CursorTypes.RESIZE_EW);
 
