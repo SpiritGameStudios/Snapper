@@ -1,6 +1,5 @@
 package dev.spiritstudios.snapper.gui.screen;
 
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.spiritstudios.snapper.gui.SnapperButtonBar;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
@@ -59,17 +58,12 @@ public class PanoramaViewerScreen extends ParentReloaderScreen {
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
         if (event.buttonInfo().button() == 0) {
-            Window window = minecraft.getWindow();
-            double dxW = (dx * window.getScreenWidth()) / window.getGuiScaledWidth();
-            float degPerPixel = (float) dxW / CubeMap.PROJECTION_FOV;
-            degPerPixel = degPerPixel * Mth.sign(dx);
-            this.spin = (float) Mth.wrapDegrees(this.spin - (dx * degPerPixel));
+            this.spin = (float) Mth.wrapDegrees(this.spin - ((dx * 25F) / CubeMap.PROJECTION_FOV));
             return true;
         } else {
             return false;
         }
     }
-
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
