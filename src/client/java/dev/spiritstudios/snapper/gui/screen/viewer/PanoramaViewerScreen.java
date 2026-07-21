@@ -22,7 +22,7 @@ public class PanoramaViewerScreen extends ParentReloaderScreen {
     private final PanoramaTexture texture;
 
     private static final float DRAG = 1.0F;
-    private static final float SPEED = 20F;
+    private static final float SPEED = 30F; // maybe add to config - SkyNotTheLimit
 
     private boolean isHeld = false;
 
@@ -87,7 +87,7 @@ public class PanoramaViewerScreen extends ParentReloaderScreen {
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
         if (event.buttonInfo().button() == 0) {
-            this.velocity += (float) ((dx * SPEED) / CubeMap.PROJECTION_FOV);
+            this.velocity -= (float) ((dx * SPEED) / CubeMap.PROJECTION_FOV);
             return true;
         } else {
             return false;
