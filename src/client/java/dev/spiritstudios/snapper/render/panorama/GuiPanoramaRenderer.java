@@ -7,6 +7,7 @@ import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.mixin.accessor.CubeMapAccessor;
 import dev.spiritstudios.snapper.mixin.accessor.PictureInPictureRendererAccessor;
 import net.minecraft.client.Minecraft;
@@ -14,9 +15,12 @@ import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Util;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
@@ -59,7 +63,7 @@ public class GuiPanoramaRenderer extends PictureInPictureRenderer<GuiPanoramaRen
             try (RenderPass renderPass = RenderSystem.getDevice()
                     .createCommandEncoder()
                     .createRenderPass(
-                            () -> "Cubemap",
+                            () -> "Snapper Cubemap",
                             accessor.getTextureView(),
                             Optional.empty(),
                             accessor.getDepthTextureView(),

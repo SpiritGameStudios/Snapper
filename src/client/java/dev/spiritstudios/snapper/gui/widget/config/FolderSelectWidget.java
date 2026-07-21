@@ -2,7 +2,7 @@ package dev.spiritstudios.snapper.gui.widget.config;
 
 import dev.spiritstudios.snapper.Snapper;
 import dev.spiritstudios.snapper.gui.overlay.ExternalDialogOverlay;
-import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
+import joptsimple.internal.Strings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -16,12 +16,15 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
+import org.apache.commons.lang3.SystemProperties;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FolderSelectWidget extends AbstractContainerWidget {
@@ -38,7 +41,7 @@ public class FolderSelectWidget extends AbstractContainerWidget {
     private final LinearLayout layout;
     private final PathFunctions functions;
 
-    public FolderSelectWidget(int width,  PathFunctions pathFunctions, String placeholderKey) {
+    public FolderSelectWidget(int width, PathFunctions pathFunctions, String placeholderKey) {
         super(0, 0, width, 0, CommonComponents.EMPTY);
         this.functions = pathFunctions;
         this.active = false;
@@ -77,13 +80,21 @@ public class FolderSelectWidget extends AbstractContainerWidget {
                             ExternalDialogOverlay overlay = new ExternalDialogOverlay();
                             minecraft.gui.setOverlay(overlay);
 
-                            DirectoryConfigUtil.openFolderSelect(
+                            // replaceAll is to prevent an ACE exploit in TinyFD
+                            CompletableFuture.supplyAsync(() -> TinyFileDialogs.tinyfd_selectFolderDialog(
                                             Component.translatable("prompt.snapper.folder_select")
                                                     .getString()
-                                    )
-                                    .thenAccept(path -> {
-                                        valueFromSelectDialog(path.orElse(null));
-                                        minecraft.submit(overlay::close).join();
+                                                    .replaceAll("[^a-zA-Z0-9 .,]", ""),
+                                            SystemProperties.getUserHome()
+                                    ))
+                                    .thenCompose(selectedPath -> {
+                                        if (Strings.isNullOrEmpty(selectedPath)) {
+                                            valueFromSelectDialog(null);
+                                        } else {
+                                            valueFromSelectDialog(Path.of(selectedPath));
+                                        }
+
+                                        return minecraft.submit(overlay::close);
                                     });
                         },
                         true
@@ -187,7 +198,7 @@ public class FolderSelectWidget extends AbstractContainerWidget {
     public boolean isMouseOver(final double mouseX, final double mouseY) {
         AtomicBoolean mouseOver = new AtomicBoolean();
         this.layout.visitChildren(child -> {
-            if (child.getRectangle().containsPoint((int)mouseX, (int)mouseY)) {
+            if (child.getRectangle().containsPoint((int) mouseX, (int) mouseY)) {
                 mouseOver.set(true);
             }
         });
