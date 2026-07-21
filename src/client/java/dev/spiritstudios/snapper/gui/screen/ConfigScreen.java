@@ -1,11 +1,13 @@
 package dev.spiritstudios.snapper.gui.screen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import dev.spiritstudios.snapper.SnapperComponents;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.PowersOf2Set;
 import dev.spiritstudios.snapper.gui.widget.config.ConfigList;
 import dev.spiritstudios.snapper.gui.widget.config.ConfigSliderWidget;
 import dev.spiritstudios.snapper.gui.widget.config.FolderSelectWidget;
+import dev.spiritstudios.snapper.gui.widget.config.DynamicCappedSlider;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -20,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -34,6 +35,16 @@ public class ConfigScreen extends Screen {
     public ConfigScreen(@Nullable Screen lastScreen) {
         super(Component.translatable("config.snapper.title"));
         this.lastScreen = lastScreen;
+    }
+
+    private void setMaxSuperSampling(DynamicCappedSlider slider, int dimensions) {
+        int maxTextureSize = RenderSystem.getDevice().getDeviceInfo().limits().maxTextureSize();
+        int maxSuperSampling = 1;
+        while (dimensions * maxSuperSampling < maxTextureSize) {
+            maxSuperSampling += 1;
+        }
+
+        slider.setMaximum(maxSuperSampling);
     }
 
     @Override
@@ -70,10 +81,29 @@ public class ConfigScreen extends Screen {
 
         this.list.addHeader(Component.translatable("config.snapper.panorama"));
 
+        Tooltip tooltip = getTooltip("panoramaSuperSampling");
+        var superSamplingSlider = new DynamicCappedSlider(
+                0, 0,
+                150, 20,
+                Component.translatable("config.snapper.panoramaSuperSampling"),
+                config.superSampling,
+                new OptionInstance.IntRange(1, 8),
+                value -> value == 1 ?
+                        CommonComponents.OPTION_OFF :
+                        Component.translatable("config.snapper.panoramaSuperSampling.value", value),
+                _ -> tooltip,
+                b -> config.superSampling = b
+        );
+
+        setMaxSuperSampling(superSamplingSlider, config.panoramaDimensions);
+
         this.list.addBig(
                 slider(
                         "panoramaDimensions",
-                        b -> config.panoramaDimensions = b,
+                        b -> {
+                            setMaxSuperSampling(superSamplingSlider, b);
+                            config.panoramaDimensions = b;
+                        },
                         config.panoramaDimensions,
                         new PowersOf2Set(512, 4096),
                         value -> {
@@ -92,17 +122,8 @@ public class ConfigScreen extends Screen {
                 )
         );
 
-        this.list.addBig(
-                slider(
-                        "panoramaSuperSampling",
-                        b -> config.superSampling = b,
-                        config.superSampling,
-                        new OptionInstance.IntRange(1, 8),
-                        value -> value == 1 ?
-                                CommonComponents.OPTION_OFF :
-                                Component.translatable("config.snapper.panoramaSuperSampling.value", value)
-                )
-        );
+        this.list.addBig(superSamplingSlider);
+
 
         this.list.addHeader(Component.translatable("config.snapper.snapperButton"));
 

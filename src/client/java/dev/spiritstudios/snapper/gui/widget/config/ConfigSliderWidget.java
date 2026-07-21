@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ConfigSliderWidget<T> extends AbstractSliderButton {
-    private final OptionInstance.SliderableValueSet<T> values;
+    protected final OptionInstance.SliderableValueSet<T> values;
 
     private final Function<T, Component> messageSupplier;
     private final Function<T, @Nullable Tooltip> tooltipSupplier;
@@ -36,9 +36,8 @@ public class ConfigSliderWidget<T> extends AbstractSliderButton {
             Function<T, @Nullable Tooltip> tooltipSupplier,
             Consumer<T> onValueChanged
     ) {
-        super(x, y, width, height, message, 0.0);
+        super(x, y, width, height, message, values.toSliderValue(value));
         this.values = values;
-        this.value = values.toSliderValue(value);
         this.title = message;
         this.messageSupplier = messageSupplier;
         this.tooltipSupplier = tooltipSupplier;
