@@ -13,24 +13,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class DirectoryConfigUtil {
-    public static final Codec<Path> PATH_CODEC = Codec.STRING.comapFlatMap(
-            string -> {
-                Path path = Path.of(string);
-
-                try {
-                    Files.createDirectories(path);
-                } catch (IOException e) {
-                    return DataResult.error(e::getMessage);
-                }
-
-                if (!Files.exists(path)) {
-                    return DataResult.error(() -> "Failed to get file from config string value. Does the directory exist?");
-                }
-
-                return DataResult.success(path);
-            },
-            path -> escapePath(path.toString())
-    );
 
     public static CompletableFuture<Optional<Path>> openFolderSelect(String title) {
         // replaceAll is to prevent an ACE exploit in TinyFD
@@ -47,9 +29,5 @@ public class DirectoryConfigUtil {
 
                     return Optional.of(Path.of(selectedPath));
                 });
-    }
-
-    public static String escapePath(String path) {
-        return path.replace("\\", "\\\\");
     }
 }

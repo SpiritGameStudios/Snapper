@@ -1,5 +1,6 @@
 package dev.spiritstudios.snapper.gui.widget.config;
 
+import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.input.KeyEvent;
@@ -16,7 +17,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ConfigSliderWidget<T> extends AbstractSliderButton {
-    private final List<T> values;
+    private final OptionInstance.SliderableValueSet<T> values;
 
     private final Function<T, Component> messageSupplier;
     private final Function<T, @Nullable Tooltip> tooltipSupplier;
@@ -30,14 +31,14 @@ public class ConfigSliderWidget<T> extends AbstractSliderButton {
             int x, int y,
             int width, int height,
             Component message, T value,
-            List<T> values,
+            OptionInstance.SliderableValueSet<T> values,
             Function<T, Component> messageSupplier,
             Function<T, @Nullable Tooltip> tooltipSupplier,
             Consumer<T> onValueChanged
     ) {
         super(x, y, width, height, message, 0.0);
         this.values = values;
-        this.value = toSliderValue(value);
+        this.value = values.toSliderValue(value);
         this.title = message;
         this.messageSupplier = messageSupplier;
         this.tooltipSupplier = tooltipSupplier;
@@ -46,47 +47,16 @@ public class ConfigSliderWidget<T> extends AbstractSliderButton {
         this.updateMessage();
     }
 
-    protected T fromSliderValue(double slider) {
-        if (slider >= 1.0) {
-            slider = 0.99999F;
-        }
-
-        int index = Mth.floor(Mth.map(slider, 0.0, 1.0, 0.0, values.size()));
-        return values.get(Mth.clamp(index, 0, values.size() - 1));
-    }
-
-    protected double toSliderValue(T value) {
-        if (Objects.equals(value, values.getFirst())) {
-            return 0.0;
-        } else {
-            return Objects.equals(value, values.getLast()) ? 1.0 : Mth.map(values.indexOf(value), 0.0, values.size() - 1, 0.0, 1.0);
-        }
-    }
-
-
-    public Optional<T> next(final T current) {
-        int currentIndex = this.values.indexOf(current);
-        int nextIndex = Mth.clamp(currentIndex + 1, 0, this.values.size() - 1);
-        return Optional.of(this.values.get(nextIndex));
-    }
-
-    public Optional<T> previous(final T current) {
-        int currentIndex = this.values.indexOf(current);
-        int previousIndex = Mth.clamp(currentIndex - 1, 0, this.values.size() - 1);
-        return Optional.of(this.values.get(previousIndex));
-    }
-
-
     @Override
     protected void updateMessage() {
-        T value = fromSliderValue(this.value);
+        T value = values.fromSliderValue(this.value);
         this.setMessage(CommonComponents.optionNameValue(title, messageSupplier.apply(value)));
         this.setTooltip(tooltipSupplier.apply(value));
     }
 
     @Override
     protected void applyValue() {
-        onValueChanged.accept(fromSliderValue(this.value));
+        onValueChanged.accept(values.fromSliderValue(this.value));
     }
 
     @Override
@@ -100,17 +70,17 @@ public class ConfigSliderWidget<T> extends AbstractSliderButton {
             boolean left = event.isLeft();
             boolean right = event.isRight();
             if (left) {
-                Optional<T> previous = previous(fromSliderValue(this.value));
+                Optional<T> previous = values.previous(values.fromSliderValue(this.value));
                 if (previous.isPresent()) {
-                    this.setValue(toSliderValue(previous.get()));
+                    this.setValue(values.toSliderValue(previous.get()));
                     return true;
                 }
             }
 
             if (right) {
-                Optional<T> next = next(fromSliderValue(this.value));
+                Optional<T> next = values.next(values.fromSliderValue(this.value));
                 if (next.isPresent()) {
-                    this.setValue(toSliderValue(next.get()));
+                    this.setValue(values.toSliderValue(next.get()));
                     return true;
                 }
             }
@@ -129,10 +99,10 @@ public class ConfigSliderWidget<T> extends AbstractSliderButton {
     public void onRelease(MouseButtonEvent event) {
         super.onRelease(event);
 
-        this.convertedValue = fromSliderValue(value);
+        this.convertedValue = values.fromSliderValue(value);
 
-        if (this.value != toSliderValue(convertedValue)) {
-            this.value = toSliderValue(convertedValue);
+        if (this.value != values.toSliderValue(convertedValue)) {
+            this.value = values.toSliderValue(convertedValue);
             this.updateMessage();
         }
     }

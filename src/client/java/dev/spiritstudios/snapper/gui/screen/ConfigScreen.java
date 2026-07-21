@@ -1,11 +1,13 @@
 package dev.spiritstudios.snapper.gui.screen;
 
+import dev.spiritstudios.snapper.SnapperComponents;
 import dev.spiritstudios.snapper.SnapperConfig;
+import dev.spiritstudios.snapper.gui.PowersOf2Set;
 import dev.spiritstudios.snapper.gui.widget.config.ConfigList;
 import dev.spiritstudios.snapper.gui.widget.config.ConfigSliderWidget;
 import dev.spiritstudios.snapper.gui.widget.config.FolderSelectWidget;
-import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
+import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
@@ -20,6 +22,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class ConfigScreen extends Screen {
     private final @Nullable Screen lastScreen;
@@ -68,20 +71,36 @@ public class ConfigScreen extends Screen {
         this.list.addHeader(Component.translatable("config.snapper.panorama"));
 
         this.list.addBig(
-                enumSlider(
+                slider(
                         "panoramaDimensions",
                         b -> config.panoramaDimensions = b,
                         config.panoramaDimensions,
-                        SnapperUtil.PanoramaSize.class
+                        new PowersOf2Set(512, 4096),
+                        value -> {
+                            String translation = switch (value) {
+                                case 512 -> "config.snapper.panoramaDimensions.small";
+                                case 1024 -> "config.snapper.panoramaDimensions.medium";
+                                case 2048 -> "config.snapper.panoramaDimensions.large";
+                                case 4096 -> "config.snapper.panoramaDimensions.enormous";
+                                default -> value < 512 ?
+                                        "config.snapper.panoramaDimensions.tiny" :
+                                        "config.snapper.panoramaDimensions.jwst";
+                            };
+
+                            return Component.translatable(translation, SnapperComponents.resolution(value, value));
+                        }
                 )
         );
 
         this.list.addBig(
-                intSlider(
+                slider(
                         "panoramaSuperSampling",
                         b -> config.superSampling = b,
                         config.superSampling,
-                        List.of(1, 2, 3, 4, 5, 6, 7, 8)
+                        new OptionInstance.IntRange(1, 8),
+                        value -> value == 1 ?
+                                CommonComponents.OPTION_OFF :
+                                Component.translatable("config.snapper.panoramaSuperSampling.value", value)
                 )
         );
 
@@ -159,7 +178,7 @@ public class ConfigScreen extends Screen {
         Tooltip tooltip = getTooltip(name);
 
         return CycleButton.onOffBuilder(currentValue)
-                .withTooltip(b -> tooltip)
+                .withTooltip(_ -> tooltip)
                 .create(
                         0, 0,
                         150, 20,
@@ -190,32 +209,12 @@ public class ConfigScreen extends Screen {
                 );
     }
 
-    private <T extends Enum<T>> AbstractWidget enumSlider(
+    private <T> AbstractWidget slider(
             String name,
             Consumer<T> setter,
             T currentValue,
-            Class<T> clazz
-    ) {
-        Tooltip tooltip = getTooltip(name);
-        List<T> values = Arrays.asList(clazz.getEnumConstants());
-
-        return new ConfigSliderWidget<>(
-                0, 0,
-                150, 20,
-                Component.translatable("config.snapper." + name),
-                currentValue,
-                values,
-                t -> Component.translatable("config.snapper." + name + "." + t.toString().toLowerCase()),
-                _ -> tooltip,
-                setter
-        );
-    }
-
-    private AbstractWidget intSlider(
-            String name,
-            Consumer<Integer> setter,
-            int currentValue,
-            List<Integer> values
+            OptionInstance.SliderableValueSet<T> set,
+            Function<T, Component> toString
     ) {
         Tooltip tooltip = getTooltip(name);
 
@@ -224,8 +223,8 @@ public class ConfigScreen extends Screen {
                 150, 20,
                 Component.translatable("config.snapper." + name),
                 currentValue,
-                values,
-                t -> Component.translatable("config.snapper." + name + ".value", t),
+                set,
+                toString,
                 _ -> tooltip,
                 setter
         );

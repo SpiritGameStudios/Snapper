@@ -1,6 +1,7 @@
 package dev.spiritstudios.snapper;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
 import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
@@ -16,6 +17,7 @@ import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonCLang;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 
 import java.nio.file.Path;
@@ -81,9 +83,9 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             "dimensions",
                                             """
                                                     Dimensions of individual panorama images when saved
-                                                    May be 1024, 2048, or 4096""",
-                                            SnapperUtil.PanoramaSize.CODEC,
-                                            SnapperUtil.PanoramaSize.ONE_THOUSAND_TWENTY_FOUR,
+                                                    May be any positive power of 2""",
+                                            SnapperCodecs.POSITIVE_POWER_OF_2,
+                                            1024,
                                             Panorama::dimensions
                                     )
                                     .withValue(
@@ -91,8 +93,8 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             """
                                                     How many times to super sample panorama images.
                                                     Increases panorama quality at the cost of rendering time.
-                                                    Must be a positive integer.""",
-                                            ExtraCodecs.POSITIVE_INT,
+                                                    May be any positive integer 8 or below.""",
+                                            ExtraCodecs.intRange(1, 8),
                                             4,
                                             Panorama::superSampling
                                     )
@@ -111,7 +113,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                     ).withValue(
                                             "path",
                                             "The path to use if custom screenshot folders are enabled",
-                                            DirectoryConfigUtil.PATH_CODEC,
+                                            SnapperCodecs.PATH,
                                             SnapperUtil.UNIFIED_FOLDER,
                                             CustomScreenshotFolder::path
                                     )
@@ -242,7 +244,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
     public record AxolotlClient(AxolotlClientApi.TermsAcceptance termsStatus) {
     }
 
-    public record Panorama(SnapperUtil.PanoramaSize dimensions, int superSampling) {
+    public record Panorama(int dimensions, int superSampling) {
 
     }
 
@@ -272,7 +274,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
         public boolean showInGameMenu;
 
         // Panorama
-        public SnapperUtil.PanoramaSize panoramaDimensions;
+        public int panoramaDimensions;
         public int superSampling;
 
         // Custom Screenshot Folder

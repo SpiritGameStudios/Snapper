@@ -21,34 +21,6 @@ public final class SnapperUtil {
         return Minecraft.getInstance().getUser().getAccessToken().length() < 400;
     }
 
-    public enum PanoramaSize {
-        ONE_THOUSAND_TWENTY_FOUR(1024), TWO_THOUSAND_FORTY_EIGHT(2048), FOUR_THOUSAND_NINETY_SIX(4096);
-
-        public static final Codec<PanoramaSize> CODEC = Codec.INT.comapFlatMap(
-                i -> {
-                    for (PanoramaSize size : PanoramaSize.values()) {
-                        if (i == size.size) {
-                            return DataResult.success(size);
-                        }
-                    }
-                    return DataResult.error(() -> "Invalid panorama size, must be one of " + Arrays.stream(PanoramaSize.values())
-                            .map(panoramaSize -> Integer.toString(panoramaSize.size))
-                            .collect(Collectors.joining(","))
-                    );
-                },
-                PanoramaSize::size
-        );
-        private final int size;
-
-        PanoramaSize(int size) {
-            this.size = size;
-        }
-
-        public int size() {
-            return size;
-        }
-    }
-
     private static Path getAppDataFolder() {
         return switch (Util.getPlatform()) {
             case WINDOWS -> Path.of(System.getenv("APPDATA"));
