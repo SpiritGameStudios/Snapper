@@ -19,7 +19,12 @@ version = "$modVersion+${libs.versions.minecraft.get()}"
 
 @Suppress("UnstableApiUsage")
 repositories {
-    maven("https://maven.terraformersmc.com/") {
+    maven("https://maven.gnomecraft.net/releases") {
+        name = "Gnomecraft (Terraformers Mirror)"
+        content { includeGroupAndSubgroups("com.terraformersmc") }
+    }
+
+    maven("https://maven.terraformersmc.com/releases") {
         name = "Terraformers"
         content { includeGroupAndSubgroups("com.terraformersmc") }
     }
