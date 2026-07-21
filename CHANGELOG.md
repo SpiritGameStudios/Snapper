@@ -40,3 +40,4 @@ All translation changes have only made it to the en_us language file at this tim
 - Added `config.snapper.panoramaSuperSampling` for the super sampling slider in the config menu.
 - Added `config.snapper.panoramaSuperSampling.tooltip` for the tooltip of the super sampling slider in the config menu.
 - Added `config.snapper.panoramaSuperSampling.value` for the value of the super sampling slider in the config menu.
+- Reworked panorama dimensions translations. All translations in `config.snapper.panoramaDimensions.*` have changed.
