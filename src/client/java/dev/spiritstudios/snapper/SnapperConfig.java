@@ -1,10 +1,8 @@
 package dev.spiritstudios.snapper;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
-import dev.spiritstudios.snapper.util.DirectoryConfigUtil;
 import dev.spiritstudios.snapper.util.SnapperUtil;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import lgbt.greenhouse.config.api.v3.GreenhouseConfigHolder;
@@ -17,7 +15,6 @@ import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonCLang;
 import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ExtraCodecs;
-import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 
 import java.nio.file.Path;
@@ -91,9 +88,9 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                     .withValue(
                                             "super_sampling",
                                             """
-                                                    How many times to super sample panorama images.
-                                                    Increases panorama quality at the cost of rendering time.
-                                                    May be any positive integer 8 or below.""",
+                                                    How many times to super sample panorama images
+                                                    Increases panorama quality at the cost of rendering time
+                                                    May be any positive integer 8 or below""",
                                             ExtraCodecs.intRange(1, 8),
                                             4,
                                             Panorama::superSampling
