@@ -87,7 +87,7 @@ public class PanoramaViewerScreen extends ParentReloaderScreen {
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
         if (event.buttonInfo().button() == 0) {
-            this.velocity -= (float) ((dx * SPEED) / CubeMap.PROJECTION_FOV);
+            this.velocity += (float) ((dx * SPEED) / CubeMap.PROJECTION_FOV);
             return true;
         } else {
             return false;
@@ -102,8 +102,11 @@ public class PanoramaViewerScreen extends ParentReloaderScreen {
         float constantSpin = isHeld ? 0.0F : delta * 0.1F;
         float velocityPerSecond = velocity * aRealTime;
 
-        this.spin = Mth.wrapDegrees(this.spin + constantSpin + velocityPerSecond);
-        this.velocity -= (velocity / DRAG) * aRealTime;
+        this.spin = Mth.wrapDegrees(this.spin + constantSpin - velocityPerSecond);
+
+        final float dragIsALie = isHeld ? 1.0F : DRAG;
+
+        this.velocity -= (velocity / dragIsALie) * aRealTime;
 
         graphics.requestCursor(CursorTypes.RESIZE_EW);
 
