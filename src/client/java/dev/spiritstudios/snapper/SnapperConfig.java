@@ -3,7 +3,7 @@ package dev.spiritstudios.snapper;
 import com.mojang.serialization.Codec;
 import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
-import dev.spiritstudios.snapper.util.SnapperUtil;
+import dev.spiritstudios.snapper.util.SnapperCodecs;
 import dev.spiritstudios.snapper.util.uploading.AxolotlClientApi;
 import lgbt.greenhouse.config.api.v3.GreenhouseConfigHolder;
 import lgbt.greenhouse.config.api.v3.GreenhouseConfigSide;
@@ -16,6 +16,7 @@ import lgbt.greenhouse.config.api.v3.lang.GreenhouseConfigJsonLang;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Util;
+import org.apache.commons.lang3.SystemProperties;
 
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
@@ -90,7 +91,8 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             """
                                                     How many times to super sample panorama images
                                                     Increases panorama quality at the cost of rendering time
-                                                    May be any positive integer 8 or below""",
+                                                    May be any positive integer 8 or below
+                                                    dimensions * super_sampling must not exceed your GPUs maximum supported texture size (usually around 16384)""",
                                             ExtraCodecs.intRange(1, 8),
                                             4,
                                             Panorama::superSampling
@@ -111,7 +113,19 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             "path",
                                             "The path to use if custom screenshot folders are enabled",
                                             SnapperCodecs.PATH,
-                                            SnapperUtil.UNIFIED_FOLDER,
+                                            (switch (Util.getPlatform()) {
+                                                case WINDOWS -> Path.of(System.getenv("APPDATA"));
+                                                case OSX ->
+                                                        Path.of(SystemProperties.getUserHome(), "Library", "Application Support");
+                                                default -> {
+                                                    String xdgDataHome = System.getenv("XDG_DATA_HOME");
+                                                    if (xdgDataHome != null && !xdgDataHome.isEmpty()) {
+                                                        yield Path.of(xdgDataHome);
+                                                    } else {
+                                                        yield Path.of(SystemProperties.getUserHome(), ".local", "share");
+                                                    }
+                                                }
+                                            }).resolve("snapper"),
                                             CustomScreenshotFolder::path
                                     )
                     ).withMapValue(

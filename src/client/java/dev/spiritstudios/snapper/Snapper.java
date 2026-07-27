@@ -1,6 +1,7 @@
 package dev.spiritstudios.snapper;
 
 import dev.spiritstudios.snapper.render.panorama.GuiPanoramaRenderer;
+import dev.spiritstudios.snapper.util.clipboard.Clipboard;
 import dev.spiritstudios.snapper.util.uploading.ScreenshotUploading;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -19,8 +20,11 @@ public final class Snapper implements ClientModInitializer {
     public static final String MOD_ID = "snapper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static final SoundEvent SHUTTER_SOUND = Registry.register(BuiltInRegistries.SOUND_EVENT, Identifier.fromNamespaceAndPath(MOD_ID, "ui.shutter"),
-            SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(MOD_ID, "ui.shutter")));
+    public static final SoundEvent SHUTTER_SOUND = Registry.register(
+            BuiltInRegistries.SOUND_EVENT,
+            id("ui.shutter"),
+            SoundEvent.createVariableRangeEvent(id("ui.shutter"))
+    );
 
     @Override
     public void onInitializeClient() {
@@ -28,6 +32,10 @@ public final class Snapper implements ClientModInitializer {
         SnapperKeyMappings.init();
         ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> ScreenshotUploading.close());
         PictureInPictureRendererRegistry.register(_ -> new GuiPanoramaRenderer());
+
+        // Make sure we know what clipboard a user is using when they send us logs
+        // TODO: Maybe add this to the system report as well?
+        LOGGER.info("Using clipboard backend: {}", Clipboard.INSTANCE.getClass().getSimpleName());
     }
 
     public static SpriteIconButton createSnapperButton(final int width, final Button.OnPress onPress) {

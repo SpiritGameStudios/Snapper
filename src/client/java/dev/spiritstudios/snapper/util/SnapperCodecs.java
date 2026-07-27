@@ -1,4 +1,4 @@
-package dev.spiritstudios.snapper;
+package dev.spiritstudios.snapper.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;

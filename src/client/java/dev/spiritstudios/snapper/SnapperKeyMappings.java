@@ -45,8 +45,7 @@ public final class SnapperKeyMappings {
         ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
             while (PANORAMA_KEY.consumeClick()) SnapperKeyMappings.takePanorama(minecraft);
             while (RECENT_SCREENSHOT_KEY.consumeClick()) SnapperKeyMappings.openRecentScreenshot(minecraft);
-            while (GALLERY_KEY.consumeClick())
-                minecraft.gui.setScreen(new GalleryScreen(minecraft.gui.screen()));
+            while (GALLERY_KEY.consumeClick()) minecraft.gui.setScreen(new GalleryScreen(minecraft.gui.screen()));
         });
     }
 
@@ -55,6 +54,7 @@ public final class SnapperKeyMappings {
         PanoramaGrabber.grabSnapperPanorama(minecraft);
     }
 
+    // TODO: Also find panoramas
     private static void openRecentScreenshot(Minecraft minecraft) {
         List<Path> screenshots = ScreenshotActions.getScreenshots();
         if (screenshots.isEmpty()) {

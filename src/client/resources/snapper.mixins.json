@@ -7,8 +7,7 @@
     "MinecraftMixin",
     "PauseScreenMixin",
     "ScreenshotMixin",
-    "TitleScreenMixin",
-    "accessor.CameraAccessor"
+    "TitleScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

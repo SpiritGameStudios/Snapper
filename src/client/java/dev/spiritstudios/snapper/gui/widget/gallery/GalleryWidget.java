@@ -265,7 +265,6 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
                 .withZone(ZoneId.systemDefault());
 
         public final GalleryTexture texture;
-        public final FileTime lastModified;
 
         protected final Component fileName;
         protected final Component creation;
@@ -278,7 +277,6 @@ public abstract class GalleryWidget extends ObjectSelectionList<GalleryWidget.En
             this.texture = texture;
 
             this.index = children().indexOf(this);
-            this.lastModified = SafeFiles.getLastModifiedTime(texture.path).orElse(FileTime.fromMillis(0L));
 
             String fileName = texture.path.getFileName().toString();
 

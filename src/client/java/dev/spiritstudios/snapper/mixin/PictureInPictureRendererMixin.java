@@ -24,10 +24,6 @@ public class PictureInPictureRendererMixin {
 
     @WrapOperation(method = "prepareTexturesAndProjection", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setProjectionMatrix(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/ProjectionType;)V"))
     private void setProjection(GpuBufferSlice projectionMatrixBuffer, ProjectionType type, Operation<Void> original) {
-        if ((Object)this instanceof GuiPanoramaRenderer) {
-            original.call(projectionMatrixBuffer, ProjectionType.PERSPECTIVE);
-        } else {
-            original.call(projectionMatrixBuffer, type);
-        }
+        original.call(projectionMatrixBuffer, (Object) this instanceof GuiPanoramaRenderer ? ProjectionType.PERSPECTIVE : type);
     }
 }
