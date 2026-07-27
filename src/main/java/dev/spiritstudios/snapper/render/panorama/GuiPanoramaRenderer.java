@@ -47,7 +47,7 @@ public class GuiPanoramaRenderer extends PictureInPictureRenderer<GuiPanoramaRen
         if (!needsAResize && this.textureIsReadyToBlit(renderState)) {
             this.blitTexture(renderState, guiRenderState);
         } else {
-            this.prepareTexturesAndProjection(needsAResize, width, height);
+            accessor.callPrepareTexturesAndProjection(needsAResize, width, height);
 
             Matrix4fStack modelViewStack = RenderSystem.getModelViewStack();
             modelViewStack.pushMatrix();

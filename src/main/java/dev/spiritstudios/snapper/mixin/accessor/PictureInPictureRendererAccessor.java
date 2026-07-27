@@ -6,6 +6,7 @@ import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(PictureInPictureRenderer.class)
 public interface PictureInPictureRendererAccessor {
@@ -17,4 +18,7 @@ public interface PictureInPictureRendererAccessor {
 
     @Accessor
     @Nullable GpuTextureView getDepthTextureView();
+
+    @Invoker
+    void callPrepareTexturesAndProjection(final boolean needsAResize, final int width, final int height);
 }

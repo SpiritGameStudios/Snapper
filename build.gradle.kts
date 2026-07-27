@@ -61,16 +61,15 @@ val debugArgs = listOf(
 loom {
     runtimeOnlyLog4j = true
 
-    splitEnvironmentSourceSets()
-
-    mods.create(modId) {
-        sourceSet(sourceSets["main"])
-        sourceSet(sourceSets["client"])
-    }
-
     accessWidenerPath = file("src/main/resources/snapper.classtweaker")
 
-    runs.configureEach { jvmArguments.addAll(debugArgs) }
+    mods.create(modId) {
+        sourceSet("main")
+    }
+
+    runs.configureEach {
+        jvmArguments.addAll(debugArgs)
+    }
 }
 
 val greenhouseModdingApiAttribute = Attribute.of("lgbt.greenhouse.modding.api", String::class.java)

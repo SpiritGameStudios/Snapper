@@ -36,10 +36,11 @@ public class ScreenshotListWidget extends GalleryWidget {
 
     @Override
     public void repositionEntries() {
-        super.repositionEntries();
-        for (var entry : this.children()) {
+        for (Entry entry : this.children()) {
             entry.setHeight(defaultEntryHeight);
         }
+
+        super.repositionEntries();
     }
 
     @Override
