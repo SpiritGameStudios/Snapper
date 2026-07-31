@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
+import net.minecraft.util.Mth;
 
 public class ScreenshotViewerScreen extends ParentReloaderScreen {
     private static final Identifier MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/menu_list_background.png");
@@ -64,15 +65,20 @@ public class ScreenshotViewerScreen extends ParentReloaderScreen {
         this.drawMenuBackground(graphics);
         this.drawHeaderAndFooterSeparators(graphics);
 
-        int finalHeight = layout.getContentHeight();
-        float scaleFactor = (float) finalHeight / texture.getHeight();
-        int finalWidth = (int) (texture.getWidth() * scaleFactor);
+        float ratio = Math.min(
+                (float) layout.getWidth() / texture.getWidth(),
+                (float) layout.getContentHeight() / texture.getHeight()
+        );
+
+        int finalWidth = Mth.floor(texture.getWidth() * ratio);
+        int finalHeight = Mth.floor(texture.getHeight() * ratio);
 
         if (texture.isLoaded()) {
             graphics.blit(
                     RenderPipelines.GUI_TEXTURED,
                     this.texture.textureLocation,
-                    (this.width / 2) - (finalWidth / 2), layout.getHeaderHeight(),
+                    (this.width / 2) - (finalWidth / 2),
+                    layout.getHeaderHeight() + (layout.getContentHeight() / 2) - (finalHeight / 2),
                     0, 0,
                     finalWidth, finalHeight,
                     finalWidth, finalHeight
@@ -98,7 +104,7 @@ public class ScreenshotViewerScreen extends ParentReloaderScreen {
             );
 
             graphics.centeredText(this.font,
-                    Component.translatable("text.snapper.scale_factor", scaleFactor),
+                    Component.translatable("text.snapper.scale_factor", ratio),
                     this.width / 2,
                     60,
                     CommonColors.WHITE

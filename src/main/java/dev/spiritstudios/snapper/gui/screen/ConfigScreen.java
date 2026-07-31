@@ -1,6 +1,7 @@
 package dev.spiritstudios.snapper.gui.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.FilterMode;
 import dev.spiritstudios.snapper.SnapperComponents;
 import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.PowersOf2Set;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -56,6 +58,14 @@ public class ConfigScreen extends Screen {
         this.list = this.layout.addToContents(new ConfigList(this.minecraft, this.width, this));
 
         this.list.addHeader(Component.translatable("config.snapper.general"));
+
+        this.list.addBig(
+                enumButton(
+                        "screenshot_filtering",
+                        b -> config.screenshotFiltering = b, config.screenshotFiltering,
+                        FilterMode.class
+                )
+        );
 
         this.list.addSmall(
                 booleanButton(
@@ -217,7 +227,7 @@ public class ConfigScreen extends Screen {
         Tooltip tooltip = getTooltip(name);
 
         return CycleButton.builder(
-                        t -> Component.translatable("config.snapper." + name + "." + t.toString().toLowerCase()),
+                        t -> Component.translatable("config.snapper." + name + "." + t.toString().toLowerCase(Locale.ROOT)),
                         currentValue
                 )
                 .withValues(Arrays.asList(clazz.getEnumConstants()))

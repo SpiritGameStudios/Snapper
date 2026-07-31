@@ -2,7 +2,11 @@ package dev.spiritstudios.snapper.render.texture;
 
 import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.AddressMode;
+import com.mojang.blaze3d.textures.FilterMode;
 import dev.spiritstudios.snapper.Snapper;
+import dev.spiritstudios.snapper.SnapperConfig;
 import dev.spiritstudios.snapper.gui.screen.viewer.ScreenshotViewerScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -52,7 +56,15 @@ public final class ScreenshotTexture extends GalleryTexture {
             return;
         }
 
-        this.texture = new DynamicTexture(() -> "Screenshot " + this.textureLocation, image);
+        this.texture = new DynamicTexture(() -> "Screenshot " + this.textureLocation, image) {
+            {
+                this.sampler = RenderSystem.getSamplerCache().getSampler(
+                        AddressMode.REPEAT, AddressMode.REPEAT,
+                        SnapperConfig.get().screenshotFiltering(), FilterMode.LINEAR,
+                        false
+                );
+            }
+        };
         this.textureManager.register(this.textureLocation, this.texture);
         image.close();
     }

@@ -43,6 +43,7 @@ public final class PanoramaTexture extends GalleryTexture {
 
     private Texture texture;
 
+    // TODO: Mipmaps may help with shimmering on hi-res panoramas, but will also eat VRAM even more
     @Override
     protected NativeImage load() {
         try (

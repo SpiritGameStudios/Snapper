@@ -1,6 +1,8 @@
 package dev.spiritstudios.snapper;
 
+import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import dev.spiritstudios.snapper.gui.screen.GalleryScreen;
 import dev.spiritstudios.snapper.gui.toast.SnapperToasts;
 import dev.spiritstudios.snapper.util.SnapperCodecs;
@@ -19,6 +21,7 @@ import net.minecraft.util.Util;
 import org.apache.commons.lang3.SystemProperties;
 
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -27,6 +30,7 @@ import static lgbt.greenhouse.config.api.v3.dfu.fix.GreenhouseConfigSetFieldsFix
 public record SnapperConfig(boolean copyTakenScreenshot,
                             SnapperButton snapperButton,
                             GalleryScreen.ViewMode viewMode,
+                            FilterMode screenshotFiltering,
                             Panorama panorama,
                             CustomScreenshotFolder customScreenshotPath,
                             AxolotlClient axolotlClient,
@@ -71,6 +75,23 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                             GalleryScreen.ViewMode.CODEC,
                             GalleryScreen.ViewMode.GRID,
                             SnapperConfig::viewMode
+                    ).withValue(
+                            "screenshot_filtering",
+                            """
+                                    The texture filtering algorithm to apply to screenshots in the gallery and viewer
+                                    May be either 'nearest' or 'linear'""",
+                            Codec.STRING.comapFlatMap(
+                                    name -> {
+                                        try {
+                                            return DataResult.success(FilterMode.valueOf(name.toUpperCase(Locale.ROOT)));
+                                        } catch (IllegalArgumentException | NullPointerException e) {
+                                            return DataResult.error(() -> "'" + name + "' is not a valid Filter Mode");
+                                        }
+                                    },
+                                    mode -> mode.name().toLowerCase(Locale.ROOT)
+                            ),
+                            FilterMode.LINEAR,
+                            SnapperConfig::screenshotFiltering
                     ).withMapValue(
                             Panorama.class,
                             "panorama",
@@ -97,7 +118,8 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                             4,
                                             Panorama::superSampling
                                     )
-                    ).withMapValue(
+                    )
+                    .withMapValue(
                             CustomScreenshotFolder.class,
                             "custom_screenshot_path",
                             "Settings relating to a custom screenshot path",
@@ -231,11 +253,14 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                                                             .withField("dimensions", TypeTemplateBuilder.INT)
                                                             .withField("super_sampling", TypeTemplateBuilder.INT)
                                             ))
+                                            .withField("screenshot_filtering", TypeTemplateBuilder.STRING)
                                             .withField("show_screenshot_helper", TypeTemplateBuilder.BOOL),
                                     schema -> GreenhouseConfigSetFieldsFix.create(
                                             schema,
                                             function("panorama.super_sampling", (_, field) -> field.createInt(4)),
-                                            function("show_screenshot_helper", (_, field) -> field.createBoolean(true))
+                                            function("show_screenshot_helper", (_, field) -> field.createBoolean(true)),
+                                            function("screenshot_filtering", (_, field) -> field.createString("linear"))
+
                                     )
                             )
                     )
@@ -256,7 +281,6 @@ public record SnapperConfig(boolean copyTakenScreenshot,
     }
 
     public record Panorama(int dimensions, int superSampling) {
-
     }
 
     public static void init() {
@@ -279,6 +303,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
         public boolean copyTakenScreenshot;
         public GalleryScreen.ViewMode viewMode;
         public boolean showScreenshotHelper;
+        public FilterMode screenshotFiltering;
 
         // Snapper Button
         public boolean showOnTitleScreen;
@@ -300,6 +325,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
             copyTakenScreenshot = config.copyTakenScreenshot;
             viewMode = config.viewMode;
             showScreenshotHelper = config.showScreenshotHelper;
+            screenshotFiltering = config.screenshotFiltering;
 
             showOnTitleScreen = config.snapperButton.showOnTitleScreen;
             showInGameMenu = config.snapperButton.showInGameMenu;
@@ -339,6 +365,7 @@ public record SnapperConfig(boolean copyTakenScreenshot,
                             showInGameMenu
                     ),
                     viewMode,
+                    screenshotFiltering,
                     new Panorama(
                             panoramaDimensions,
                             superSampling
