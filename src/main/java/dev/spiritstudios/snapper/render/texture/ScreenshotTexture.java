@@ -58,11 +58,7 @@ public final class ScreenshotTexture extends GalleryTexture {
 
         this.texture = new DynamicTexture(() -> "Screenshot " + this.textureLocation, image) {
             {
-                this.sampler = RenderSystem.getSamplerCache().getSampler(
-                        AddressMode.REPEAT, AddressMode.REPEAT,
-                        SnapperConfig.get().screenshotFiltering(), FilterMode.LINEAR,
-                        false
-                );
+                this.sampler = RenderSystem.getSamplerCache().getRepeat(SnapperConfig.get().screenshotFiltering());
             }
         };
         this.textureManager.register(this.textureLocation, this.texture);

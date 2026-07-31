@@ -14,6 +14,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.Panorama;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
@@ -25,6 +26,7 @@ import java.util.function.Supplier;
 
 public class ScreenshotGridWidget extends GalleryWidget {
     public static final int GRID_ENTRY_WIDTH = 144;
+    public static final int GRID_ENTRY_HEIGHT = 81;
 
     public ScreenshotGridWidget(
             Minecraft client,
@@ -35,7 +37,7 @@ public class ScreenshotGridWidget extends GalleryWidget {
             GalleryTexture.Type textureType,
             Screen parent
     ) {
-        super(client, width, height, y, 81, findScreenshots, previous, textureType, parent);
+        super(client, width, height, y, GRID_ENTRY_HEIGHT, findScreenshots, previous, textureType, parent);
     }
 
     private int getColumnCount() {
@@ -145,7 +147,7 @@ public class ScreenshotGridWidget extends GalleryWidget {
 
             int centreX = getContentX() + getContentWidth() / 2;
             int centreY = getContentY() + getContentHeight() / 2;
-            
+
             clickThroughHovered = SnapperUtil.inBoundingBox(centreX - 16, centreY - 16, 32, 32, mouseX, mouseY);
 
             if (this.texture.isLoaded()) {
@@ -172,14 +174,35 @@ public class ScreenshotGridWidget extends GalleryWidget {
                         );
                     }
                     case ScreenshotTexture _ -> {
+
+
+                        float ratio = Math.min(
+                                (float) getContentWidth() / texture.getWidth(),
+                                (float) getContentHeight() / texture.getHeight()
+                        );
+
+                        int finalWidth = Mth.floor(texture.getWidth() * ratio);
+                        int finalHeight = Mth.floor(texture.getHeight() * ratio);
+
+                        if (finalWidth != getContentWidth() || finalHeight != getContentHeight()) {
+                            graphics.blit(
+                                    RenderPipelines.GUI_TEXTURED,
+                                    Identifier.withDefaultNamespace("textures/gui/inworld_menu_background.png"),
+                                    getContentX(), getContentY(),
+                                    0, 0,
+                                    getContentWidth(), getContentHeight(),
+                                    32, 32
+                            );
+                        }
+
                         graphics.blit(
                                 RenderPipelines.GUI_TEXTURED,
                                 this.texture.textureLocation,
-                                getContentX(), getContentY(),
+                                getContentX() + (getContentWidth() / 2) - (finalWidth / 2),
+                                getContentY() + (getContentHeight() / 2) - (finalHeight / 2),
                                 0, 0,
-                                getContentWidth(), getContentHeight(),
-                                texture.getWidth(), texture.getHeight(),
-                                texture.getWidth(), texture.getHeight()
+                                finalWidth, finalHeight,
+                                finalWidth, finalHeight
                         );
                     }
                 }
