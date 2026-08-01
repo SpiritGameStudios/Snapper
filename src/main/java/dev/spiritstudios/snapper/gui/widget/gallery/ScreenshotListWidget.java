@@ -1,5 +1,6 @@
 package dev.spiritstudios.snapper.gui.widget.gallery;
 
+import dev.spiritstudios.snapper.SnapperComponents;
 import dev.spiritstudios.snapper.render.texture.GalleryTexture;
 import dev.spiritstudios.snapper.render.texture.PanoramaTexture;
 import dev.spiritstudios.snapper.render.texture.ScreenshotTexture;
@@ -61,7 +62,7 @@ public class ScreenshotListWidget extends GalleryWidget {
 
             graphics.text(
                     minecraft.font,
-                    ComponentRenderUtils.clipText(fileName, minecraft.font, getContentWidth() - 32 - 6),
+                    SnapperComponents.clipTextIfNeeded(fileName, minecraft.font, getContentWidth() - 32 - 6),
                     getContentX() + 32 + 3, getContentY() + 1,
                     CommonColors.WHITE,
                     true
