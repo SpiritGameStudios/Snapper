@@ -40,6 +40,7 @@ public abstract class PauseScreenMixin extends Screen {
                 this.minecraft.gui.setScreen(new GalleryScreen(this));
             }));
         }
+
         if (SnapperConfig.get().showScreenshotHelper()) {
             iconButtonRow.addChild(new SpriteIconButton.CenteredIcon(
                     20, 20,
